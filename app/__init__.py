@@ -69,3 +69,4 @@ def _seed_data():
         db.session.bulk_save_objects(default_expenses)
         
     db.session.commit()
+app = create_app()
