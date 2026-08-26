@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Terms of Service & Privacy Policy | Jackiecutz Hair Studio{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-black text-zinc-300 py-10 px-4 sm:px-6 flex justify-center selection:bg-amber-400 selection:text-black">
+    <div class="max-w-2xl w-full bg-black border border-amber-500/40 rounded-3xl p-6 sm:p-10 shadow-[0_0_50px_rgba(218,165,32,0.18)]">
+        
+        <!-- Header Logo -->
+        <div class="flex justify-center mb-6">
+            <img src="/static/img/card_bg.jpg" alt="Jackiecutz Hair Studio" class="h-28 object-contain">
+        </div>
+
+        <h1 class="text-xl font-bold text-amber-400 uppercase tracking-widest text-center mb-2">Studio Policies, Terms & Privacy</h1>
+        <p class="text-[11px] text-zinc-500 text-center uppercase tracking-wider mb-8">Jackiecutz Hair Studio • Divine Salon Suite 105</p>
+
+        <div class="space-y-6 text-xs leading-relaxed text-zinc-300">
+            <!-- 1. Right to Refuse Service -->
+            <section class="border-b border-zinc-900 pb-5">
+                <h2 class="text-amber-400 font-bold uppercase tracking-wider text-xs mb-2">1. Right to Refuse Service</h2>
+                <p>Jackiecutz Hair Studio reserves the right to refuse service to anyone demonstrating disruptive behavior, intoxication, non-compliance with health or safety protocols, or requests that compromise scalp or hair integrity.</p>
+            </section>
+
+            <!-- 2. Privacy & Promotional Consent -->
+            <section class="border-b border-zinc-900 pb-5">
+                <h2 class="text-amber-400 font-bold uppercase tracking-wider text-xs mb-2">2. Privacy, Communications & Marketing Consent</h2>
+                <p class="mb-2">By creating an account, you expressly consent to receive salon communications from Jackiecutz Hair Studio, including:</p>
+                <ul class="list-disc pl-5 space-y-1 text-zinc-400">
+                    <li>Appointment confirmations, waitlist reminders, and schedule updates via SMS and Phone.</li>
+                    <li>Exclusive promotional offers, seasonal discounts, and birthday specials delivered via Email, SMS, and in-app notifications.</li>
+                    <li>Industry-standard record keeping of styling preferences and service history to ensure tailored hair care.</li>
+                </ul>
+                <p class="mt-2 text-zinc-500 text-[11px]">We value your privacy. Your personal information will never be sold, rented, or distributed to third-party advertisers.</p>
+            </section>
+
+            <!-- 3. Scheduling & Grace Periods -->
+            <section class="border-b border-zinc-900 pb-5">
+                <h2 class="text-amber-400 font-bold uppercase tracking-wider text-xs mb-2">3. Appointments, Grace Window & Cancellations</h2>
+                <p>We provide a <strong>10-minute grace window</strong> for all scheduled bookings. Arrivals beyond 10 minutes may need to be rescheduled or transitioned to walk-in status to protect other client reservations. We respectfully request at least <strong>2 hours advance notice</strong> for any cancellation or schedule change.</p>
+            </section>
+
+            <!-- 4. Chemical Services & Health Disclaimer -->
+            <section class="border-b border-zinc-900 pb-5">
+                <h2 class="text-amber-400 font-bold uppercase tracking-wider text-xs mb-2">4. Chemical Services & Health Disclosure</h2>
+                <p>Clients receiving color, bleach, or intensive treatments must disclose any known skin allergies, sensitivities, or previous home hair coloring history. Strand tests and patch consultations may be required prior to service.</p>
+            </section>
+
+            <!-- 5. Payments Accepted -->
+            <section class="pb-2">
+                <h2 class="text-amber-400 font-bold uppercase tracking-wider text-xs mb-2">5. Payments & Gratuities</h2>
+                <p>Payments are collected upon completion of service. Cash is preferred; Zelle, Cash App, and major Debit/Credit cards are welcomed.</p>
+            </section>
+        </div>
+
+        <!-- Close / Return -->
+        <div class="mt-8 pt-6 border-t border-zinc-900 text-center">
+            <button onclick="window.close()" class="bg-gradient-to-r from-amber-500 to-amber-300 hover:from-amber-400 hover:to-amber-200 text-black font-extrabold px-6 py-2.5 rounded-xl uppercase tracking-wider text-xs transition">
+                Close Terms Window
+            </button>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

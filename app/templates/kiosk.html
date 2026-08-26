@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Walk-In Sign In | Jackiecutz Hair Studio{% endblock %}
+{% block content %}
+<div class="min-h-screen flex flex-col justify-center items-center px-4 bg-black py-8 selection:bg-amber-400 selection:text-black">
+    <div class="max-w-md w-full bg-black border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(218,165,32,0.25)] text-center relative">
+        
+        <!-- Header Logo -->
+        <div class="relative overflow-hidden mb-4 bg-transparent border-0 outline-none">
+            <img src="/static/img/card_bg.jpg" alt="Jackiecutz Hair Studio" class="w-full object-contain block border-0 outline-none shadow-none">
+        </div>
+
+        <div class="mb-4">
+            <h1 class="text-base font-black text-amber-400 uppercase tracking-widest">Walk-In Check-In Terminal</h1>
+            <p class="text-xs text-zinc-400 mt-0.5">Please sign in to join today's active chair waitlist.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, msg in messages %}
+              <div class="mb-4 p-3 rounded-xl text-xs bg-red-500/10 text-red-400 border border-red-500/20">
+                {{ msg }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('main.walkin_kiosk') }}" class="space-y-3.5 text-left">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">First Name</label>
+                    <input type="text" name="first_name" required placeholder="First" 
+                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Last Name</label>
+                    <input type="text" name="last_name" required placeholder="Last" 
+                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Phone Number</label>
+                <input type="tel" name="phone" id="kiosk-phone" required placeholder="832-000-0000" maxlength="12"
+                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Email Address <span class="text-[10px] text-zinc-500 font-normal lowercase">(for app link & receipt)</span></label>
+                <input type="email" name="email" required placeholder="name@example.com" 
+                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+                <div class="col-span-1">
+                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Zip Code</label>
+                    <input type="text" name="zip_code" placeholder="77073" maxlength="5"
+                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Select Service</label>
+                    <select name="service_id" required class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
+                        {% for s in services %}
+                        <option value="{{ s.id }}">{{ s.name }} — ${{ "%.2f"|format(s.price) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-300 hover:from-amber-400 hover:to-amber-200 text-black font-black py-3.5 rounded-xl uppercase tracking-wider text-xs shadow-lg mt-3 transition">
+                Sign In & Join Waitlist ✂️
+            </button>
+        </form>
+
+        <div class="mt-5 pt-3 border-t border-zinc-900 text-center">
+            <p class="text-[10px] text-zinc-500">Jackiecutz Hair Studio • Ivonne Gonzalez • Divine Salon Suite 105</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('kiosk-phone').addEventListener('input', function (e) {
+    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+    e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+});
+</script>
+{% endblock %}

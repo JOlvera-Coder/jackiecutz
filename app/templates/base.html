@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Jackiecutz Hair Studio{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Bebas+Neue&family=Orbitron:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .font-ivonne {
+            font-family: 'Alex Brush', cursive;
+        }
+        .font-studio {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0.35em;
+        }
+        .font-contact {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.06em;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fcf6ba 0%, #d4af37 35%, #b38728 65%, #aa771c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .silver-gradient-text {
+            background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-black text-zinc-100 min-h-screen font-sans selection:bg-amber-400 selection:text-black">
+    {% block content %}{% endblock %}
+</body>
+</html>

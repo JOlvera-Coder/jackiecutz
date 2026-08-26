@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen py-12 px-4 flex justify-center items-center">
+    <div class="max-w-md w-full bg-zinc-950 border border-amber-500/30 rounded-3xl p-8 text-center shadow-2xl">
+        <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold border border-emerald-500/20">
+            ✓
+        </div>
+        <h1 class="text-2xl font-bold text-white mb-2">You are on the Schedule!</h1>
+        <p class="text-zinc-400 text-sm mb-6">We sent an SMS reminder to <span class="text-white font-mono">{{ booking.customer.phone }}</span>.</p>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-left space-y-2 mb-6">
+            <div class="flex justify-between">
+                <span class="text-zinc-400 text-sm">Client:</span>
+                <span class="text-white font-medium text-sm">{{ booking.customer.name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-zinc-400 text-sm">Service:</span>
+                <span class="text-amber-400 font-medium text-sm">{{ booking.service.name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-zinc-400 text-sm">Time:</span>
+                <span class="text-white font-medium text-sm">{{ booking.scheduled_time.strftime('%b %d at %I:%M %p') }}</span>
+            </div>
+        </div>
+        <a href="{{ url_for('main.client_portal') }}" class="text-xs text-amber-400 hover:underline">← Book another cut</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}You're On The List! | Jackiecutz{% endblock %}
+{% block content %}
+<div class="min-h-screen flex flex-col justify-center items-center px-4 bg-black py-8 selection:bg-amber-400 selection:text-black">
+    <div class="max-w-md w-full bg-black border border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(16,185,129,0.2)] text-center space-y-5">
+        
+        <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto text-3xl">
+            ✨
+        </div>
+
+        <div>
+            <h1 class="text-xl font-black text-white uppercase tracking-wider">You're Checked In!</h1>
+            <p class="text-xs text-amber-400 font-bold mt-1">Welcome, {{ customer_name }}</p>
+            <p class="text-xs text-zinc-400 mt-2">Your stylist Ivonne will call you up to the chair shortly.</p>
+        </div>
+
+        <!-- App Download Notification Card -->
+        <div class="bg-zinc-950 border border-amber-500/30 rounded-2xl p-4 text-left space-y-2">
+            <div class="flex items-center gap-2">
+                <span class="text-lg">📲</span>
+                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Customer App Link Sent!</span>
+            </div>
+            <p class="text-[11px] text-zinc-300 leading-relaxed">
+                We just dispatched your private direct booking link to <strong class="text-white font-mono">{{ email }}</strong>.
+            </p>
+            <p class="text-[10px] text-zinc-500">
+                Install our web app to browse services, check wait times live, and unlock exclusive client promos.
+            </p>
+        </div>
+
+        <div class="space-y-2 pt-2">
+            <a href="{{ url_for('main.client_portal') }}" class="block w-full bg-gradient-to-r from-amber-500 to-amber-300 hover:from-amber-400 hover:to-amber-200 text-black font-black py-3 rounded-xl uppercase tracking-wider text-xs transition shadow-lg">
+                Open Client App Now ↗
+            </a>
+            <a href="{{ url_for('main.walkin_kiosk') }}" class="block w-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-400 py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition">
+                Check In Another Guest
+            </a>
+        </div>
+
+        <p class="text-[10px] text-zinc-600 font-mono">Terminal resets automatically in 15 seconds.</p>
+    </div>
+</div>
+
+<script>
+setTimeout(function() {
+    window.location.href = "{{ url_for('main.walkin_kiosk') }}";
+}, 15000);
+</script>
+{% endblock %}

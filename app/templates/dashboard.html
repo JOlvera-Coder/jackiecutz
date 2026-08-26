@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+{% block title %}Owner Command Center & Analytics Matrix | Jackiecutz{% endblock %}
+{% block content %}
+<!-- Include Chart.js for Live Visual Analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="min-h-screen bg-black text-white p-3 sm:p-6 selection:bg-amber-400 selection:text-black">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Top Header Navigation -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-zinc-950 border border-amber-500/30 rounded-3xl p-5 shadow-[0_0_40px_rgba(218,165,32,0.15)] gap-4">
+            <div class="flex items-center gap-4">
+                <img src="/static/img/card_bg.jpg" alt="Jackiecutz" class="h-12 object-contain rounded-lg">
+                <div>
+                    <h1 class="text-lg font-black text-amber-400 uppercase tracking-widest">Command Center & Analytics Matrix</h1>
+                    <p class="text-xs text-zinc-400">Ivonne Gonzalez • Divine Salon Suite 105</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <a href="{{ url_for('main.export_tax_csv') }}" class="text-xs bg-emerald-500/10 border border-emerald-400 text-emerald-300 hover:bg-emerald-400 hover:text-black px-3 py-2 rounded-xl transition font-extrabold uppercase">
+                    📑 1-Click Tax Export (CSV) ⬇
+                </a>
+                <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="text-xs bg-amber-500/10 border border-amber-400 text-amber-300 hover:bg-amber-400 hover:text-black px-3 py-2 rounded-xl transition font-extrabold uppercase">
+                    📱 Kiosk Terminal ↗
+                </a>
+                <a href="{{ url_for('main.client_portal') }}" class="text-xs bg-zinc-900 border border-zinc-700 hover:border-amber-400 text-zinc-300 hover:text-white px-3 py-2 rounded-xl transition font-bold">
+                    Client App ↗
+                </a>
+                <a href="{{ url_for('main.logout') }}" class="text-xs bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 px-3 py-2 rounded-xl transition font-bold">
+                    Sign Out
+                </a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, msg in messages %}
+              <div class="p-3 rounded-2xl text-xs {% if category == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+                {{ msg }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- 1. HIGH-LEVEL KPI METRICS -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-zinc-950 border border-amber-500/40 p-4 rounded-2xl">
+                <p class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Gross Revenue (YTD)</p>
+                <p class="text-2xl font-black text-amber-400 mt-1">${{ "%.2f"|format(gross_revenue) }}</p>
+            </div>
+            <div class="bg-zinc-950 border border-red-500/30 p-4 rounded-2xl">
+                <p class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Total Studio Overhead</p>
+                <p class="text-2xl font-black text-red-400 mt-1">${{ "%.2f"|format(total_overhead) }}</p>
+            </div>
+            <div class="bg-zinc-950 border border-emerald-500/40 p-4 rounded-2xl">
+                <p class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Net Taxable Profit</p>
+                <p class="text-2xl font-black text-emerald-400 mt-1">${{ "%.2f"|format(net_income) }}</p>
+            </div>
+            <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl">
+                <p class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Active Queue / Walk-Ins</p>
+                <p class="text-2xl font-black text-white mt-1">{{ bookings|length }}</p>
+            </div>
+        </div>
+
+        <!-- 2. LIVE PIE CHARTS & VISUAL ANALYTICS MATRIX -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Pie Chart 1: Customer Traffic & Acquisition Channels -->
+            <div class="bg-zinc-950 border border-amber-500/30 p-5 rounded-3xl space-y-3">
+                <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
+                    <h3 class="text-xs font-black uppercase text-amber-400 tracking-wider">📢 Live Traffic Acquisition</h3>
+                    <span class="text-[10px] text-zinc-500 font-mono">Marketing ROI</span>
+                </div>
+                <div class="relative h-48 flex items-center justify-center">
+                    <canvas id="chartAcquisition"></canvas>
+                </div>
+            </div>
+
+            <!-- Pie Chart 2: Client Geographic Density (Zip Codes) -->
+            <div class="bg-zinc-950 border border-amber-500/30 p-5 rounded-3xl space-y-3">
+                <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
+                    <h3 class="text-xs font-black uppercase text-amber-400 tracking-wider">📍 Geographic Density Map</h3>
+                    <span class="text-[10px] text-zinc-500 font-mono">Top Zip Codes</span>
+                </div>
+                <div class="relative h-48 flex items-center justify-center">
+                    <canvas id="chartZipCodes"></canvas>
+                </div>
+            </div>
+
+            <!-- Bar Chart 3: Revenue vs Overhead Ratio -->
+            <div class="bg-zinc-950 border border-amber-500/30 p-5 rounded-3xl space-y-3">
+                <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
+                    <h3 class="text-xs font-black uppercase text-amber-400 tracking-wider">⚖️ Revenue vs Overhead</h3>
+                    <span class="text-[10px] text-zinc-500 font-mono">Profit Margin</span>
+                </div>
+                <div class="relative h-48 flex items-center justify-center">
+                    <canvas id="chartFinancials"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 3. INVENTORY CONTROL, PURCHASE ORDERS & RETAIL POS MODULE -->
+        <div class="bg-zinc-950 border border-amber-500/40 rounded-3xl p-5 shadow-[0_0_30px_rgba(218,165,32,0.1)] space-y-5">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-zinc-900 pb-3">
+                <div>
+                    <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                        <span>📦 Retail Inventory & Purchase Order (PO) Engine</span>
+                        <span class="bg-amber-400/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-mono">{{ products|length }} Items In Stock</span>
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">Manage products, wholesale costs, retail pricing, create/receive POs, and sync items with Kiosk/App.</p>
+                </div>
+            </div>
+
+            <!-- Products Inventory Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {% for p in products %}
+                <div class="bg-black border border-zinc-800 p-4 rounded-2xl space-y-3 relative">
+                    <div class="flex gap-3">
+                        <img src="{{ p.image_url }}" alt="{{ p.name }}" class="w-12 h-12 rounded-xl object-cover border border-zinc-700">
+                        <div class="flex-1">
+                            <p class="text-xs font-bold text-white">{{ p.name }}</p>
+                            <p class="text-[10px] text-amber-400 font-mono">SKU: {{ p.sku }}</p>
+                            <p class="text-[10px] text-zinc-400 mt-0.5">Wholesale: <strong class="text-zinc-300">${{ "%.2f"|format(p.wholesale_cost) }}</strong> • Retail: <strong class="text-emerald-400">${{ "%.2f"|format(p.retail_price) }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-zinc-950 p-2 rounded-xl border border-zinc-900 text-xs">
+                        <span class="text-[10px] text-zinc-400 font-bold uppercase">In Stock:</span>
+                        <span class="font-mono font-black {% if p.stock_qty <= p.low_stock_threshold %}text-red-400{% else %}text-white{% endif %}">
+                            {{ p.stock_qty }} Units {% if p.stock_qty <= p.low_stock_threshold %}(Low){% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Quick Edit Product Form -->
+                    <form method="POST" action="{{ url_for('main.edit_product', product_id=p.id) }}" class="space-y-2 text-[10px] border-t border-zinc-900 pt-2">
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <div>
+                                <label class="text-zinc-500 block">Retail Price ($)</label>
+                                <input type="number" step="0.01" name="retail_price" value="{{ p.retail_price }}" class="w-full bg-[#fffee0] text-black font-bold p-1 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-zinc-500 block">Adjust Stock Qty</label>
+                                <input type="number" name="stock_qty" value="{{ p.stock_qty }}" class="w-full bg-[#fffee0] text-black font-bold p-1 rounded-lg">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full py-1 bg-zinc-900 hover:bg-amber-400 hover:text-black text-amber-300 font-bold rounded-lg transition uppercase">
+                            Update Product
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+
+                <!-- Add New Product Form -->
+                <form method="POST" action="{{ url_for('main.add_product') }}" class="bg-zinc-950/60 border border-dashed border-amber-500/40 p-4 rounded-2xl space-y-2 text-left">
+                    <span class="text-xs font-bold text-amber-300 uppercase tracking-wider block">+ Add New Product</span>
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="text" name="sku" required placeholder="SKU (e.g. JC-WAX-04)" class="w-full bg-[#fffee0] p-1.5 rounded-lg text-black text-xs font-medium">
+                        <input type="text" name="name" required placeholder="Product Name" class="w-full bg-[#fffee0] p-1.5 rounded-lg text-black text-xs font-medium">
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <input type="number" step="0.01" name="wholesale_cost" placeholder="Cost ($)" class="w-full bg-[#fffee0] p-1.5 rounded-lg text-black text-xs font-medium">
+                        <input type="number" step="0.01" name="retail_price" placeholder="Retail ($)" class="w-full bg-[#fffee0] p-1.5 rounded-lg text-black text-xs font-medium">
+                        <input type="number" name="stock_qty" placeholder="Qty" class="w-full bg-[#fffee0] p-1.5 rounded-lg text-black text-xs font-medium">
+                    </div>
+                    <input type="text" name="description" placeholder="Description..." class="w-full bg-[#fffee0] p-1.5 rounded-lg text-black text-xs font-medium">
+                    <button type="submit" class="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-300 text-black font-extrabold rounded-xl text-xs uppercase tracking-wider transition">
+                        Save Product to Catalog
+                    </button>
+                </form>
+            </div>
+
+            <!-- Purchase Orders (PO) Table & Create PO -->
+            <div class="pt-4 border-t border-zinc-900 space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-black uppercase text-amber-400 tracking-wider">📋 Supplier Purchase Orders (POs)</h3>
+                </div>
+
+                <!-- Create New PO Form -->
+                <form method="POST" action="{{ url_for('main.create_purchase_order') }}" class="grid grid-cols-1 sm:grid-cols-5 gap-2 bg-black p-3 rounded-2xl border border-zinc-850 text-xs">
+                    <input type="text" name="supplier_name" required placeholder="Supplier / Vendor" class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                    <select name="product_id" required class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                        {% for p in products %}
+                        <option value="{{ p.id }}">{{ p.name }} ({{ p.sku }})</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="quantity" required placeholder="Qty" class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                    <input type="number" step="0.01" name="unit_cost" required placeholder="Unit Cost ($)" class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                    <button type="submit" class="bg-amber-400 hover:bg-amber-300 text-black font-black p-2 rounded-xl uppercase tracking-wider">
+                        Create PO ➔
+                    </button>
+                </form>
+
+                <!-- PO List Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-zinc-300">
+                        <thead class="bg-black text-[10px] text-amber-400 uppercase tracking-wider border-b border-zinc-850">
+                            <tr>
+                                <th class="p-2.5">PO Number</th>
+                                <th class="p-2.5">Supplier</th>
+                                <th class="p-2.5">Item</th>
+                                <th class="p-2.5">Quantity</th>
+                                <th class="p-2.5">Total Cost</th>
+                                <th class="p-2.5">Status</th>
+                                <th class="p-2.5 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-zinc-900 font-mono text-[11px]">
+                            {% for po in purchase_orders %}
+                            <tr class="hover:bg-zinc-900/40 transition">
+                                <td class="p-2.5 font-bold text-white">{{ po.po_number }}</td>
+                                <td class="p-2.5 text-zinc-300 font-sans">{{ po.supplier_name }}</td>
+                                <td class="p-2.5 text-amber-300 font-sans">{{ po.product.name }}</td>
+                                <td class="p-2.5">{{ po.quantity }} units</td>
+                                <td class="p-2.5 font-bold text-emerald-400">${{ "%.2f"|format(po.total_cost) }}</td>
+                                <td class="p-2.5">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase {% if po.status.value == 'received' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/30{% elif po.status.value == 'pending' %}bg-amber-500/10 text-amber-300 border border-amber-500/30{% else %}bg-zinc-800 text-zinc-400{% endif %}">
+                                        {{ po.status.value }}
+                                    </span>
+                                </td>
+                                <td class="p-2.5 text-right space-x-1 font-sans">
+                                    {% if po.status.value == 'pending' %}
+                                    <form method="POST" action="{{ url_for('main.receive_purchase_order', po_id=po.id) }}" class="inline">
+                                        <button type="submit" class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-black text-[10px] font-bold rounded-lg uppercase">
+                                            Receive & Restock 📦
+                                        </button>
+                                    </form>
+                                    {% elif po.status.value == 'received' %}
+                                    <form method="POST" action="{{ url_for('main.close_purchase_order', po_id=po.id) }}" class="inline">
+                                        <button type="submit" class="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] font-bold rounded-lg uppercase">
+                                            Close PO
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="p-4 text-center text-zinc-500 font-sans">No Purchase Orders logged yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. STUDIO OVERHEAD EXPENSE TRACKER & TAX DEDUCTIONS -->
+        <div class="bg-zinc-950 border border-amber-500/40 rounded-3xl p-5 shadow-[0_0_30px_rgba(218,165,32,0.1)] space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-zinc-900 pb-3">
+                <div>
+                    <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                        <span>🏢 Studio Overhead & Tax-Deductible Expenses</span>
+                        <span class="bg-red-500/20 text-red-300 text-[10px] px-2 py-0.5 rounded-full font-mono">${{ "%.2f"|format(total_overhead) }} Total YTD</span>
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-0.5">Track rent, utilities, booth equipment, barber supplies, and marketing for IRS Schedule C filing.</p>
+                </div>
+            </div>
+
+            <!-- Add Expense Form -->
+            <form method="POST" action="{{ url_for('main.add_expense') }}" class="grid grid-cols-1 sm:grid-cols-5 gap-2 bg-black p-3 rounded-2xl border border-zinc-850 text-xs">
+                <input type="text" name="title" required placeholder="Expense Title / Description" class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                <select name="category" required class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                    <option value="rent">Rent / Booth Lease</option>
+                    <option value="supplies">Barber Supplies / Products</option>
+                    <option value="utilities">Utilities / Internet</option>
+                    <option value="equipment">Tools & Equipment</option>
+                    <option value="marketing">Marketing & Social Ads</option>
+                    <option value="insurance">Insurance</option>
+                    <option value="other">Other Overhead</option>
+                </select>
+                <input type="number" step="0.01" name="amount" required placeholder="Amount ($)" class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                <input type="text" name="vendor" placeholder="Vendor / Payee" class="bg-[#fffee0] text-black p-2 rounded-xl font-medium">
+                <button type="submit" class="bg-red-500/20 border border-red-500/50 hover:bg-red-500/30 text-red-300 font-black p-2 rounded-xl uppercase tracking-wider">
+                    Log Expense ➔
+                </button>
+            </form>
+
+            <!-- Expense Ledger Table -->
+            <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                <table class="w-full text-left text-xs text-zinc-300">
+                    <thead class="bg-black text-[10px] text-amber-400 uppercase tracking-wider border-b border-zinc-850 sticky top-0">
+                        <tr>
+                            <th class="p-2.5">Date</th>
+                            <th class="p-2.5">Category</th>
+                            <th class="p-2.5">Title / Vendor</th>
+                            <th class="p-2.5">Amount</th>
+                            <th class="p-2.5">Tax Deductible</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-900 font-mono text-[11px]">
+                        {% for exp in expenses %}
+                        <tr class="hover:bg-zinc-900/40 transition">
+                            <td class="p-2.5 text-zinc-500">{{ exp.expense_date.strftime('%m/%d/%Y') }}</td>
+                            <td class="p-2.5 font-sans"><span class="bg-zinc-900 px-2 py-0.5 rounded text-[10px] text-amber-300">{{ exp.category.value.capitalize() }}</span></td>
+                            <td class="p-2.5 font-sans font-bold text-white">{{ exp.title }} {% if exp.vendor %}<span class="text-zinc-500 font-normal">({{ exp.vendor }})</span>{% endif %}</td>
+                            <td class="p-2.5 font-black text-red-400">${{ "%.2f"|format(exp.amount) }}</td>
+                            <td class="p-2.5"><span class="text-emerald-400 font-bold">YES (100%)</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. STYLIST PERFORMANCE & COMMISSION MATRIX -->
+        <div class="bg-zinc-950 border border-amber-500/40 rounded-3xl p-5 shadow-[0_0_30px_rgba(218,165,32,0.1)] space-y-4">
+            <div class="border-b border-zinc-900 pb-3">
+                <h2 class="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                    <span>✂️ Stylist Performance & Commission Ledger</span>
+                </h2>
+                <p class="text-xs text-zinc-400 mt-0.5">Track production, completed services, gross volume, and commission splits per stylist.</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-zinc-300">
+                    <thead class="bg-black text-[10px] text-amber-400 uppercase tracking-wider border-b border-zinc-850">
+                        <tr>
+                            <th class="p-3">Stylist Name</th>
+                            <th class="p-3">Role</th>
+                            <th class="p-3">Commission Rate</th>
+                            <th class="p-3">Completed Services</th>
+                            <th class="p-3">Gross Sales</th>
+                            <th class="p-3">Payout Due</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-900 font-mono text-[11px]">
+                        {% for sm in stylist_matrix %}
+                        <tr class="hover:bg-zinc-900/40 transition">
+                            <td class="p-3 font-bold font-sans text-white">{{ sm.name }}</td>
+                            <td class="p-3 font-sans text-amber-300 capitalize">{{ sm.role }}</td>
+                            <td class="p-3">{{ sm.rate }}%</td>
+                            <td class="p-3">{{ sm.cuts_completed }} cuts</td>
+                            <td class="p-3 font-bold text-white">${{ "%.2f"|format(sm.gross_sales) }}</td>
+                            <td class="p-3 font-black text-emerald-400">${{ "%.2f"|format(sm.payout_due) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Chart.js Real-Time Rendering Scripts -->
+<script>
+// 1. Acquisition Traffic Pie Chart
+const ctxChannel = document.getElementById('chartAcquisition').getContext('2d');
+new Chart(ctxChannel, {
+    type: 'doughnut',
+    data: {
+        labels: {{ chart_channel_labels|tojson }},
+        datasets: [{
+            data: {{ chart_channel_data|tojson }},
+            backgroundColor: ['#f59e0b', '#3b82f6', '#ec4899', '#10b981', '#8b5cf6', '#6b7280'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom', labels: { color: '#d1d5db', font: { size: 10 } } }
+        }
+    }
+});
+
+// 2. Top Zip Codes Density Pie Chart
+const ctxZip = document.getElementById('chartZipCodes').getContext('2d');
+new Chart(ctxZip, {
+    type: 'pie',
+    data: {
+        labels: {{ chart_zip_labels|tojson }},
+        datasets: [{
+            data: {{ chart_zip_data|tojson }},
+            backgroundColor: ['#eab308', '#f97316', '#06b6d4', '#84cc16', '#a855f7'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom', labels: { color: '#d1d5db', font: { size: 10 } } }
+        }
+    }
+});
+
+// 3. Financials & Profit Margin Bar Chart
+const ctxFin = document.getElementById('chartFinancials').getContext('2d');
+new Chart(ctxFin, {
+    type: 'bar',
+    data: {
+        labels: ['Gross Revenue', 'Overhead Expenses', 'Net Profit'],
+        datasets: [{
+            data: [{{ gross_revenue }}, {{ total_overhead }}, {{ net_income }}],
+            backgroundColor: ['#f59e0b', '#ef4444', '#10b981'],
+            borderRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { color: '#27272a' } },
+            x: { ticks: { color: '#d1d5db', font: { size: 10 } }, grid: { display: false } }
+        }
+    }
+});
+</script>
+{% endblock %}
