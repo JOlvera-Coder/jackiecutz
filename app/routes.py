@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from app import db
-from app.models import User, Customer, BarberBooking
+from app.models import User, Customer, BarberBooking, BarberService
 from werkzeug.security import check_password_hash
 import re
 
@@ -78,7 +78,7 @@ def register():
             'birthday': birthday
         }
 
-        # Required fields validation
+        # Field validation
         missing = []
         if not first_name and not full_name:
             missing.append("First Name")
@@ -93,8 +93,9 @@ def register():
 
         existing = Customer.query.filter(Customer.phone == phone).first()
         if existing:
-            flash("An account with that phone number already exists. Please log in.", "warning")
-            return redirect(url_for('main.login'))
+            session['customer_id'] = existing.id
+            flash(f"Welcome back, {existing.name}!", "info")
+            return redirect(url_for('main.customer_portal'))
 
         new_customer = Customer(
             name=full_name,
@@ -107,7 +108,7 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Route straight to Customer Portal without error
+        # Route client directly into customer app
         session['customer_id'] = new_customer.id
         flash(f"Welcome to Jackiecutz, {first_name or full_name}!", "success")
         return redirect(url_for('main.customer_portal'))
@@ -115,26 +116,21 @@ def register():
     return render_template('register.html', form_data=form_data)
 
 @main_bp.route('/customer/portal')
+@main_bp.route('/book')
+@main_bp.route('/booking')
 def customer_portal():
     customer_id = session.get('customer_id')
-    if not customer_id:
-        flash("Please log in to access your profile.", "warning")
-        return redirect(url_for('main.login'))
-
-    customer = Customer.query.get(customer_id)
-    if not customer:
-        session.pop('customer_id', None)
-        return redirect(url_for('main.login'))
-
-    # Load customer bookings safely
+    customer = Customer.query.get(customer_id) if customer_id else None
+    
     try:
-        bookings = customer.bookings.all()
+        services = BarberService.query.all()
     except Exception:
-        bookings = BarberBooking.query.filter_by(customer_id=customer.id).all()
+        services = []
 
-    return render_template('customer_portal.html', customer=customer, bookings=bookings)
+    return render_template('booking.html', customer=customer, services=services)
 
 @main_bp.route('/stylist/dashboard')
+@main_bp.route('/admin')
 def stylist_dashboard():
     search_query = request.args.get('q', '').strip()
     search_digits = clean_phone(search_query)
@@ -151,18 +147,26 @@ def stylist_dashboard():
         customers = Customer.query.order_by(Customer.created_at.desc()).all()
 
     try:
-        bookings = BarberBooking.query.order_by(BarberBooking.created_at.desc()).all()
+        bookings = BarberBooking.query.order_by(Customer.created_at.desc()).all()
     except Exception:
         bookings = BarberBooking.query.all()
 
-    return render_template('admin_dashboard.html', customers=customers, bookings=bookings, search_query=search_query)
+    return render_template('dashboard.html', customers=customers, bookings=bookings, search_query=search_query)
 
 @main_bp.route('/kiosk')
 def kiosk():
     return render_template('kiosk.html')
 
+@main_bp.route('/kiosk/success')
+def kiosk_success():
+    return render_template('kiosk_success.html')
+
 @main_bp.route('/terms')
 def terms():
+    return render_template('terms.html')
+
+@main_bp.route('/privacy')
+def privacy():
     return render_template('terms.html')
 
 @main_bp.route('/forgot-password', methods=['GET', 'POST'])
