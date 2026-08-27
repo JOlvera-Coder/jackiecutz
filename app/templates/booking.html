@@ -1,816 +1,175 @@
-{% extends 'base.html' %}
-{% block title %}Jackiecutz Hair Studio | Ivonne Gonzalez{% endblock %}
+{% extends "base.html" %}
+{% block title %}Book Appointment - Jackiecutz Hair Studio{% endblock %}
 {% block content %}
-<div class="min-h-screen bg-black text-white flex flex-col items-center justify-center p-3 sm:p-6 selection:bg-amber-400 selection:text-black relative">
-    
-    <div class="max-w-xl w-full bg-black border border-amber-500/30 rounded-3xl p-4 sm:p-8 shadow-[0_0_60px_rgba(218,165,32,0.18)] text-center relative overflow-hidden">
-        
-        <!-- Top Navigation Bar -->
-        <div class="flex justify-between items-center mb-4 pb-2 border-b border-zinc-900">
-            <div class="flex items-center gap-2.5">
-                <button type="button" onclick="openDrawer()" class="p-1.5 rounded-xl bg-zinc-950 border border-amber-500/40 hover:border-amber-400 text-amber-400 hover:text-amber-300 transition flex flex-col justify-center items-center gap-1 w-9 h-9" title="Open Account Menu">
-                    <span class="w-4 h-0.5 bg-amber-400 rounded-full block"></span>
-                    <span class="w-4 h-0.5 bg-amber-400 rounded-full block"></span>
-                    <span class="w-4 h-0.5 bg-amber-400 rounded-full block"></span>
-                </button>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 
-                <span class="text-xs text-amber-400 font-bold" id="txt-welcome">Welcome, {{ session.get('user_name', 'Client') }} ✨</span>
-                {% if session.get('user_role') in ['owner', 'stylist'] %}
-                <a href="{{ url_for('main.stylist_dashboard') }}" class="text-[11px] bg-amber-500/10 border border-amber-500/40 text-amber-300 px-2.5 py-0.5 rounded-md hover:bg-amber-500/20 transition font-semibold" id="txt-admin-btn">
-                    Admin ⚙️
-                </a>
-                {% endif %}
+<style>
+  body { background-color: #050505; color: #f3f3f3; font-family: 'Montserrat', sans-serif; }
+  .gold-gradient-text { background: linear-gradient(135deg, #f5d77f 0%, #c89e4b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .gold-btn { background: linear-gradient(135deg, #f5d77f 0%, #c89e4b 100%); color: #000; font-weight: 800; border: none; border-radius: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: transform 0.15s; }
+  .gold-btn:active { transform: scale(0.98); }
+  .slot-btn { padding: 10px; background: #121212; border: 1px solid #333; color: #eee; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-align: center; }
+  .slot-btn:hover, .slot-btn.active { border-color: #c89e4b; background: rgba(200, 158, 75, 0.15); color: #f5d77f; }
+  .drawer { position: fixed; top: 0; left: 0; width: 100%; max-width: 360px; height: 100%; background: #0c0c0c; border-right: 1px solid #222; box-shadow: 10px 0 30px rgba(0,0,0,0.8); z-index: 999; transform: translateX(-100%); transition: transform 0.3s ease-in-out; overflow-y: auto; padding: 25px 20px; }
+  .drawer.open { transform: translateX(0); }
+</style>
+
+<!-- SIDE PROFILE DRAWER -->
+<div id="account-drawer" class="drawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; letter-spacing: 1px; color: #f5d77f;">ACCOUNT MENU</h3>
+        <button onclick="toggleDrawer()" style="background: none; border: none; color: #888; font-size: 1.4rem; cursor: pointer;">✕</button>
+    </div>
+
+    <!-- TABS -->
+    <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #222; padding-bottom: 12px;">
+        <button onclick="showTab('profile')" id="tab-btn-profile" style="flex: 1; padding: 8px; border-radius: 8px; background: #c89e4b; color: #000; font-weight: 800; border: none; cursor: pointer;">Profile</button>
+        <button onclick="showTab('family')" id="tab-btn-family" style="flex: 1; padding: 8px; border-radius: 8px; background: #1a1a1a; color: #888; font-weight: 700; border: none; cursor: pointer;">Family</button>
+    </div>
+
+    <!-- TAB 1: PERSONAL PROFILE -->
+    <div id="tab-profile">
+        <form method="POST" action="{{ url_for('main.update_profile') }}">
+            <div style="margin-bottom: 14px;">
+                <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; display: block; margin-bottom: 5px;">FULL NAME</label>
+                <input type="text" name="name" value="{{ customer.name if customer else '' }}" style="width: 100%; padding: 12px; background: #181818; border: 1px solid #333; border-radius: 10px; color: #fff; box-sizing: border-box;" required>
             </div>
-            <a href="{{ url_for('main.logout') }}" class="text-xs text-zinc-500 hover:text-red-400 transition font-semibold" id="txt-signout">Sign Out</a>
-        </div>
-
-        <!-- Language Switcher Bar with Real SVG Flags -->
-        <div class="flex justify-center items-center gap-2 mb-4">
-            <span class="text-xs font-bold text-zinc-400" id="txt-flyer-label">Language:</span>
-            <div class="inline-flex bg-zinc-950 p-1 rounded-xl border border-zinc-800">
-                
-                <button type="button" id="btn-en" onclick="setLang('en')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black transition cursor-pointer flex items-center gap-2">
-                    <span>English</span>
-                    <svg class="w-4 h-3 rounded-sm shadow-sm" viewBox="0 0 7410 3900">
-                        <rect width="7410" height="3900" fill="#b22234"/>
-                        <path d="M0,450H7410M0,1050H7410M0,1650H7410M0,2250H7410M0,2850H7410M0,3450H7410" stroke="#fff" stroke-width="300"/>
-                        <rect width="2964" height="2100" fill="#3c3b6e"/>
-                        <g fill="#fff">
-                            <g id="s18"><g id="s9"><g id="s5"><g id="s4"><path id="s" d="M247,90 317,307 135,173h224L177,307z"/><use href="#s" y="420"/><use href="#s" y="840"/><use href="#s" y="1260"/></g><use href="#s" y="1680"/></g><use href="#s4" x="247" y="210"/></g><use href="#s9" x="494"/></g><use href="#s18" x="988"/><use href="#s9" x="1976"/><use href="#s5" x="2470"/>
-                        </g>
-                    </svg>
-                </button>
-
-                <button type="button" id="btn-es" onclick="setLang('es')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer flex items-center gap-2">
-                    <span>Español</span>
-                    <svg class="w-4 h-3 rounded-sm shadow-sm" viewBox="0 0 640 480">
-                        <path fill="#006847" d="M0 0h213.3v480H0z"/>
-                        <path fill="#fff" d="M213.3 0h213.4v480H213.3z"/>
-                        <path fill="#ce1126" d="M426.7 0H640v480H426.7z"/>
-                        <circle cx="320" cy="240" r="30" fill="#8B5A2B"/>
-                    </svg>
-                </button>
+            <div style="margin-bottom: 14px;">
+                <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; display: block; margin-bottom: 5px;">PHONE NUMBER</label>
+                <input type="tel" name="phone" value="{{ customer.phone if customer else '' }}" style="width: 100%; padding: 12px; background: #181818; border: 1px solid #333; border-radius: 10px; color: #fff; box-sizing: border-box;" required>
             </div>
-        </div>
-
-        <!-- 1. FULL FLYER GRAPHIC (Original clean image) -->
-        <div class="relative rounded-2xl overflow-hidden mb-5 bg-black border border-zinc-900 shadow-md">
-            <img id="flyer-img" src="{{ url_for('static', filename='img/flyer.jpg') }}" alt="Jackiecutz Hair Studio Flyer" class="w-full object-contain rounded-2xl block" onerror="this.src='/static/img/card_bg.jpg'">
-            
-            <!-- Hotspots -->
-            <a href="tel:8323534577" title="Call (832) 353-4577" class="absolute left-[3%] right-[40%] top-[27%] bottom-[63%] z-20 cursor-pointer rounded-lg hover:bg-amber-400/10 active:bg-amber-400/20 transition-all"></a>
-            <a href="https://www.google.com/maps/search/?api=1&query=806-E+Airtex+Dr+Suite+105+Houston+TX+77073" target="_blank" rel="noopener noreferrer" title="Open Divine Salon in Google Maps" class="absolute left-[3%] right-[38%] top-[37%] bottom-[53%] z-20 cursor-pointer rounded-lg hover:bg-amber-400/10 active:bg-amber-400/20 transition-all"></a>
-            <a href="https://www.tiktok.com/@jackiecutz" target="_blank" rel="noopener noreferrer" title="Jackiecutz on TikTok" class="absolute left-[2%] right-[68%] top-[82%] bottom-[2%] z-20 cursor-pointer rounded-xl hover:bg-pink-500/20 active:bg-pink-500/30 transition-all"></a>
-            <a href="https://www.facebook.com/jackiecutz" target="_blank" rel="noopener noreferrer" title="Jackiecutz on Facebook" class="absolute left-[65%] right-[2%] top-[84%] bottom-[2%] z-20 cursor-pointer rounded-xl hover:bg-blue-500/20 active:bg-blue-500/30 transition-all"></a>
-        </div>
-
-        <!-- 2. WEEKLY OPERATING HOURS (Yellowish Cards Theme) -->
-        <div class="bg-zinc-950 border border-zinc-800/90 rounded-2xl p-3.5 mb-5 text-left space-y-2.5">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
-                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5" id="txt-hours-header">
-                    <span>🕒 Weekly Hours & Availability</span>
-                </span>
-                <span class="text-[10px] text-zinc-500 font-mono" id="txt-timezone">Houston, TX (CT)</span>
+            <div style="margin-bottom: 14px;">
+                <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; display: block; margin-bottom: 5px;">EMAIL ADDRESS</label>
+                <input type="email" name="email" value="{{ customer.email if customer else '' }}" style="width: 100%; padding: 12px; background: #181818; border: 1px solid #333; border-radius: 10px; color: #fff; box-sizing: border-box;">
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
-                    <p class="font-extrabold text-zinc-800 text-xs" id="txt-day-sunmon">Sun - Mon</p>
-                    <p class="text-red-600 font-black text-[11px] mt-0.5" id="txt-status-closed">🔴 Closed</p>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <div style="flex: 1;">
+                    <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; display: block; margin-bottom: 5px;">BIRTHDAY</label>
+                    <input type="text" name="birthday" value="{{ customer.birthday if customer else '' }}" placeholder="MM/DD/YYYY" style="width: 100%; padding: 12px; background: #181818; border: 1px solid #333; border-radius: 10px; color: #fff; box-sizing: border-box;">
                 </div>
-                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
-                    <p class="font-extrabold text-zinc-900 text-xs" id="txt-day-tue">Tuesday</p>
-                    <p class="text-zinc-900 font-bold text-[11px] mt-0.5" id="txt-status-tue">10am - 6pm <span class="text-amber-800 block text-[9px] font-black">(Appt Only)</span></p>
-                </div>
-                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
-                    <p class="font-extrabold text-zinc-900 text-xs" id="txt-day-wedthu">Wed - Thu</p>
-                    <p class="text-emerald-700 font-black text-[11px] mt-0.5" id="txt-status-wedthu">10am - 6pm</p>
-                </div>
-                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
-                    <p class="font-extrabold text-zinc-900 text-xs" id="txt-day-frisat">Fri - Sat</p>
-                    <p class="text-emerald-700 font-black text-[11px] mt-0.5" id="txt-status-frisat">10am - 7pm</p>
+                <div style="flex: 1;">
+                    <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; display: block; margin-bottom: 5px;">ZIP CODE</label>
+                    <input type="text" name="zip_code" value="{{ customer.zip_code if customer else '' }}" style="width: 100%; padding: 12px; background: #181818; border: 1px solid #333; border-radius: 10px; color: #fff; box-sizing: border-box;">
                 </div>
             </div>
-        </div>
+            <button type="submit" class="gold-btn" style="width: 100%; padding: 14px;">Save Profile Changes</button>
+        </form>
+    </div>
 
-        <!-- 3. REAL-TIME BOOKING & LIVE SLOTS ENGINE -->
-        <div class="text-left">
-            <details class="group bg-black border border-amber-500/40 rounded-2xl p-4 sm:p-5 cursor-pointer" open>
-                <summary class="font-extrabold text-center text-amber-400 flex items-center justify-center gap-2 text-sm uppercase tracking-wider select-none">
-                    <span id="txt-booking-drawer-title">✨ RESERVE YOUR SPOT ✨</span>
-                    <span class="transition-transform group-open:rotate-180">▼</span>
-                </summary>
+    <!-- TAB 2: FAMILY DEPENDENTS -->
+    <div id="tab-family" style="display: none;">
+        <p style="font-size: 0.82rem; color: #888; margin-bottom: 15px;">Add family members or dependents to book group appointments under your account.</p>
+        <form method="POST" action="{{ url_for('main.add_family_member') }}" style="margin-bottom: 20px;">
+            <input type="text" name="member_name" placeholder="Dependent's Full Name" style="width: 100%; padding: 12px; background: #181818; border: 1px solid #333; border-radius: 10px; color: #fff; margin-bottom: 10px; box-sizing: border-box;" required>
+            <button type="submit" class="gold-btn" style="width: 100%; padding: 12px; font-size: 0.85rem;">Add Family Member</button>
+        </form>
+    </div>
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                  {% if messages %}
-                    {% for category, msg in messages %}
-                      <div class="mt-3 p-2.5 rounded-xl text-xs {% if category == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
-                        {{ msg }}
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                {% endwith %}
-
-                <form id="booking-form" action="{{ url_for('main.book_service') }}" method="POST" class="mt-4 space-y-4 cursor-default">
-                    
-                    <input type="hidden" name="scheduled_time" id="primary_scheduled_time" required>
-
-                    <!-- Step 1: Select Service -->
-                    <div class="p-3.5 bg-zinc-950 border border-zinc-850 rounded-2xl space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-primary-card-title">1. Choose Service & Booking Date</span>
-                            <span class="text-[10px] text-zinc-500" id="txt-primary-self">Primary Client</span>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-service">Service</label>
-                            <select name="service_id" id="primary-service" required onchange="onServiceOrDateChange()" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                                {% for s in services %}
-                                <option value="{{ s.id }}" data-price="{{ s.price }}" data-cat-en="{{ s.category }}" data-name-en="{{ s.name }}">
-                                    {{ s.name }} ({{ s.category }}) — ${{ "%.2f"|format(s.price) }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-select-date">Select Appointment Date</label>
-                            <input type="date" id="primary-date-picker" required onchange="onServiceOrDateChange()" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                        </div>
-
-                        <!-- LIVE SLOTS CONTAINER -->
-                        <div class="pt-2 border-t border-zinc-900 space-y-1.5">
-                            <div class="flex justify-between items-center">
-                                <label class="block text-[10px] font-bold uppercase text-amber-400" id="lbl-live-slots">Available Live Time Slots</label>
-                                <span id="slot-status-badge" class="text-[10px] text-zinc-500 font-mono">Select date above</span>
-                            </div>
-                            <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-56 overflow-y-auto p-1.5 bg-black rounded-xl border border-zinc-900">
-                                <p class="col-span-full text-center text-xs text-zinc-500 py-4" id="txt-pick-date-msg">Please choose an appointment date to see live open chairs.</p>
-                            </div>
-                        </div>
-
-                        <!-- Primary Contact Info -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-zinc-900">
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-name">Your Full Name</label>
-                                <input type="text" name="name" required value="{{ current_user.name if current_user else session.get('user_name', '') }}" placeholder="Full Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-phone">Phone Number</label>
-                                <input type="tel" name="phone" id="booking-phone" required value="{{ current_user.phone if current_user and current_user.phone else '' }}" placeholder="832-000-0000" maxlength="12" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Dynamic Additional Guests Container -->
-                    <div id="additional-guests-container" class="space-y-3"></div>
-
-                    <!-- Add Person Button -->
-                    <button type="button" onclick="addGuestRow()" class="w-full py-2.5 bg-zinc-950 border border-amber-500/40 hover:border-amber-400 text-amber-300 hover:text-amber-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition shadow-sm">
-                        <span id="txt-add-person-btn">+ Add Additional Person / Child</span>
-                    </button>
-
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-amber-400 mb-1" id="lbl-notes">Notes / Style Preferences</label>
-                        <input type="text" name="notes" placeholder="e.g. Skin fade with scissors on top, beard lineup" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                    </div>
-
-                    <!-- Payment Method Selector -->
-                    <div class="pt-2">
-                        <label class="block text-xs font-bold uppercase text-amber-400 mb-2" id="lbl-pay-method">Payment & Card Hold Method</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                            <label class="bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10 transition">
-                                <input type="radio" name="payment_method" value="card" checked onchange="togglePaymentGateway('card')" class="hidden">
-                                <span class="block text-xs font-bold text-white" id="txt-pay-card">💳 Card Hold</span>
-                                <span class="block text-[9px] text-zinc-500 mt-0.5" id="txt-pay-card-sub">Charged After Cut</span>
-                            </label>
-                            
-                            <label class="bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl cursor-pointer hover:border-purple-500 has-[:checked]:border-purple-400 has-[:checked]:bg-purple-500/10 transition">
-                                <input type="radio" name="payment_method" value="zelle" onchange="togglePaymentGateway('zelle')" class="hidden">
-                                <span class="block text-xs font-bold text-purple-400">⚡ Zelle</span>
-                                <span class="block text-[9px] text-zinc-500 mt-0.5" id="txt-pay-zelle-sub">Pay at Salon</span>
-                            </label>
-
-                            <label class="bg-zinc-950 border border-emerald-500 p-2.5 rounded-xl cursor-pointer hover:border-emerald-500 has-[:checked]:border-emerald-400 has-[:checked]:bg-emerald-500/10 transition">
-                                <input type="radio" name="payment_method" value="cash_app" onchange="togglePaymentGateway('cash_app')" class="hidden">
-                                <span class="block text-xs font-bold text-emerald-400">💵 Cash App</span>
-                                <span class="block text-[9px] text-zinc-500 mt-0.5">$Jackiecutz</span>
-                            </label>
-
-                            <label class="bg-zinc-950 border border-amber-400 has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10 transition">
-                                <input type="radio" name="payment_method" value="cash" onchange="togglePaymentGateway('cash')" class="hidden">
-                                <span class="block text-xs font-bold text-amber-300" id="txt-pay-salon">💈 In-Salon</span>
-                                <span class="block text-[9px] text-zinc-500 mt-0.5" id="txt-pay-salon-sub">Cash Preferred</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Payment Sub-Gateways -->
-                    <div id="card-gateway" class="p-3.5 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-2.5">
-                        <div class="flex items-center justify-between text-xs text-zinc-400 font-bold border-b border-zinc-900 pb-2">
-                            <span id="txt-secure-card-title">Card Hold (Pay After Service)</span>
-                            <span class="text-amber-400 text-[10px]">🔒 256-Bit Encrypted</span>
-                        </div>
-                        <p class="text-[11px] text-zinc-400 leading-relaxed" id="txt-card-hold-desc">
-                            Your card is held to secure your time slot. <strong>You will not be charged until your service is completed in the chair.</strong>
-                        </p>
-                        <div>
-                            <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-name">Name on Card</label>
-                            <input type="text" id="card_name" placeholder="Name as shown on card" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-number">Card Number</label>
-                            <input type="text" id="card_number" placeholder="4000 1234 5678 9010" maxlength="19" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-exp">Exp (MM/YY)</label>
-                                <input type="text" id="card_exp" placeholder="MM/YY" maxlength="5" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1">CVV</label>
-                                <input type="password" id="card_cvv" placeholder="•••" maxlength="4" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-zip">Zip Code</label>
-                                <input type="text" id="card_zip" placeholder="77073" maxlength="5" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="zelle-gateway" class="hidden p-3.5 bg-purple-950/20 border border-purple-500/30 rounded-2xl space-y-2 text-left">
-                        <span class="text-xs text-purple-300 font-bold block border-b border-purple-500/20 pb-1" id="txt-zelle-head">Zelle Payment Instructions</span>
-                        <p class="text-xs text-zinc-300 leading-relaxed" id="txt-zelle-desc">
-                            Pay upon arrival via Zelle to: <span class="text-amber-400 font-bold font-mono">832-353-4577</span> (Ivonne Gonzalez / Jackiecutz).
-                        </p>
-                    </div>
-
-                    <div id="cashapp-gateway" class="hidden p-3.5 bg-emerald-950/20 border border-emerald-500/30 rounded-2xl space-y-2 text-left">
-                        <span class="text-xs text-emerald-300 font-bold block border-b border-emerald-500/20 pb-1" id="txt-cashapp-head">Cash App Instructions</span>
-                        <p class="text-xs text-zinc-300 leading-relaxed" id="txt-cashapp-desc">
-                            Pay upon arrival to Cashtag: <span class="text-emerald-400 font-bold font-mono">$Jackiecutz</span>.
-                        </p>
-                    </div>
-
-                    <div id="cash-gateway" class="hidden p-3 bg-zinc-950 border border-amber-500/30 rounded-2xl text-left">
-                        <p class="text-xs text-zinc-300" id="txt-cash-desc">💵 Pay upon completion at Divine Salon (Suite 105). Cash is preferred.</p>
-                    </div>
-
-                    <!-- Estimated Total Card -->
-                    <div class="flex justify-between items-center bg-zinc-950 p-3.5 rounded-2xl border border-amber-500/40 shadow-sm">
-                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-300" id="txt-total-label">Estimated Total (Pay Upon Service)</span>
-                        <span id="booking-total-price" class="text-base font-black text-amber-400">$25.00</span>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" id="btn-submit-booking" class="w-full bg-gradient-to-r from-amber-500 to-amber-300 hover:from-amber-400 hover:to-amber-200 text-black font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition shadow-lg opacity-60 cursor-not-allowed" disabled>
-                        CHOOSE A LIVE TIME SLOT ABOVE
-                    </button>
-
-                    <div class="pt-2 text-[10px] text-zinc-500 leading-relaxed text-center border-t border-zinc-900">
-                        <p id="txt-policy-footer">Appointments held with a 10-minute grace window. Cancellations require 2 hours advance notice.</p>
-                    </div>
-                </form>
-            </details>
-        </div>
-
+    <!-- LOGOUT / DELETE -->
+    <div style="margin-top: 35px; border-top: 1px solid #222; padding-top: 20px;">
+        <a href="{{ url_for('main.logout') }}" style="display: block; text-align: center; color: #ff5555; text-decoration: none; font-weight: 700; font-size: 0.88rem; margin-bottom: 15px;">Log Out of Account</a>
     </div>
 </div>
 
-<!-- Slide-Out Drawer Component -->
-<div id="drawer-backdrop" onclick="closeDrawer()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+<!-- MAIN PAGE CONTAINER -->
+<div style="max-width: 500px; margin: 0 auto; padding: 15px;">
 
-<div id="app-drawer" class="fixed top-0 left-0 bottom-0 w-full max-w-sm bg-black border-r border-amber-500/40 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-5 overflow-y-auto space-y-5 text-left selection:bg-amber-400 selection:text-black">
-    <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
-        <span class="text-amber-400 font-black text-sm uppercase tracking-wider" id="txt-drawer-header">Account Menu</span>
-        <button type="button" onclick="closeDrawer()" class="text-zinc-400 hover:text-white text-lg font-bold p-1">✕</button>
-    </div>
-
-    <div class="grid grid-cols-3 gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800 text-[11px] font-bold text-center">
-        <button type="button" onclick="switchDrawerTab('profile')" id="tab-btn-profile" class="py-1.5 rounded-lg bg-amber-400 text-black transition">Profile</button>
-        <button type="button" onclick="switchDrawerTab('family')" id="tab-btn-family" class="py-1.5 rounded-lg text-zinc-400 hover:text-white transition">Family</button>
-        <button type="button" onclick="switchDrawerTab('security')" id="tab-btn-security" class="py-1.5 rounded-lg text-zinc-400 hover:text-white transition">Security</button>
-    </div>
-
-    <div id="drawer-tab-profile" class="space-y-3.5">
-        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-profile-title">Personal Profile</h3>
-        <form method="POST" action="{{ url_for('main.update_profile') }}" class="space-y-3">
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-name">Full Name</label>
-                <input type="text" name="name" required value="{{ current_user.name if current_user else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-phone">Phone Number</label>
-                <input type="tel" name="phone" value="{{ current_user.phone if current_user and current_user.phone else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-email">Email Address</label>
-                <input type="email" name="email" value="{{ current_user.email if current_user and current_user.email else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-bday">Birthday (MM/DD/YYYY)</label>
-                    <input type="text" name="birthday" value="{{ current_user.birthday if current_user and current_user.birthday else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-zip">Zip Code</label>
-                    <input type="text" name="zip_code" value="{{ current_user.zip_code if current_user and current_user.zip_code else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                </div>
-            </div>
-            <button type="submit" class="w-full bg-amber-400 hover:bg-amber-300 text-black font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Save Profile Changes</button>
-        </form>
-    </div>
-
-    <div id="drawer-tab-family" class="space-y-4 hidden">
-        <div>
-            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-family-title">Saved Family Profiles</h3>
-            <p class="text-[11px] text-zinc-400 mt-0.5" id="txt-family-sub">Save children or family members for quick appointment scheduling.</p>
-        </div>
-        <div class="space-y-2">
-            {% for m in family_members %}
-            <div class="flex items-center justify-between bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl">
-                <div>
-                    <p class="text-xs font-bold text-white">{{ m.name }}</p>
-                    <p class="text-[10px] text-zinc-400">{{ m.relationship }} {% if m.birthday %}• Born: {{ m.birthday }}{% endif %}</p>
-                </div>
-                <form method="POST" action="{{ url_for('main.delete_family_member') }}">
-                    <input type="hidden" name="member_index" value="{{ loop.index0 }}">
-                    <button type="submit" class="text-red-400 hover:text-red-300 text-xs font-bold p-1">✕</button>
-                </form>
-            </div>
-            {% else %}
-            <p class="text-[11px] text-zinc-500 italic" id="txt-family-empty">No family members saved yet.</p>
-            {% endfor %}
-        </div>
-        <form method="POST" action="{{ url_for('main.add_family_member') }}" class="p-3 bg-zinc-950 border border-amber-500/30 rounded-2xl space-y-2.5">
-            <span class="text-[11px] font-bold text-amber-300 uppercase tracking-wider block" id="txt-add-fam-head">+ Add Family Member</span>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-fam-name">Name</label>
-                <input type="text" name="family_name" required placeholder="e.g. Mateo Gonzalez" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-fam-rel">Relation</label>
-                    <select name="relationship" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-2 py-1.5 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                        <option value="Child">Child</option>
-                        <option value="Spouse">Spouse</option>
-                        <option value="Parent">Parent</option>
-                        <option value="Sibling">Sibling</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-fam-bday">Birthday</label>
-                    <input type="text" name="family_birthday" placeholder="MM/DD/YYYY" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                </div>
-            </div>
-            <button type="submit" class="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-300 text-black font-bold rounded-xl text-xs uppercase tracking-wider transition">Add To Family List</button>
-        </form>
-    </div>
-
-    <div id="drawer-tab-security" class="space-y-5 hidden">
-        <div>
-            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-sec-title">Login Credentials</h3>
-            <p class="text-[11px] text-zinc-400 mt-0.5" id="txt-sec-sub">Update your sign-in username or password.</p>
-        </div>
-        <form method="POST" action="{{ url_for('main.update_credentials') }}" class="space-y-3">
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-sec-user">Username</label>
-                <input type="text" name="username" value="{{ current_user.username if current_user else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-sec-newpass">New Password</label>
-                <input type="password" name="new_password" placeholder="Leave blank to keep current" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-sec-confpass">Confirm New Password</label>
-                <input type="password" name="confirm_password" placeholder="••••••••" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <button type="submit" class="w-full bg-amber-400 hover:bg-amber-300 text-black font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Update Credentials</button>
-        </form>
-
-        <div class="pt-4 border-t border-red-500/30 space-y-2">
-            <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider" id="txt-danger-title">Delete Account</h4>
-            <p class="text-[10px] text-zinc-400 leading-relaxed" id="txt-danger-desc">Permanently delete your profile and booking records.</p>
-            <form method="POST" action="{{ url_for('main.delete_account') }}" onsubmit="return confirm('Are you sure you want to permanently delete your account?');">
-                <button type="submit" class="w-full py-2 bg-red-500/10 border border-red-500/40 hover:bg-red-500/20 text-red-400 font-bold rounded-xl text-xs uppercase tracking-wider transition" id="btn-danger-del">Permanently Delete Account</button>
-            </form>
+    <!-- TOP HEADER -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <button onclick="toggleDrawer()" style="background: #141414; border: 1px solid #333; color: #f5d77f; padding: 8px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <span>☰</span> Menu
+        </button>
+        <div style="font-size: 0.9rem; font-weight: 700; color: #f5d77f;">
+            {{ customer.name if customer else 'Guest' }}
         </div>
     </div>
-</div>
 
-<!-- Template for Dynamic Additional Guest Rows -->
-<template id="guest-row-template">
-    <div class="guest-row p-3.5 bg-zinc-950 border border-amber-500/30 rounded-2xl space-y-2.5 relative">
-        <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider guest-card-title">Additional Person / Guest</span>
-            <button type="button" onclick="removeGuestRow(this)" class="text-xs text-red-400 hover:text-red-300 font-bold guest-remove-btn">✕ Remove</button>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div>
-                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1 guest-lbl-name">Guest Full Name</label>
-                <input type="text" name="guest_name[]" required placeholder="Guest Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1 guest-lbl-service">Guest Service</label>
-                <select name="guest_service_id[]" required onchange="calculateTotal()" class="guest-service-select w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-                    {% for s in services %}
-                    <option value="{{ s.id }}" data-price="{{ s.price }}" data-cat-en="{{ s.category }}" data-name-en="{{ s.name }}">
-                        {{ s.name }} ({{ s.category }}) — ${{ "%.2f"|format(s.price) }}
-                    </option>
-                    {% endfor %}
+    <!-- STUDIO BRAND CARD -->
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h1 class="gold-gradient-text" style="font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0; font-weight: 700;">Jackiecutz</h1>
+        <p style="margin: 4px 0 0 0; color: #888; font-size: 0.82rem; letter-spacing: 1px;">HAIR STUDIO • 806-E AIRTEX DR #105</p>
+    </div>
+
+    <!-- APPOINTMENT BOOKING FORM -->
+    <div style="background: #0f0f0f; border: 1px solid #222; border-radius: 18px; padding: 22px;">
+        <h2 style="font-size: 1.15rem; font-weight: 800; color: #f5d77f; margin-top: 0; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 0.5px;">✨ Reserve Your Spot</h2>
+
+        <form method="POST" action="{{ url_for('main.book_service') }}">
+            <!-- 1. SERVICE -->
+            <div style="margin-bottom: 18px;">
+                <label style="color: #c89e4b; font-weight: 700; font-size: 0.82rem; display: block; margin-bottom: 6px;">1. SELECT SERVICE</label>
+                <select name="service_id" style="width: 100%; padding: 14px; background: #181818; border: 1px solid #333; border-radius: 12px; color: #fff; font-weight: 600; font-size: 0.95rem; box-sizing: border-box;">
+                    {% if services %}
+                        {% for s in services %}
+                            <option value="{{ s.id }}">{{ s.name }} — ${{ "%.2f"|format(s.price) }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="1">Men & Boys Specialty Cut — $25.00</option>
+                        <option value="2">Fade & Beard Styling Combo — $35.00</option>
+                        <option value="3">Full Precision Cut & Hot Towel — $45.00</option>
+                    {% endif %}
                 </select>
             </div>
-        </div>
-        <div>
-            <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1 guest-lbl-time">Guest Time Slot</label>
-            <input type="datetime-local" name="guest_scheduled_time[]" required class="guest-time-input w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
-        </div>
+
+            <!-- 2. DATE -->
+            <div style="margin-bottom: 18px;">
+                <label style="color: #c89e4b; font-weight: 700; font-size: 0.82rem; display: block; margin-bottom: 6px;">2. SELECT APPOINTMENT DATE</label>
+                <input type="date" name="booking_date" value="{{ None|default('', true) }}" id="book-date" style="width: 100%; padding: 14px; background: #181818; border: 1px solid #333; border-radius: 12px; color: #fff; font-weight: 600; box-sizing: border-box;" required>
+            </div>
+
+            <!-- 3. AVAILABLE TIME SLOTS -->
+            <div style="margin-bottom: 22px;">
+                <label style="color: #c89e4b; font-weight: 700; font-size: 0.82rem; display: block; margin-bottom: 8px;">3. AVAILABLE TIME SLOTS</label>
+                <input type="hidden" name="time_slot" id="selected-time-slot" value="10:00 AM">
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-height: 190px; overflow-y: auto; padding: 4px;">
+                    {% for slot in time_slots %}
+                        <div class="slot-btn {% if loop.first %}active{% endif %}" onclick="selectSlot(this, '{{ slot }}')">
+                            {{ slot }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- SUBMIT BOOKING -->
+            <button type="submit" class="gold-btn" style="width: 100%; padding: 16px; font-size: 1rem; letter-spacing: 1px;">
+                Confirm Appointment
+            </button>
+        </form>
     </div>
-</template>
+
+</div>
 
 <script>
-let currentLang = 'en';
+// Set default date to today
+document.getElementById('book-date').valueAsDate = new Date();
 
-const serviceTranslations = {
-    "Men & Boys Specialty Cut": { es: "Corte Especial para Hombres y Niños", cat_es: "Corte Especial" },
-    "Women & Girls Haircut": { es: "Corte para Damas y Niñas", cat_es: "Corte de Cabello" },
-    "Color & Highlights": { es: "Tinte y Rayitos", cat_es: "Color" },
-    "Hairstyles / Updos": { es: "Peinados / Recogidos", cat_es: "Estilo" },
-    "Professional Makeup": { es: "Maquillaje Profesional", cat_es: "Belleza y Maquillaje" },
-    "Waxing Services (Eyebrows/Lip)": { es: "Depilación con Cera (Cejas/Labios)", cat_es: "Depilación" },
-    "Intensive Deep Conditioning Treatment": { es: "Tratamiento Profundo Intensivo", cat_es: "Tratamiento" }
-};
+function toggleDrawer() {
+    document.getElementById('account-drawer').classList.toggle('open');
+}
 
-const i18n = {
-    en: {
-        welcome: "Welcome, {{ session.get('user_name', 'Client') }} ✨",
-        adminBtn: "Admin ⚙️",
-        signOut: "Sign Out",
-        flyerLabel: "Language:",
-        hoursHeader: "🕒 Weekly Hours & Availability",
-        daySunMon: "Sun - Mon",
-        statusClosed: "🔴 Closed",
-        dayTue: "Tuesday",
-        statusTue: "10am - 6pm (Appt Only)",
-        dayWedThu: "Wed - Thu",
-        statusWedThu: "10am - 6pm",
-        dayFriSat: "Fri - Sat",
-        statusFriSat: "10am - 7pm",
-        drawerTitle: "✨ RESERVE YOUR SPOT ✨",
-        primaryCardTitle: "1. Choose Service & Booking Date",
-        primarySelf: "Primary Client",
-        lblService: "Service",
-        lblSelectDate: "Select Appointment Date",
-        lblLiveSlots: "Available Live Time Slots",
-        fullName: "Your Full Name",
-        phone: "Phone Number",
-        addPersonBtn: "+ Add Additional Person / Child",
-        notes: "Notes / Style Preferences",
-        payMethod: "Payment & Card Hold Method",
-        payCard: "💳 Card Hold",
-        payCardSub: "Charged After Cut",
-        payZelleSub: "Pay at Salon",
-        paySalon: "💈 In-Salon",
-        paySalonSub: "Cash Preferred",
-        secureCard: "Card Hold (Pay After Service)",
-        cardHoldDesc: "Your card is held to secure your time slot. You will not be charged until your service is completed in the chair.",
-        cardName: "Name on Card",
-        cardNumber: "Card Number",
-        cardExp: "Exp (MM/YY)",
-        cardZip: "Zip Code",
-        zelleHead: "Zelle Payment Instructions",
-        zelleDesc: "Pay upon arrival via Zelle to: 832-353-4577 (Ivonne Gonzalez / Jackiecutz).",
-        cashappHead: "Cash App Instructions",
-        cashappDesc: "Pay upon arrival to Cashtag: $Jackiecutz.",
-        cashDesc: "💵 Pay upon completion at Divine Salon (Suite 105). Cash is preferred.",
-        totalLabel: "Estimated Total (Pay Upon Service)",
-        btnSubmit: "Confirm & Reserve Spot",
-        btnChooseSlotPrompt: "CHOOSE A LIVE TIME SLOT ABOVE",
-        policyFooter: "Appointments held with a 10-minute grace window. Cancellations require 2 hours advance notice.",
-        drawerHeader: "Account Menu",
-        tabProfile: "Profile",
-        tabFamily: "Family",
-        tabSecurity: "Security",
-        openSlotsSuffix: "live slots open"
-    },
-    es: {
-        welcome: "Bienvenido(a), {{ session.get('user_name', 'Cliente') }} ✨",
-        adminBtn: "Admin ⚙️",
-        signOut: "Cerrar Sesión",
-        flyerLabel: "Idioma:",
-        hoursHeader: "🕒 Horario de Servicio Semanal",
-        daySunMon: "Dom - Lun",
-        statusClosed: "🔴 Cerrado",
-        dayTue: "Martes",
-        statusTue: "10am - 6pm (Con Cita)",
-        dayWedThu: "Mié - Jue",
-        statusWedThu: "10am - 6pm",
-        dayFriSat: "Vie - Sáb",
-        statusFriSat: "10am - 7pm",
-        drawerTitle: "✨ RESERVA TU CITA ✨",
-        primaryCardTitle: "1. Seleccione Servicio y Fecha de Cita",
-        primarySelf: "Cliente Principal",
-        lblService: "Servicio",
-        lblSelectDate: "Seleccionar Fecha de Cita",
-        lblLiveSlots: "Horarios Disponibles en Vivo",
-        fullName: "Nombre Completo",
-        phone: "Número de Teléfono",
-        addPersonBtn: "+ Agregar Persona / Niño(a) Adicional",
-        notes: "Notas / Preferencias de Estilo",
-        payMethod: "Método de Pago y Retención",
-        payCard: "💳 Retención de Tarjeta",
-        payCardSub: "Se Cobra al Terminar",
-        payZelleSub: "Pagar en el Salón",
-        paySalon: "💈 En el Salón",
-        paySalonSub: "Efectivo Preferible",
-        secureCard: "Retención de Tarjeta (Pago tras el Servicio)",
-        cardHoldDesc: "Su tarjeta se retiene para asegurar su horario. No se le cobrará nada hasta que se complete su servicio en la silla.",
-        cardName: "Nombre en la Tarjeta",
-        cardNumber: "Número de Tarjeta",
-        cardExp: "Vence (MM/AA)",
-        cardZip: "Código Postal",
-        zelleHead: "Instrucciones de Pago con Zelle",
-        zelleDesc: "Pague al llegar por Zelle a: 832-353-4577 (Ivonne Gonzalez / Jackiecutz).",
-        cashappHead: "Instrucciones de Cash App",
-        cashappDesc: "Pague al llegar a: $Jackiecutz.",
-        cashDesc: "💵 Pago al terminar en Divine Salon (Suite 105). Es preferible el pago en efectivo.",
-        totalLabel: "Total Estimado (Se Paga tras el Servicio)",
-        btnSubmit: "Confirmar y Reservar Cita",
-        btnChooseSlotPrompt: "SELECCIONE UN HORARIO DISPONIBLE ARRIBA",
-        policyFooter: "Tolerancia de 10 minutos para citas. Cancelaciones requieren mínimo 2 horas de anticipación.",
-        drawerHeader: "Menú de Cuenta",
-        tabProfile: "Perfil",
-        tabFamily: "Familia",
-        tabSecurity: "Seguridad",
-        openSlotsSuffix: "horarios libres disponibles"
-    }
-};
-
-function setLang(lang) {
-    currentLang = lang;
-    const img = document.getElementById('flyer-img');
-    const btnEn = document.getElementById('btn-en');
-    const btnEs = document.getElementById('btn-es');
-    const t = i18n[lang];
-
-    if (lang === 'es') {
-        img.src = '/static/img/flyer_es.jpg';
-        btnEs.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black transition cursor-pointer flex items-center gap-2';
-        btnEn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer flex items-center gap-2';
+function showTab(tab) {
+    if (tab === 'profile') {
+        document.getElementById('tab-profile').style.display = 'block';
+        document.getElementById('tab-family').style.display = 'none';
+        document.getElementById('tab-btn-profile').style.background = '#c89e4b';
+        document.getElementById('tab-btn-profile').style.color = '#000';
+        document.getElementById('tab-btn-family').style.background = '#1a1a1a';
+        document.getElementById('tab-btn-family').style.color = '#888';
     } else {
-        img.src = '/static/img/flyer.jpg';
-        btnEn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black transition cursor-pointer flex items-center gap-2';
-        btnEs.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer flex items-center gap-2';
-    }
-
-    document.getElementById('txt-welcome').textContent = t.welcome;
-    if (document.getElementById('txt-admin-btn')) document.getElementById('txt-admin-btn').textContent = t.adminBtn;
-    document.getElementById('txt-signout').textContent = t.signOut;
-    document.getElementById('txt-flyer-label').textContent = t.flyerLabel;
-    document.getElementById('txt-hours-header').textContent = t.hoursHeader;
-    document.getElementById('txt-day-sunmon').textContent = t.daySunMon;
-    document.getElementById('txt-status-closed').textContent = t.statusClosed;
-    document.getElementById('txt-day-tue').textContent = t.dayTue;
-    document.getElementById('txt-status-tue').textContent = t.statusTue;
-    document.getElementById('txt-day-wedthu').textContent = t.dayWedThu;
-    document.getElementById('txt-status-wedthu').textContent = t.statusWedThu;
-    document.getElementById('txt-day-frisat').textContent = t.dayFriSat;
-    document.getElementById('txt-status-frisat').textContent = t.statusFriSat;
-    document.getElementById('txt-booking-drawer-title').textContent = t.drawerTitle;
-    document.getElementById('txt-primary-card-title').textContent = t.primaryCardTitle;
-    document.getElementById('lbl-service').textContent = t.lblService;
-    document.getElementById('lbl-select-date').textContent = t.lblSelectDate;
-    document.getElementById('lbl-live-slots').textContent = t.lblLiveSlots;
-    document.getElementById('txt-primary-self').textContent = t.primarySelf;
-    document.getElementById('lbl-name').textContent = t.fullName;
-    document.getElementById('lbl-phone').textContent = t.phone;
-    document.getElementById('txt-add-person-btn').textContent = t.addPersonBtn;
-    document.getElementById('lbl-notes').textContent = t.notes;
-    document.getElementById('lbl-pay-method').textContent = t.payMethod;
-    document.getElementById('txt-pay-card').textContent = t.payCard;
-    document.getElementById('txt-pay-card-sub').textContent = t.payCardSub;
-    document.getElementById('txt-pay-zelle-sub').textContent = t.payZelleSub;
-    document.getElementById('txt-pay-salon').textContent = t.paySalon;
-    document.getElementById('txt-pay-salon-sub').textContent = t.paySalonSub;
-    document.getElementById('txt-secure-card-title').textContent = t.secureCard;
-    document.getElementById('txt-card-hold-desc').textContent = t.cardHoldDesc;
-    document.getElementById('lbl-card-name').textContent = t.cardName;
-    document.getElementById('lbl-card-number').textContent = t.cardNumber;
-    document.getElementById('lbl-card-exp').textContent = t.cardExp;
-    document.getElementById('lbl-card-zip').textContent = t.cardZip;
-    document.getElementById('txt-zelle-head').textContent = t.zelleHead;
-    document.getElementById('txt-zelle-desc').textContent = t.zelleDesc;
-    document.getElementById('txt-cashapp-head').textContent = t.cashappHead;
-    document.getElementById('txt-cashapp-desc').textContent = t.cashappDesc;
-    document.getElementById('txt-cash-desc').textContent = t.cashDesc;
-    document.getElementById('txt-total-label').textContent = t.totalLabel;
-    document.getElementById('txt-policy-footer').textContent = t.policyFooter;
-
-    document.getElementById('txt-drawer-header').textContent = t.drawerHeader;
-    document.getElementById('tab-btn-profile').textContent = t.tabProfile;
-    document.getElementById('tab-btn-family').textContent = t.tabFamily;
-    document.getElementById('tab-btn-security').textContent = t.tabSecurity;
-
-    document.querySelectorAll('#primary-service option, .guest-service-select option').forEach(opt => {
-        const nameEn = opt.getAttribute('data-name-en');
-        const catEn = opt.getAttribute('data-cat-en');
-        const price = parseFloat(opt.getAttribute('data-price')).toFixed(2);
-        
-        if (lang === 'es' && serviceTranslations[nameEn]) {
-            const tr = serviceTranslations[nameEn];
-            opt.textContent = `${tr.es} (${tr.cat_es}) — $${price}`;
-        } else {
-            opt.textContent = `${nameEn} (${catEn}) — $${price}`;
-        }
-    });
-
-    const slotVal = document.getElementById('primary_scheduled_time').value;
-    if (!slotVal) {
-        document.getElementById('btn-submit-booking').textContent = t.btnChooseSlotPrompt;
-    }
-
-    onServiceOrDateChange();
-}
-
-async function onServiceOrDateChange() {
-    calculateTotal();
-    const serviceId = document.getElementById('primary-service').value;
-    const dateVal = document.getElementById('primary-date-picker').value;
-    const grid = document.getElementById('slots-grid');
-    const badge = document.getElementById('slot-status-badge');
-    const t = i18n[currentLang];
-
-    if (!dateVal) {
-        grid.innerHTML = `<p class="col-span-full text-center text-xs text-zinc-500 py-4">${currentLang === 'es' ? 'Por favor elija una fecha para ver sillas disponibles.' : 'Please choose an appointment date to see live open chairs.'}</p>`;
-        badge.textContent = currentLang === 'es' ? 'Seleccione fecha' : 'Select date above';
-        return;
-    }
-
-    badge.textContent = currentLang === 'es' ? 'Buscando horarios...' : 'Querying live chairs...';
-    grid.innerHTML = `<p class="col-span-full text-center text-xs text-amber-400 py-4 animate-pulse">⏳ ${currentLang === 'es' ? 'Verificando disponibilidad en vivo...' : 'Checking live availability...'}</p>`;
-
-    try {
-        const res = await fetch(`/api/available-slots?service_id=${serviceId}&date=${dateVal}`);
-        const data = await res.json();
-
-        if (data.closed) {
-            grid.innerHTML = `<p class="col-span-full text-center text-xs text-red-400 py-4 font-bold">🔴 ${currentLang === 'es' ? 'El salón está cerrado los domingos y lunes.' : 'Salon is closed on Sundays and Mondays. Please select Tue - Sat.'}</p>`;
-            badge.textContent = currentLang === 'es' ? 'Cerrado' : 'Closed';
-            disableSubmit();
-            return;
-        }
-
-        if (!data.slots || data.slots.length === 0) {
-            grid.innerHTML = `<p class="col-span-full text-center text-xs text-zinc-400 py-4 font-semibold">${data.message || (currentLang === 'es' ? 'No hay horarios disponibles para esta fecha. Intente con otra.' : 'No slots open on this date. Please pick another day.')}</p>`;
-            badge.textContent = currentLang === 'es' ? '0 Disponibles' : '0 Available';
-            disableSubmit();
-            return;
-        }
-
-        badge.textContent = `${data.slots.length} ${t.openSlotsSuffix}`;
-        grid.innerHTML = '';
-
-        data.slots.forEach(slot => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'slot-btn py-2 px-2 text-center bg-black hover:bg-amber-400 hover:text-black border border-zinc-800 hover:border-amber-400 rounded-xl text-xs font-bold text-zinc-300 transition duration-150';
-            btn.textContent = slot.time_str;
-            btn.onclick = () => selectSlot(slot.iso_val, slot.time_str, btn);
-            grid.appendChild(btn);
-        });
-
-    } catch (err) {
-        grid.innerHTML = `<p class="col-span-full text-center text-xs text-red-400 py-4">Error loading slots.</p>`;
+        document.getElementById('tab-profile').style.display = 'none';
+        document.getElementById('tab-family').style.display = 'block';
+        document.getElementById('tab-btn-family').style.background = '#c89e4b';
+        document.getElementById('tab-btn-family').style.color = '#000';
+        document.getElementById('tab-btn-profile').style.background = '#1a1a1a';
+        document.getElementById('tab-btn-profile').style.color = '#888';
     }
 }
 
-function selectSlot(isoVal, timeStr, btnElement) {
-    document.getElementById('primary_scheduled_time').value = isoVal;
-    document.querySelectorAll('.slot-btn').forEach(b => {
-        b.className = 'slot-btn py-2 px-2 text-center bg-black hover:bg-amber-400 hover:text-black border border-zinc-800 hover:border-amber-400 rounded-xl text-xs font-bold text-zinc-300 transition duration-150';
-    });
-    btnElement.className = 'slot-btn py-2 px-2 text-center bg-amber-400 text-black border border-amber-300 rounded-xl text-xs font-black shadow-lg';
-
-    document.querySelectorAll('.guest-time-input').forEach(inp => {
-        if (!inp.value) inp.value = isoVal;
-    });
-
-    const submitBtn = document.getElementById('btn-submit-booking');
-    submitBtn.disabled = false;
-    submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
-    const total = document.getElementById('booking-total-price').textContent;
-    const t = i18n[currentLang];
-    submitBtn.textContent = `${t.btnSubmit} (${total}) — ${timeStr}`;
+function selectSlot(btn, slotText) {
+    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('selected-time-slot').value = slotText;
 }
-
-function disableSubmit() {
-    const submitBtn = document.getElementById('btn-submit-booking');
-    submitBtn.disabled = true;
-    submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
-    const t = i18n[currentLang];
-    submitBtn.textContent = t.btnChooseSlotPrompt;
-    document.getElementById('primary_scheduled_time').value = '';
-}
-
-function openDrawer() {
-    document.getElementById('drawer-backdrop').classList.remove('hidden');
-    document.getElementById('app-drawer').classList.remove('-translate-x-full');
-}
-function closeDrawer() {
-    document.getElementById('drawer-backdrop').classList.add('hidden');
-    document.getElementById('app-drawer').classList.add('-translate-x-full');
-}
-function switchDrawerTab(tab) {
-    ['profile', 'family', 'security'].forEach(t => {
-        document.getElementById(`drawer-tab-${t}`).classList.toggle('hidden', t !== tab);
-        const btn = document.getElementById(`tab-btn-${t}`);
-        if (t === tab) {
-            btn.className = 'py-1.5 rounded-lg bg-amber-400 text-black transition';
-        } else {
-            btn.className = 'py-1.5 rounded-lg text-zinc-400 hover:text-white transition';
-        }
-    });
-}
-
-function addGuestRow() {
-    const container = document.getElementById('additional-guests-container');
-    const template = document.getElementById('guest-row-template');
-    const clone = template.content.cloneNode(true);
-    
-    const primaryTimeVal = document.getElementById('primary_scheduled_time').value;
-    if (primaryTimeVal) {
-        const timeInput = clone.querySelector('.guest-time-input');
-        if (timeInput) timeInput.value = primaryTimeVal;
-    }
-
-    container.appendChild(clone);
-    setLang(currentLang);
-    calculateTotal();
-}
-
-function removeGuestRow(btn) {
-    btn.closest('.guest-row').remove();
-    calculateTotal();
-}
-
-function calculateTotal() {
-    let total = 0;
-    const primarySelect = document.getElementById('primary-service');
-    if (primarySelect && primarySelect.selectedOptions[0]) {
-        total += parseFloat(primarySelect.selectedOptions[0].getAttribute('data-price') || 0);
-    }
-    document.querySelectorAll('.guest-service-select').forEach(sel => {
-        if (sel.selectedOptions[0]) {
-            total += parseFloat(sel.selectedOptions[0].getAttribute('data-price') || 0);
-        }
-    });
-    const formatted = '$' + total.toFixed(2);
-    document.getElementById('booking-total-price').textContent = formatted;
-    
-    const slotVal = document.getElementById('primary_scheduled_time').value;
-    if (slotVal) {
-        const t = i18n[currentLang];
-        document.getElementById('btn-submit-booking').textContent = `${t.btnSubmit} (${formatted})`;
-    }
-}
-
-function togglePaymentGateway(method) {
-    document.getElementById('card-gateway').classList.toggle('hidden', method !== 'card');
-    document.getElementById('zelle-gateway').classList.toggle('hidden', method !== 'zelle');
-    document.getElementById('cashapp-gateway').classList.toggle('hidden', method !== 'cash_app');
-    document.getElementById('cash-gateway').classList.toggle('hidden', method !== 'cash');
-
-    const isCard = (method === 'card');
-    document.getElementById('card_name').required = isCard;
-    document.getElementById('card_number').required = isCard;
-    document.getElementById('card_exp').required = isCard;
-    document.getElementById('card_cvv').required = isCard;
-    document.getElementById('card_zip').required = isCard;
-}
-
-document.getElementById('booking-phone').addEventListener('input', function (e) {
-    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-    e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-});
-
-document.getElementById('card_number').addEventListener('input', function (e) {
-    let v = e.target.value.replace(/\D/g, '').substring(0, 16);
-    let parts = v.match(/(\d{1,4})/g) || [];
-    e.target.value = parts.join(' ');
-});
-
-document.getElementById('card_exp').addEventListener('input', function (e) {
-    let v = e.target.value.replace(/\D/g, '').substring(0, 4);
-    if (v.length >= 3) {
-        e.target.value = v.substring(0, 2) + '/' + v.substring(2);
-    } else {
-        e.target.value = v;
-    }
-});
-
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('primary-date-picker').min = today;
-document.getElementById('primary-date-picker').value = today;
-onServiceOrDateChange();
 </script>
 {% endblock %}
