@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy - Jackiecutz Hair Studio{% endblock %}
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<div style="max-width: 580px; margin: 25px auto; padding: 30px 24px; background: #0a0a0a; border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 20px; color: #ddd; font-family: 'Montserrat', sans-serif; line-height: 1.6;">
+    
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz" style="width: 100%; max-width: 320px; border-radius: 12px; margin: 0 auto 10px;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
+        <h2 style="color: #d4af37; margin-top: 10px; font-size: 1.4rem; letter-spacing: 1px;">PRIVACY POLICY</h2>
+    </div>
+
+    <p style="font-size: 0.9rem; color: #bbb;">Jackiecutz Hair Studio values your privacy. Personal information collected during registration and booking (name, phone number, email, and address) is used solely to provide appointment reminders, service history, and studio notifications.</p>
+    
+    <p style="font-size: 0.9rem; color: #bbb;">We do not sell, distribute, or share client information with any external marketing agencies or third parties.</p>
+
+    <div style="text-align: center; margin-top: 25px;">
+        <a href="{{ url_for('main.login') }}" style="display: inline-block; padding: 14px 28px; background: #d4af37; color: #000; font-weight: 800; border-radius: 12px; text-decoration: none; text-transform: uppercase; font-size: 0.9rem;">Return to Log In</a>
+    </div>
+</div>
+{% endblock %}

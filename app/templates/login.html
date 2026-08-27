@@ -7,18 +7,16 @@
 
 <div style="max-width: 460px; margin: 0 auto; padding: 20px 15px; font-family: 'Montserrat', sans-serif;">
     
-    <!-- BANNER IMAGE WITH INVISIBLE CLICKABLE OVERLAYS -->
+    <!-- BRANDING CARD IMAGE WITH INVISIBLE CLICKABLE OVERLAYS -->
     <div style="position: relative; max-width: 380px; margin: 0 auto 25px auto; text-align: center;">
         <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
         
-        <!-- CLICKABLE ADDRESS (GOOGLE MAPS) -->
+        <!-- CLICKABLE MAP & PHONE -->
         <a href="https://maps.google.com/?q=806-E+Airtex+Dr+Suite+105,+Houston,+TX+77073" target="_blank" title="Open in Google Maps" style="position: absolute; top: 48%; left: 8%; width: 84%; height: 16%; display: block; cursor: pointer; z-index: 10;"></a>
-        
-        <!-- CLICKABLE PHONE NUMBER (TEL CALL) -->
         <a href="tel:8323534577" title="Call Jackiecutz" style="position: absolute; top: 64%; left: 15%; width: 70%; height: 14%; display: block; cursor: pointer; z-index: 10;"></a>
     </div>
 
-    <!-- FLASH MESSAGES -->
+    <!-- FLASH NOTIFICATIONS -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -38,25 +36,25 @@
         </div>
 
         <!-- PASSWORD -->
-        <div style="margin-bottom: 12px;">
+        <div style="margin-bottom: 14px;">
             <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">PASSWORD</label>
             <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
-        <!-- REMEMBER ME & FORGOT PASSWORD -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; font-size: 0.85rem;">
+        <!-- FIX 1 & 2: REMEMBER ME & DEDICATED FORGOT PASSWORD ROUTE -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem;">
             <label style="color: #aaa; display: flex; align-items: center; gap: 6px; cursor: pointer;">
                 <input type="checkbox" name="remember_me" style="accent-color: #d4af37;"> Remember Me
             </label>
-            <a href="javascript:alert('Please call (832) 353-4577 or visit the salon to reset your password.');" style="color: #d4af37; text-decoration: none; font-weight: 600;">Forgot Password?</a>
+            <a href="{{ url_for('main.forgot_password') }}" style="color: #d4af37; text-decoration: none; font-weight: 600;">Forgot Password?</a>
         </div>
 
-        <!-- TERMS & CONDITIONS / PRIVACY POLICY -->
-        <div style="margin-bottom: 22px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
+        <!-- FIX 2 & 3: CENTERED DEDICATED TERMS & PRIVACY LINKS (NO MODALS) -->
+        <div style="margin: 0 auto 22px auto; max-width: 360px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
             By signing in, you agree to our 
-            <a href="javascript:void(0);" onclick="document.getElementById('terms-modal').style.display='flex';" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Terms & Conditions</a> 
+            <a href="{{ url_for('main.terms') }}" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Terms & Conditions</a> 
             and 
-            <a href="javascript:void(0);" onclick="document.getElementById('privacy-modal').style.display='flex';" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Privacy Policy</a>.
+            <a href="{{ url_for('main.privacy') }}" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Privacy Policy</a>.
         </div>
 
         <!-- SUBMIT BUTTON -->
@@ -65,36 +63,15 @@
         </button>
     </form>
 
-    <!-- NAVIGATION LINKS -->
+    <!-- REGISTER LINK -->
     <div style="text-align: center; margin-top: 20px;">
         <span style="color: #888; font-size: 0.9rem;">Need an account?</span>
         <a href="{{ url_for('main.register') }}" style="color: #d4af37; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Register</a>
     </div>
 
-    <div style="text-align: center; margin-top: 14px; border-top: 1px solid #222; padding-top: 14px; display: flex; justify-content: space-around;">
-        <a href="{{ url_for('main.index') }}" style="color: #777; font-size: 0.82rem; text-decoration: none;">← Back to Home</a>
-        <a href="{{ url_for('main.stylist_dashboard') }}" style="color: #777; font-size: 0.82rem; text-decoration: none;">Stylist Portal →</a>
-    </div>
-</div>
-
-<!-- TERMS & CONDITIONS MODAL -->
-<div id="terms-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
-    <div style="background: #151515; border: 1px solid #d4af37; border-radius: 16px; max-width: 440px; width: 100%; padding: 24px; color: #ddd; font-size: 0.88rem; max-height: 80vh; overflow-y: auto;">
-        <h3 style="color: #d4af37; margin-top: 0; font-size: 1.2rem;">Terms & Cancellation Policy</h3>
-        <p><strong>Appointments & Punctuality:</strong> Please arrive on time. Appointments may need to be rescheduled if delayed more than 15 minutes.</p>
-        <p><strong>Cancellations:</strong> Please provide at least 24 hours notice for any cancellation or rescheduling.</p>
-        <p><strong>Payments:</strong> All services and products must be settled at the studio upon completion.</p>
-        <button onclick="document.getElementById('terms-modal').style.display='none';" style="width: 100%; margin-top: 16px; padding: 10px; background: #d4af37; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">Close</button>
-    </div>
-</div>
-
-<!-- PRIVACY POLICY MODAL -->
-<div id="privacy-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
-    <div style="background: #151515; border: 1px solid #d4af37; border-radius: 16px; max-width: 440px; width: 100%; padding: 24px; color: #ddd; font-size: 0.88rem; max-height: 80vh; overflow-y: auto;">
-        <h3 style="color: #d4af37; margin-top: 0; font-size: 1.2rem;">Privacy Policy</h3>
-        <p>Your personal details (name, phone, email, and birthday) are used solely for booking notifications, account records, and studio updates at Jackiecutz Hair Studio.</p>
-        <p>We do not sell, rent, or distribute your private contact information to third parties.</p>
-        <button onclick="document.getElementById('privacy-modal').style.display='none';" style="width: 100%; margin-top: 16px; padding: 10px; background: #d4af37; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">Close</button>
+    <!-- FIX 4: NO BACK BUTTON (STYLIST PORTAL ONLY) -->
+    <div style="text-align: center; margin-top: 20px; border-top: 1px solid #1a1a1a; padding-top: 14px;">
+        <a href="{{ url_for('main.stylist_dashboard') }}" style="color: #666; font-size: 0.82rem; text-decoration: none; font-weight: 600;">Stylist Portal →</a>
     </div>
 </div>
 
