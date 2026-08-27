@@ -27,7 +27,7 @@ def index():
     return redirect(url_for('main.login'))
 
 # ==========================================
-# 1. AUTHENTICATION (LOGIN & LOGOUT)
+# 1. RETURNING CUSTOMER / STYLIST LOGIN
 # ==========================================
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -37,7 +37,7 @@ def login():
         remember = bool(request.form.get('remember_me'))
         digits = clean_phone(identifier)
 
-        # A. Check Stylist / Admin User
+        # 1. Check Stylist / Admin User
         user = User.query.filter(
             (User.username.ilike(identifier)) | 
             (User.email.ilike(identifier))
@@ -51,7 +51,7 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # B. Check Customer Account (by Name, Username, Phone, or Email)
+        # 2. Check Customer Account (by Name, Phone, or Email)
         customer = Customer.query.filter(
             (Customer.name.ilike(identifier)) |
             (Customer.email.ilike(identifier)) |
@@ -106,7 +106,6 @@ def register():
             'birthday': birthday
         }
 
-        # Required fields validation
         missing = []
         if not first_name:
             missing.append("First Name")
@@ -116,18 +115,18 @@ def register():
             missing.append("Zip Code")
 
         if missing:
-            flash(f"Please complete: {', '.join(missing)}.", "danger")
+            flash(f"Please fill out required fields: {', '.join(missing)}.", "danger")
             return render_template('register.html', form_data=form_data)
 
-        # Check Duplicate Account
-        existing_by_phone = Customer.query.filter(Customer.phone == phone).first()
-        existing_by_email = Customer.query.filter(Customer.email == email).first() if email else None
+        # Catch duplicate accounts
+        existing_phone = Customer.query.filter(Customer.phone == phone).first()
+        existing_email = Customer.query.filter(Customer.email == email).first() if email else None
 
-        if existing_by_phone or existing_by_email:
+        if existing_phone or existing_email:
             flash("An account with this phone number or email already exists. Please sign in.", "warning")
             return redirect(url_for('main.login'))
 
-        # Create New Client Profile
+        # Create new customer record
         new_customer = Customer(
             name=full_name,
             phone=phone,
@@ -139,7 +138,7 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Instant login on first registration
+        # Route client directly into booking portal
         session.clear()
         session['customer_id'] = new_customer.id
         flash(f"Welcome to Jackiecutz, {new_customer.name}!", "success")
@@ -155,7 +154,7 @@ def forgot_password():
     if request.method == 'POST':
         identifier = request.form.get('identifier', '').strip()
         digits = clean_phone(identifier)
-
+        
         customer = Customer.query.filter(
             (Customer.phone == digits if digits else False) |
             (Customer.name.ilike(identifier)) |
@@ -168,13 +167,13 @@ def forgot_password():
             flash(f"Account verified! Welcome back, {customer.name}.", "success")
             return redirect(url_for('main.customer_portal'))
         else:
-            flash("No registered client found. Please create an account below.", "danger")
+            flash("No account matched that information. Please register below.", "danger")
             return redirect(url_for('main.register'))
 
     return render_template('forgot_password.html')
 
 # ==========================================
-# 4. CUSTOMER BOOKING PORTAL & APPOINTMENTS
+# 4. CUSTOMER BOOKING PORTAL & ACTIONS
 # ==========================================
 @main_bp.route('/customer/portal')
 @main_bp.route('/book')
@@ -182,7 +181,7 @@ def forgot_password():
 def customer_portal():
     customer_id = session.get('customer_id')
     customer = Customer.query.get(customer_id) if customer_id else None
-
+    
     try:
         services = BarberService.query.all()
     except Exception:
@@ -213,8 +212,8 @@ def book_service():
     booking_date = request.form.get('booking_date', date.today().strftime('%Y-%m-%d'))
     time_slot = request.form.get('time_slot', '10:00 AM')
 
-    srv_name = "Custom Haircut & Styling"
-    srv_price = 35.00
+    srv_name = "Haircut & Styling"
+    srv_price = 25.00
     if service_id:
         srv = BarberService.query.get(service_id)
         if srv:
@@ -230,7 +229,7 @@ def book_service():
     db.session.add(new_booking)
     db.session.commit()
 
-    flash(f"Appointment scheduled for {booking_date} at {time_slot}!", "success")
+    flash(f"Appointment reserved for {booking_date} at {time_slot}!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/customer/update-profile', methods=['POST'])
@@ -246,7 +245,7 @@ def update_profile():
             customer.birthday = request.form.get('birthday', customer.birthday)
             customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
             db.session.commit()
-            flash("Profile changes successfully updated!", "success")
+            flash("Profile changes saved successfully!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/customer/update-credentials', methods=['POST'])
@@ -259,7 +258,7 @@ def update_credentials():
 @main_bp.route('/add-family-member', methods=['POST'])
 def add_family_member():
     member_name = request.form.get('member_name', '').strip()
-    flash(f"Family member '{member_name}' added to your profile.", "success")
+    flash(f"Family member '{member_name}' added to profile.", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/customer/cancel-booking/<int:booking_id>', methods=['POST'])
@@ -282,22 +281,27 @@ def delete_account():
             db.session.delete(customer)
             db.session.commit()
     session.clear()
-    flash("Account deleted.", "info")
+    flash("Your account has been deleted.", "info")
     return redirect(url_for('main.login'))
 
 # ==========================================
-# 5. GENERAL / KIOSK / STYLIST ROUTES
+# 5. STYLIST DASHBOARD & ALL ACTION ENDPOINTS
 # ==========================================
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
 def stylist_dashboard():
     customers = Customer.query.order_by(Customer.created_at.desc()).all()
     bookings = BarberBooking.query.all()
+    try:
+        services = BarberService.query.all()
+    except Exception:
+        services = []
+
     return render_template(
         'dashboard.html',
         customers=customers,
         bookings=bookings,
-        services=[],
+        services=services,
         search_query="",
         gross_revenue=0.0,
         total_overhead=0.0,
@@ -336,11 +340,22 @@ def create_purchase_order():
 @main_bp.route('/admin/add-service', methods=['POST'])
 @main_bp.route('/add-service', methods=['POST'])
 def add_service():
+    name = request.form.get('name', '').strip()
+    price = request.form.get('price', 0)
+    category = request.form.get('category', 'Haircut')
+    if name:
+        new_srv = BarberService(name=name, price=float(price), category=category)
+        db.session.add(new_srv)
+        db.session.commit()
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/update-booking-status/<int:booking_id>', methods=['POST'])
 @main_bp.route('/update-booking-status/<int:booking_id>', methods=['POST'])
 def update_booking_status(booking_id):
+    booking = BarberBooking.query.get(booking_id)
+    if booking:
+        booking.status = request.form.get('status', 'Completed')
+        db.session.commit()
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/export-tax-csv')
@@ -352,6 +367,9 @@ def export_tax_csv():
     output.seek(0)
     return Response(output.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=tax_report.csv"})
 
+# ==========================================
+# 6. WALK-IN KIOSK & GENERAL ROUTES
+# ==========================================
 @main_bp.route('/kiosk', methods=['GET', 'POST'])
 @main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
 def kiosk():
