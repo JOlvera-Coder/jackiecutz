@@ -7,11 +7,9 @@
 
 <div style="max-width: 460px; margin: 0 auto; padding: 20px 15px; font-family: 'Montserrat', sans-serif;">
     
-    <!-- BRANDING CARD IMAGE WITH INVISIBLE CLICKABLE OVERLAYS -->
+    <!-- BRANDING CARD IMAGE -->
     <div style="position: relative; max-width: 380px; margin: 0 auto 25px auto; text-align: center;">
         <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px; background-color: #000000; mix-blend-mode: screen;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
-        
-        <!-- CLICKABLE MAP & PHONE -->
         <a href="https://maps.google.com/?q=806-E+Airtex+Dr+Suite+105,+Houston,+TX+77073" target="_blank" title="Open in Google Maps" style="position: absolute; top: 48%; left: 8%; width: 84%; height: 16%; display: block; cursor: pointer; z-index: 10;"></a>
         <a href="tel:8323534577" title="Call Jackiecutz" style="position: absolute; top: 64%; left: 15%; width: 70%; height: 14%; display: block; cursor: pointer; z-index: 10;"></a>
     </div>
@@ -20,7 +18,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div style="background: rgba(220, 53, 69, 0.25); border: 1px solid #dc3545; color: #ff858d; padding: 12px 16px; border-radius: 12px; margin-bottom: 18px; font-size: 0.88rem; font-weight: bold; text-align: center;">
+          <div style="background: rgba(197, 160, 89, 0.2); border: 1px solid #c5a059; color: #f3e5ab; padding: 12px 16px; border-radius: 12px; margin-bottom: 18px; font-size: 0.88rem; font-weight: bold; text-align: center;">
             {{ message }}
           </div>
         {% endfor %}
@@ -29,34 +27,34 @@
 
     <form method="POST" action="{{ url_for('main.login') }}">
         
-        <!-- IDENTIFIER -->
+        <!-- USERNAME -->
         <div style="margin-bottom: 18px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">USERNAME, PHONE, OR EMAIL</label>
-            <input type="text" id="login-identifier" name="identifier" placeholder="e.g. alex24 or 832-000-0000" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            <label style="color: #c5a059; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">USERNAME</label>
+            <input type="text" id="login-identifier" name="identifier" placeholder="Enter your username" style="width: 100%; padding: 15px; background: #161616; border: 1px solid #c5a059; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
         </div>
 
         <!-- PASSWORD -->
         <div style="margin-bottom: 14px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">PASSWORD</label>
-            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            <label style="color: #c5a059; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">PASSWORD</label>
+            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 15px; background: #161616; border: 1px solid #c5a059; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
         </div>
 
-        <!-- REMEMBER ME & DEDICATED FORGOT PASSWORD ROUTE -->
+        <!-- REMEMBER ME & FORGOT PASSWORD -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem;">
             <label style="color: #aaa; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                <input type="checkbox" name="remember_me" style="accent-color: #d4af37;"> Remember Me
+                <input type="checkbox" name="remember_me" style="accent-color: #c5a059;"> Remember Me
             </label>
-            <a href="{{ url_for('main.forgot_password') }}" style="color: #d4af37; text-decoration: none; font-weight: 600;">Forgot Password?</a>
+            <a href="{{ url_for('main.forgot_password') }}" style="color: #c5a059; text-decoration: none; font-weight: 600;">Forgot Password?</a>
         </div>
 
-        <!-- SINGLE COMBINED TERMS, CONDITIONS & PRIVACY LINK -->
+        <!-- TERMS & POLICY -->
         <div style="margin: 0 auto 22px auto; max-width: 360px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
             By signing in, you agree to our 
-            <a href="{{ url_for('main.terms') }}" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
+            <a href="{{ url_for('main.terms') }}" style="color: #c5a059; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
         </div>
 
         <!-- SUBMIT BUTTON -->
-        <button type="submit" style="width: 100%; padding: 16px; background: #d4af37; color: #000; font-weight: 800; font-size: 1.05rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Montserrat', sans-serif;">
+        <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #d8b467 0%, #c5a059 100%); color: #000; font-weight: 800; font-size: 1.05rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Montserrat', sans-serif;">
             Log In
         </button>
     </form>
@@ -64,27 +62,12 @@
     <!-- REGISTER LINK -->
     <div style="text-align: center; margin-top: 20px;">
         <span style="color: #888; font-size: 0.9rem;">Need an account?</span>
-        <a href="{{ url_for('main.register') }}" style="color: #d4af37; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Register</a>
+        <a href="{{ url_for('main.register') }}" style="color: #c5a059; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Register</a>
     </div>
 
-    <!-- STYLIST PORTAL ONLY (NO BACK BUTTON) -->
+    <!-- STYLIST PORTAL -->
     <div style="text-align: center; margin-top: 20px; border-top: 1px solid #1a1a1a; padding-top: 14px;">
         <a href="{{ url_for('main.stylist_dashboard') }}" style="color: #666; font-size: 0.82rem; text-decoration: none; font-weight: 600;">Stylist Portal →</a>
     </div>
 </div>
-
-<script>
-const idInput = document.getElementById('login-identifier');
-if (idInput) {
-    idInput.addEventListener('input', function(e) {
-        let val = e.target.value;
-        if (/^[0-9\-\s]+$/.test(val) && val.replace(/\D/g, '').length <= 10) {
-            let x = val.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-            if (x[1]) {
-                e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-            }
-        }
-    });
-}
-</script>
 {% endblock %}

@@ -2,7 +2,6 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app import db
 from app.models import User, Customer, BarberBooking, BarberService
 from werkzeug.security import check_password_hash
-from datetime import datetime
 import re
 
 main_bp = Blueprint('main', __name__)
@@ -38,18 +37,19 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # 2. Client / Customer Check (via Phone or Email)
+        # 2. Client / Customer Check (via Username, Phone, or Email)
         customer = Customer.query.filter(
-            (Customer.phone == digits) if digits else (Customer.email == identifier)
+            (Customer.name.ilike(identifier)) |
+            (Customer.email == identifier) |
+            (Customer.phone == digits) if digits else (Customer.name.ilike(identifier))
         ).first()
 
         if customer:
             session['customer_id'] = customer.id
             session.permanent = remember
-            flash(f"Welcome back, {customer.name}!", "success")
             return redirect(url_for('main.customer_portal'))
 
-        flash("Account not found or invalid credentials. Please check your info or register.", "danger")
+        flash("Account not found or invalid credentials.", "danger")
         return redirect(url_for('main.login'))
 
     return render_template('login.html')
@@ -58,9 +58,10 @@ def login():
 def register():
     form_data = {}
     if request.method == 'POST':
+        username = request.form.get('username', '').strip()
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
-        full_name = f"{first_name} {last_name}".strip() if (first_name or last_name) else request.form.get('name', '').strip()
+        full_name = f"{first_name} {last_name}".strip() if (first_name or last_name) else username
         
         phone_raw = request.form.get('phone', '')
         phone = clean_phone(phone_raw)
@@ -70,6 +71,7 @@ def register():
         birthday = request.form.get('birthday', '').strip()
 
         form_data = {
+            'username': username,
             'first_name': first_name,
             'last_name': last_name,
             'phone': phone_raw,
@@ -79,9 +81,8 @@ def register():
             'birthday': birthday
         }
 
-        # Field validation
         missing = []
-        if not first_name and not full_name:
+        if not first_name:
             missing.append("First Name")
         if not phone or len(phone) < 10:
             missing.append("Valid 10-digit Phone Number")
@@ -95,7 +96,6 @@ def register():
         existing = Customer.query.filter(Customer.phone == phone).first()
         if existing:
             session['customer_id'] = existing.id
-            flash(f"Welcome back, {existing.name}!", "info")
             return redirect(url_for('main.customer_portal'))
 
         new_customer = Customer(
@@ -109,9 +109,8 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Route client directly into customer portal
+        # Direct transition into customer portal
         session['customer_id'] = new_customer.id
-        flash(f"Welcome to Jackiecutz, {first_name or full_name}!", "success")
         return redirect(url_for('main.customer_portal'))
 
     return render_template('register.html', form_data=form_data)
@@ -133,14 +132,28 @@ def customer_portal():
 @main_bp.route('/book/service', methods=['POST'])
 @main_bp.route('/book-service', methods=['POST'])
 def book_service():
-    customer_id = session.get('customer_id')
-    service_id = request.form.get('service_id')
-    date_str = request.form.get('booking_date')
-    time_str = request.form.get('booking_time')
-    
-    # Store or log booking confirmation
-    flash("Your appointment has been successfully scheduled with Jackiecutz!", "success")
+    flash("Your appointment has been successfully scheduled!", "success")
     return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        identifier = request.form.get('identifier', '').strip()
+        digits = clean_phone(identifier)
+        
+        customer = Customer.query.filter(
+            (Customer.phone == digits) if digits else (Customer.name.ilike(identifier))
+        ).first()
+
+        if customer:
+            session['customer_id'] = customer.id
+            flash(f"Account verified! Welcome back, {customer.name}.", "success")
+            return redirect(url_for('main.customer_portal'))
+        else:
+            flash("No account matched that information. Please register below.", "danger")
+            return redirect(url_for('main.register'))
+
+    return render_template('forgot_password.html')
 
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
@@ -181,13 +194,6 @@ def terms():
 @main_bp.route('/privacy')
 def privacy():
     return render_template('terms.html')
-
-@main_bp.route('/forgot-password', methods=['GET', 'POST'])
-def forgot_password():
-    if request.method == 'POST':
-        flash("Password reset instructions have been sent if an account matches.", "info")
-        return redirect(url_for('main.login'))
-    return render_template('forgot_password.html')
 
 @main_bp.route('/logout')
 def logout():
