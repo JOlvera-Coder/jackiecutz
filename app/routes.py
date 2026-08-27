@@ -56,38 +56,75 @@ def login():
 
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    form_data = {}
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        phone = clean_phone(request.form.get('phone', ''))
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        full_name = f"{first_name} {last_name}".strip() if (first_name or last_name) else request.form.get('name', '').strip()
+        
+        phone_raw = request.form.get('phone', '')
+        phone = clean_phone(phone_raw)
         email = request.form.get('email', '').strip()
+        zip_code = request.form.get('zip_code', '').strip()
         address = request.form.get('address', '').strip()
+        gender = request.form.get('gender', '').strip()
+        birthday = request.form.get('birthday', '').strip()
         password = request.form.get('password', '').strip()
         notes = request.form.get('notes', '').strip()
 
-        if not name or not phone or not password:
-            flash("Name, phone, and password are required.", "danger")
-            return redirect(url_for('main.register'))
+        form_data = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'phone': phone_raw,
+            'email': email,
+            'zip_code': zip_code,
+            'address': address,
+            'gender': gender,
+            'birthday': birthday,
+            'notes': notes
+        }
+
+        # Specific field validation
+        missing = []
+        if not first_name and not full_name:
+            missing.append("First Name")
+        if not phone or len(phone) < 10:
+            missing.append("Valid 10-digit Phone Number")
+        if not password:
+            missing.append("Password")
+        if not zip_code:
+            missing.append("Zip Code")
+
+        if missing:
+            flash(f"Please fill out required fields: {', '.join(missing)}.", "danger")
+            return render_template('register.html', form_data=form_data)
 
         existing = Customer.query.filter(Customer.phone == phone).first()
         if existing:
             flash("An account with that phone number already exists. Please log in.", "warning")
             return redirect(url_for('main.login'))
 
+        full_address = f"{address} {zip_code}".strip() if address else zip_code
+        meta_notes = f"Gender: {gender} | Birthday: {birthday}"
+        final_notes = f"{meta_notes} | {notes}".strip(" |") if notes else meta_notes
+
         new_customer = Customer(
-            name=name,
+            name=full_name,
             phone=phone,
             email=email,
-            address=address,
+            address=full_address,
             password_hash=generate_password_hash(password),
-            notes=notes
+            notes=final_notes
         )
         db.session.add(new_customer)
         db.session.commit()
 
-        flash("Registration successful! You can now log in.", "success")
-        return redirect(url_for('main.login'))
+        # Automatically log in and route directly to customer portal
+        session['customer_id'] = new_customer.id
+        flash(f"Welcome to Jackiecutz, {first_name or full_name}! Your account has been created.", "success")
+        return redirect(url_for('main.customer_portal'))
 
-    return render_template('register.html')
+    return render_template('register.html', form_data=form_data)
 
 @main_bp.route('/customer/portal')
 def customer_portal():

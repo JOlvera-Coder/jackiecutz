@@ -5,20 +5,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<div style="max-width: 460px; margin: 0 auto; padding: 20px 15px; font-family: 'Montserrat', sans-serif;">
+<div style="max-width: 480px; margin: 0 auto; padding: 20px 15px; font-family: 'Montserrat', sans-serif;">
     
-    <!-- BANNER IMAGE WITH INVISIBLE CLICKABLE OVERLAYS (NO DUPLICATE TEXT) -->
-    <div style="position: relative; max-width: 380px; margin: 0 auto 25px auto; text-align: center;">
-        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
-        
-        <!-- HIDDEN GOOGLE MAPS LINK OVER ADDRESS (CLICKABLE) -->
+    <!-- TOP LOGO BANNER (MATCHES JET BLACK SEAMLESSLY) -->
+    <div style="position: relative; max-width: 380px; margin: 0 auto 20px auto; text-align: center;">
+        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px; background-color: #000000; mix-blend-mode: screen;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
         <a href="https://maps.google.com/?q=806-E+Airtex+Dr+Suite+105,+Houston,+TX+77073" target="_blank" title="Open in Google Maps" style="position: absolute; top: 48%; left: 8%; width: 84%; height: 16%; display: block; cursor: pointer; z-index: 10;"></a>
-        
-        <!-- HIDDEN TEL LINK OVER PHONE NUMBER (CLICKABLE) -->
         <a href="tel:8323534577" title="Call Jackiecutz" style="position: absolute; top: 64%; left: 15%; width: 70%; height: 14%; display: block; cursor: pointer; z-index: 10;"></a>
     </div>
 
-    <!-- FLASH MESSAGES -->
+    <!-- FLASH NOTIFICATIONS -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -31,86 +27,83 @@
 
     <form method="POST" action="{{ url_for('main.register') }}">
         
-        <!-- FIRST NAME & LAST NAME -->
-        <div style="margin-bottom: 18px;">
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">FIRST NAME *</label>
-                    <input type="text" name="first_name" value="{{ form_data.first_name if form_data else '' }}" placeholder="First" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
-                </div>
-                <div style="flex: 1;">
-                    <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">LAST NAME *</label>
-                    <input type="text" name="last_name" value="{{ form_data.last_name if form_data else '' }}" placeholder="Last" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
-                </div>
+        <!-- FIRST & LAST NAME -->
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div style="flex: 1;">
+                <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">FIRST NAME *</label>
+                <input type="text" name="first_name" value="{{ form_data.first_name if form_data else '' }}" placeholder="First" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            </div>
+            <div style="flex: 1;">
+                <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">LAST NAME *</label>
+                <input type="text" name="last_name" value="{{ form_data.last_name if form_data else '' }}" placeholder="Last" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
             </div>
         </div>
 
-        <!-- GENDER -->
-        <div style="margin-bottom: 18px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">GENDER</label>
+        <!-- GENDER SELECTION -->
+        <div style="margin-bottom: 16px;">
+            <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">GENDER</label>
             <div style="display: flex; gap: 8px;">
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 10px; background: #111; border: 1px solid #333; border-radius: 14px; color: #fff; cursor: pointer; font-size: 0.95rem; font-weight: 600;">
-                    <input type="radio" name="gender" value="Female" {% if not form_data or form_data.gender == 'Female' %}checked{% endif %}> Female
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="gender" value="Female" {% if form_data and form_data.gender == 'Female' %}checked{% endif %} style="accent-color: #d4af37;"> Female
                 </label>
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 10px; background: #111; border: 1px solid #333; border-radius: 14px; color: #fff; cursor: pointer; font-size: 0.95rem; font-weight: 600;">
-                    <input type="radio" name="gender" value="Male" {% if form_data and form_data.gender == 'Male' %}checked{% endif %}> Male
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="gender" value="Male" {% if not form_data or form_data.gender == 'Male' or not form_data.gender %}checked{% endif %} style="accent-color: #d4af37;"> Male
                 </label>
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 10px; background: #111; border: 1px solid #333; border-radius: 14px; color: #fff; cursor: pointer; font-size: 0.95rem; font-weight: 600;">
-                    <input type="radio" name="gender" value="Other" {% if form_data and form_data.gender == 'Other' %}checked{% endif %}> Other
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="gender" value="Other" {% if form_data and form_data.gender == 'Other' %}checked{% endif %} style="accent-color: #d4af37;"> Other
                 </label>
             </div>
         </div>
 
         <!-- BIRTHDAY -->
-        <div style="margin-bottom: 18px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">BIRTHDAY <span style="font-weight: 400; font-size: 0.75rem; color: #888;">(mm/dd/yyyy)</span></label>
-            <input type="text" id="client-bday" name="birthday" value="{{ form_data.birthday if form_data else '' }}" placeholder="07/16/1986" maxlength="10" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        <div style="margin-bottom: 16px;">
+            <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">BIRTHDAY <span style="font-weight: 400; color: #888;">(mm/dd/yyyy)</span></label>
+            <input type="text" id="reg-birthday" name="birthday" value="{{ form_data.birthday if form_data else '' }}" placeholder="MM/DD/YYYY" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;">
         </div>
 
-        <!-- EMAIL -->
-        <div style="margin-bottom: 18px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">EMAIL ADDRESS</label>
-            <input type="email" name="email" value="{{ form_data.email if form_data else '' }}" placeholder="name@example.com" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        <!-- EMAIL ADDRESS -->
+        <div style="margin-bottom: 16px;">
+            <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">EMAIL ADDRESS</label>
+            <input type="email" name="email" value="{{ form_data.email if form_data else '' }}" placeholder="name@example.com" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;">
         </div>
 
-        <!-- PHONE -->
-        <div style="margin-bottom: 18px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">PHONE NUMBER</label>
-            <input type="tel" id="client-phone" name="phone" value="{{ form_data.phone if form_data else '' }}" placeholder="832-000-0000" maxlength="12" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        <!-- PHONE NUMBER -->
+        <div style="margin-bottom: 16px;">
+            <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">PHONE NUMBER *</label>
+            <input type="tel" id="reg-phone" name="phone" value="{{ form_data.phone if form_data else '' }}" placeholder="832-000-0000" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
         <!-- ZIP CODE & ADDRESS -->
-        <div style="margin-bottom: 18px;">
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">ZIP CODE *</label>
-                    <input type="text" name="zip_code" value="{{ form_data.zip_code if form_data else '' }}" placeholder="77073" maxlength="5" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
-                </div>
-                <div style="flex: 1.5;">
-                    <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">ADDRESS <span style="font-weight: 400; font-size: 0.75rem; color: #888;">(OPTIONAL)</span></label>
-                    <input type="text" name="address" value="{{ form_data.address if form_data else '' }}" placeholder="123 Main St" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;">
-                </div>
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div style="width: 35%;">
+                <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">ZIP CODE *</label>
+                <input type="text" name="zip_code" value="{{ form_data.zip_code if form_data else '' }}" placeholder="77073" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            </div>
+            <div style="width: 65%;">
+                <label style="color: #888; font-weight: 700; font-size: 0.82rem; display: block; margin-bottom: 6px;">ADDRESS <span style="font-weight: 400;">(OPTIONAL)</span></label>
+                <input type="text" name="address" value="{{ form_data.address if form_data else '' }}" placeholder="123 Main St" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;">
             </div>
         </div>
 
-        <!-- USERNAME -->
-        <div style="margin-bottom: 18px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">USERNAME</label>
-            <input type="text" name="username" value="{{ form_data.username if form_data else '' }}" placeholder="e.g. alex24" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        <!-- PASSWORD -->
+        <div style="margin-bottom: 20px;">
+            <label style="color: #d4af37; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">CREATE PASSWORD *</label>
+            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 14px; background: #fffde7; border: 1px solid #d4af37; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
-        <!-- PASSWORD -->
-        <div style="margin-bottom: 25px;">
-            <label style="color: #d4af37; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">PASSWORD</label>
-            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        <!-- TERMS & POLICY LINK -->
+        <div style="margin: 0 auto 20px auto; max-width: 360px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
+            By registering, you agree to our 
+            <a href="{{ url_for('main.terms') }}" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
         </div>
 
         <!-- SUBMIT BUTTON -->
-        <button type="submit" style="width: 100%; padding: 16px; background: #d4af37; color: #000; font-weight: 800; font-size: 1.05rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;">
-            Sign Up
+        <button type="submit" style="width: 100%; padding: 16px; background: #d4af37; color: #000; font-weight: 800; font-size: 1rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Montserrat', sans-serif;">
+            Create Account
         </button>
     </form>
 
+    <!-- BACK TO LOGIN -->
     <div style="text-align: center; margin-top: 20px;">
         <span style="color: #888; font-size: 0.9rem;">Already have an account?</span>
         <a href="{{ url_for('main.login') }}" style="color: #d4af37; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Log In</a>
@@ -118,19 +111,27 @@
 </div>
 
 <script>
-const phoneInput = document.getElementById('client-phone');
+// Format Phone Number as (XXX-XXX-XXXX)
+const phoneInput = document.getElementById('reg-phone');
 if (phoneInput) {
     phoneInput.addEventListener('input', function(e) {
-        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-        e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+        let val = e.target.value.replace(/\D/g, '');
+        let x = val.match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+        if (x[1]) {
+            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+        }
     });
 }
 
-const bdayInput = document.getElementById('client-bday');
+// Format Birthday as MM/DD/YYYY
+const bdayInput = document.getElementById('reg-birthday');
 if (bdayInput) {
     bdayInput.addEventListener('input', function(e) {
-        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
-        e.target.value = !x[2] ? x[1] : x[1] + '/' + x[2] + (x[3] ? '/' + x[3] : '');
+        let val = e.target.value.replace(/\D/g, '');
+        let x = val.match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
+        if (x[1]) {
+            e.target.value = !x[2] ? x[1] : x[1] + '/' + x[2] + (x[3] ? '/' + x[3] : '');
+        }
     });
 }
 </script>
