@@ -165,11 +165,13 @@ def admin_dashboard():
     bookings = BarberBooking.query.order_by(BarberBooking.start_time.desc()).all()
     return render_template('admin_dashboard.html', customers=customers, bookings=bookings, search_query=search_query)
 
-@main_bp.route('/stylist/dashboard')
-def stylist_dashboard():
-    today = date.today()
-    bookings = BarberBooking.query.filter(
-        BarberBooking.start_time >= datetime.combine(today, time.min),
-        BarberBooking.start_time <= datetime.combine(today, time.max)
-    ).order_by(BarberBooking.start_time.asc()).all()
-    return render_template('stylist_dashboard.html', bookings=bookings)
+@main_bp.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@main_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        flash("Password reset instructions have been sent if an account matches.", "info")
+        return redirect(url_for('main.login'))
+    return render_template('forgot_password.html')
