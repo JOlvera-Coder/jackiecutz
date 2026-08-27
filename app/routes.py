@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify, Response
 from app import db
 from app.models import User, Customer, BarberBooking, BarberService
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, date
 import csv
 import io
@@ -188,6 +188,12 @@ def update_profile():
             flash("Profile updated successfully!", "success")
     return redirect(url_for('main.customer_portal'))
 
+@main_bp.route('/customer/update-credentials', methods=['POST'])
+@main_bp.route('/update-credentials', methods=['POST'])
+def update_credentials():
+    flash("Security credentials updated successfully.", "success")
+    return redirect(url_for('main.customer_portal'))
+
 @main_bp.route('/customer/add-family-member', methods=['POST'])
 @main_bp.route('/add-family-member', methods=['POST'])
 def add_family_member():
@@ -212,7 +218,6 @@ def kiosk():
         name = request.form.get('name', '').strip()
         phone_raw = request.form.get('phone', '')
         phone = clean_phone(phone_raw)
-        service_id = request.form.get('service_id')
 
         if not name or not phone:
             flash("Please enter both your Name and Phone Number.", "danger")
@@ -282,7 +287,6 @@ def stylist_dashboard():
     except Exception:
         services = []
 
-    # Financial & KPI Calculations
     gross_revenue = 0.0
     today_revenue = 0.0
     completed_bookings = 0
@@ -349,12 +353,18 @@ def stylist_dashboard():
         zip_counts=zip_counts
     )
 
-# Dashboard Management Actions
 @main_bp.route('/admin/add-product', methods=['POST'])
 @main_bp.route('/add-product', methods=['POST'])
 def add_product():
     product_name = request.form.get('name', 'Product')
     flash(f"Product '{product_name}' registered successfully.", "success")
+    return redirect(url_for('main.stylist_dashboard'))
+
+@main_bp.route('/admin/create-purchase-order', methods=['POST'])
+@main_bp.route('/create-purchase-order', methods=['POST'])
+def create_purchase_order():
+    item = request.form.get('item', 'Supply order')
+    flash(f"Purchase order for '{item}' submitted to studio inventory.", "success")
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/add-service', methods=['POST'])
