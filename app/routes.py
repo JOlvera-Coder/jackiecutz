@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify, Response
 from app import db
 from app.models import User, Customer, BarberBooking, BarberService
 from werkzeug.security import check_password_hash
+import csv
+import io
 import re
 
 main_bp = Blueprint('main', __name__)
@@ -109,12 +111,12 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Direct transition into customer portal
         session['customer_id'] = new_customer.id
         return redirect(url_for('main.customer_portal'))
 
     return render_template('register.html', form_data=form_data)
 
+# CUSTOMER PORTAL (Supports both 'customer_portal' and 'client_portal' endpoints)
 @main_bp.route('/customer/portal')
 @main_bp.route('/book')
 @main_bp.route('/booking')
@@ -133,6 +135,10 @@ def customer_portal():
         bookings = []
 
     return render_template('booking.html', customer=customer, services=services, bookings=bookings)
+
+@main_bp.route('/customer/portal', endpoint='client_portal')
+def client_portal():
+    return customer_portal()
 
 @main_bp.route('/book/service', methods=['POST'])
 @main_bp.route('/book-service', methods=['POST'])
@@ -187,6 +193,7 @@ def forgot_password():
 
     return render_template('forgot_password.html')
 
+# STYLIST DASHBOARD (Supports both 'stylist_dashboard' and 'admin' endpoints)
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
 def stylist_dashboard():
@@ -209,7 +216,7 @@ def stylist_dashboard():
     except Exception:
         bookings = BarberBooking.query.all()
 
-    # Aggregate Zip Codes for Map visualization
+    # Aggregate Zip Codes for Map
     zip_counts = {}
     for c in customers:
         if getattr(c, 'zip_code', None):
@@ -218,13 +225,46 @@ def stylist_dashboard():
 
     return render_template('dashboard.html', customers=customers, bookings=bookings, search_query=search_query, zip_counts=zip_counts)
 
+# KIOSK ENDPOINTS (Supports both 'kiosk' and 'walkin_kiosk')
 @main_bp.route('/kiosk')
+@main_bp.route('/walkin-kiosk')
 def kiosk():
+    return render_template('kiosk.html')
+
+@main_bp.route('/kiosk', endpoint='walkin_kiosk')
+def walkin_kiosk():
     return render_template('kiosk.html')
 
 @main_bp.route('/kiosk/success')
 def kiosk_success():
     return render_template('kiosk_success.html')
+
+@main_bp.route('/admin/export-tax-csv')
+@main_bp.route('/export-tax-csv')
+def export_tax_csv():
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Booking ID', 'Customer Name', 'Phone', 'Service', 'Price', 'Date', 'Status'])
+
+    try:
+        bookings = BarberBooking.query.all()
+        for b in bookings:
+            cust_name = b.customer.name if getattr(b, 'customer', None) else 'Walk-in'
+            cust_phone = b.customer.phone if getattr(b, 'customer', None) else ''
+            srv_name = getattr(b, 'service_name', 'Service')
+            price = getattr(b, 'price', 0)
+            created = getattr(b, 'created_at', '')
+            status = getattr(b, 'status', 'Completed')
+            writer.writerow([b.id, cust_name, cust_phone, srv_name, price, created, status])
+    except Exception:
+        pass
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=jackiecutz_tax_report.csv"}
+    )
 
 @main_bp.route('/terms')
 def terms():
