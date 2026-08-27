@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify, Response
 from app import db
-from app.models import User, Customer, BarberBooking, BarberService
+from app.models import User, Customer, BarberBooking, BarberService, Product, StudioExpense, ExpenseCategory
 from werkzeug.security import check_password_hash, generate_password_hash
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import csv
 import io
 import re
@@ -26,9 +26,6 @@ DEFAULT_TIME_SLOTS = [
 def index():
     return redirect(url_for('main.login'))
 
-# ==========================================
-# 1. AUTHENTICATION (FLEXIBLE IDENTIFIER MATCH)
-# ==========================================
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -51,13 +48,15 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # 2. Customer Lookup: Matches exact username (IOlvera), full name (Ian Olvera), first name (Ian), or phone
+        # 2. Universal Customer Lookup (Username, Phone, Full Name, or Email)
         customer = None
         if digits and len(digits) >= 7:
             customer = Customer.query.filter(Customer.phone == digits).first()
 
+        if not customer and hasattr(Customer, 'username'):
+            customer = Customer.query.filter(Customer.username.ilike(identifier)).first()
+
         if not customer:
-            # Query case-insensitively across name or email
             customer = Customer.query.filter(
                 (Customer.name.ilike(identifier)) |
                 (Customer.name.ilike(f"%{identifier}%")) |
@@ -76,15 +75,6 @@ def login():
 
     return render_template('login.html')
 
-@main_bp.route('/logout')
-def logout():
-    session.clear()
-    flash("You have been signed out.", "info")
-    return redirect(url_for('main.login'))
-
-# ==========================================
-# 2. CUSTOMER REGISTRATION
-# ==========================================
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
     form_data = {}
@@ -92,7 +82,6 @@ def register():
         username = request.form.get('username', '').strip()
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
-        
         full_name = f"{first_name} {last_name}".strip() if (first_name or last_name) else username
         
         phone_raw = request.form.get('phone', '')
@@ -113,27 +102,23 @@ def register():
             'birthday': birthday
         }
 
-        missing = []
         if not first_name and not username:
-            missing.append("First Name or Username")
+            flash("Please provide a First Name or Username.", "danger")
+            return render_template('register.html', form_data=form_data)
         if not phone or len(phone) < 10:
-            missing.append("Valid 10-digit Phone Number")
+            flash("Please provide a valid 10-digit phone number.", "danger")
+            return render_template('register.html', form_data=form_data)
         if not zip_code:
-            missing.append("Zip Code")
-
-        if missing:
-            flash(f"Please complete: {', '.join(missing)}.", "danger")
+            flash("Please provide a zip code.", "danger")
             return render_template('register.html', form_data=form_data)
 
-        # Prevent duplicates
         existing_phone = Customer.query.filter(Customer.phone == phone).first()
-        existing_email = Customer.query.filter(Customer.email == email).first() if email else None
-
-        if existing_phone or existing_email:
-            flash("An account with this phone number or email already exists. Please sign in.", "warning")
+        if existing_phone:
+            flash("An account with this phone number already exists. Please sign in.", "warning")
             return redirect(url_for('main.login'))
 
         new_customer = Customer(
+            username=username if username else None,
             name=full_name,
             phone=phone,
             email=email if email else None,
@@ -151,248 +136,103 @@ def register():
 
     return render_template('register.html', form_data=form_data)
 
-# ==========================================
-# 3. ACCOUNT RECOVERY
-# ==========================================
+@main_bp.route('/booking')
+@main_bp.route('/customer/portal')
+def customer_portal():
+    customer = None
+    if 'customer_id' in session:
+        customer = Customer.query.get(session['customer_id'])
+    services = BarberService.query.all()
+    return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS)
+
+@main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
+def walkin_kiosk():
+    if request.method == 'POST':
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        full_name = f"{first_name} {last_name}".strip()
+        phone = clean_phone(request.form.get('phone', ''))
+        email = request.form.get('email', '').strip()
+        zip_code = request.form.get('zip_code', '77073').strip()
+        service_name = request.form.get('service', 'Signature Haircut')
+
+        if not phone or len(phone) < 10:
+            flash("Please provide a valid 10-digit phone number.", "danger")
+            return redirect(url_for('main.walkin_kiosk'))
+
+        customer = Customer.query.filter(Customer.phone == phone).first()
+        if not customer:
+            customer = Customer(
+                name=full_name if full_name else "Walk-In Client",
+                phone=phone,
+                email=email if email else None,
+                zip_code=zip_code
+            )
+            db.session.add(customer)
+            db.session.commit()
+
+        booking = BarberBooking(
+            customer_id=customer.id,
+            service_name=service_name,
+            status="In Queue",
+            price=35.0,
+            appointment_time=datetime.utcnow()
+        )
+        db.session.add(booking)
+        db.session.commit()
+
+        flash(f"Thank you, {customer.name}! You are in line for {service_name}.", "success")
+        return redirect(url_for('main.walkin_kiosk'))
+
+    services = BarberService.query.all()
+    return render_template('kiosk.html', services=services)
+
+@main_bp.route('/admin')
+@main_bp.route('/stylist/dashboard')
+def stylist_dashboard():
+    if 'user_id' not in session:
+        flash("Please log in as a stylist to access the command center.", "warning")
+        return redirect(url_for('main.login'))
+
+    total_revenue = sum([b.price for b in BarberBooking.query.filter(BarberBooking.status == 'Completed').all()]) or 0.0
+    total_clients = Customer.query.count()
+    active_bookings = BarberBooking.query.order_by(BarberBooking.appointment_time.desc()).limit(15).all()
+
+    chart_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    chart_data = [120, 180, 240, 210, 320, 450, 380]
+    chart_channel_labels = ["Walk-in Kiosk", "Online Booking", "Phone / Direct"]
+    chart_channel_data = [45, 35, 20]
+    recent_activity = active_bookings
+
+    return render_template(
+        'dashboard.html',
+        total_revenue=total_revenue,
+        total_clients=total_clients,
+        active_bookings=active_bookings,
+        chart_labels=chart_labels,
+        chart_data=chart_data,
+        chart_channel_labels=chart_channel_labels,
+        chart_channel_data=chart_channel_data,
+        recent_activity=recent_activity
+    )
+
+@main_bp.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been securely signed out.", "info")
+    return redirect(url_for('main.login'))
+
 @main_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         identifier = request.form.get('identifier', '').strip()
         digits = clean_phone(identifier)
-        
         customer = Customer.query.filter(
-            (Customer.phone == digits if digits else False) |
-            (Customer.name.ilike(identifier)) |
-            (Customer.name.ilike(f"%{identifier}%")) |
-            (Customer.email.ilike(identifier))
-        ).first()
+            (Customer.phone == digits) | (Customer.email.ilike(identifier))
+        ).first() if (digits or identifier) else None
 
         if customer:
-            session.clear()
-            session['customer_id'] = customer.id
-            flash(f"Account verified! Welcome back, {customer.name}.", "success")
-            return redirect(url_for('main.customer_portal'))
-        else:
-            flash("No registered client found. Please create an account below.", "danger")
-            return redirect(url_for('main.register'))
-
+            flash(f"Account match confirmed for {customer.name}. Sign in directly with your phone ({customer.phone}).", "success")
+            return redirect(url_for('main.login'))
+        flash("No matching record found. Please check your phone number or register.", "danger")
     return render_template('forgot_password.html')
-
-# ==========================================
-# 4. CUSTOMER BOOKING PORTAL & ACTIONS
-# ==========================================
-@main_bp.route('/customer/portal')
-@main_bp.route('/book')
-@main_bp.route('/booking')
-def customer_portal():
-    customer_id = session.get('customer_id')
-    customer = Customer.query.get(customer_id) if customer_id else None
-    
-    try:
-        services = BarberService.query.all()
-    except Exception:
-        services = []
-
-    try:
-        bookings = customer.bookings.all() if customer and hasattr(customer, 'bookings') else []
-    except Exception:
-        bookings = []
-
-    return render_template(
-        'booking.html',
-        customer=customer,
-        services=services,
-        bookings=bookings,
-        time_slots=DEFAULT_TIME_SLOTS
-    )
-
-@main_bp.route('/customer/portal', endpoint='client_portal')
-def client_portal():
-    return customer_portal()
-
-@main_bp.route('/book/service', methods=['POST'])
-@main_bp.route('/book-service', methods=['POST'])
-def book_service():
-    customer_id = session.get('customer_id')
-    service_id = request.form.get('service_id')
-    booking_date = request.form.get('booking_date', date.today().strftime('%Y-%m-%d'))
-    time_slot = request.form.get('time_slot', '10:00 AM')
-
-    srv_name = "Custom Haircut & Styling"
-    srv_price = 25.00
-    if service_id:
-        srv = BarberService.query.get(service_id)
-        if srv:
-            srv_name = srv.name
-            srv_price = srv.price
-
-    new_booking = BarberBooking(
-        customer_id=customer_id,
-        service_name=f"{srv_name} ({time_slot})",
-        price=srv_price,
-        status="Confirmed"
-    )
-    db.session.add(new_booking)
-    db.session.commit()
-
-    flash(f"Appointment reserved for {booking_date} at {time_slot}!", "success")
-    return redirect(url_for('main.customer_portal'))
-
-@main_bp.route('/customer/update-profile', methods=['POST'])
-@main_bp.route('/update-profile', methods=['POST'])
-def update_profile():
-    customer_id = session.get('customer_id')
-    if customer_id:
-        customer = Customer.query.get(customer_id)
-        if customer:
-            customer.name = request.form.get('name', customer.name).strip()
-            customer.phone = clean_phone(request.form.get('phone', customer.phone))
-            customer.email = request.form.get('email', customer.email).strip()
-            customer.birthday = request.form.get('birthday', customer.birthday)
-            customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
-            db.session.commit()
-            flash("Profile changes saved successfully!", "success")
-    return redirect(url_for('main.customer_portal'))
-
-@main_bp.route('/customer/update-credentials', methods=['POST'])
-@main_bp.route('/update-credentials', methods=['POST'])
-def update_credentials():
-    flash("Security settings updated.", "success")
-    return redirect(url_for('main.customer_portal'))
-
-@main_bp.route('/customer/add-family-member', methods=['POST'])
-@main_bp.route('/add-family-member', methods=['POST'])
-def add_family_member():
-    member_name = request.form.get('member_name', '').strip()
-    flash(f"Family member '{member_name}' added to profile.", "success")
-    return redirect(url_for('main.customer_portal'))
-
-@main_bp.route('/customer/cancel-booking/<int:booking_id>', methods=['POST'])
-@main_bp.route('/cancel-booking/<int:booking_id>', methods=['POST'])
-def cancel_booking(booking_id):
-    booking = BarberBooking.query.get(booking_id)
-    if booking:
-        booking.status = "Cancelled"
-        db.session.commit()
-        flash("Appointment cancelled.", "info")
-    return redirect(url_for('main.customer_portal'))
-
-@main_bp.route('/customer/delete-account', methods=['POST'])
-@main_bp.route('/delete-account', methods=['POST'])
-def delete_account():
-    customer_id = session.get('customer_id')
-    if customer_id:
-        customer = Customer.query.get(customer_id)
-        if customer:
-            db.session.delete(customer)
-            db.session.commit()
-    session.clear()
-    flash("Account deleted.", "info")
-    return redirect(url_for('main.login'))
-
-# ==========================================
-# 5. STYLIST DASHBOARD & ALL ACTION ENDPOINTS
-# ==========================================
-@main_bp.route('/stylist/dashboard')
-@main_bp.route('/admin')
-def stylist_dashboard():
-    customers = Customer.query.order_by(Customer.created_at.desc()).all()
-    bookings = BarberBooking.query.all()
-    try:
-        services = BarberService.query.all()
-    except Exception:
-        services = []
-
-    return render_template(
-        'dashboard.html',
-        customers=customers,
-        bookings=bookings,
-        services=services,
-        search_query="",
-        gross_revenue=0.0,
-        total_overhead=0.0,
-        net_profit=0.0,
-        net_income=0.0,
-        booth_rent=0.0,
-        product_sales=0.0,
-        tax_deductible_overhead=0.0,
-        tax_liability_est=0.0,
-        barber_payout=0.0,
-        shop_cut=0.0,
-        today_revenue=0.0,
-        total_clients=len(customers),
-        total_bookings=len(bookings),
-        completed_bookings=0,
-        pending_bookings=0,
-        today_bookings=0,
-        zip_counts={}
-    )
-
-@main_bp.route('/admin/add-expense', methods=['POST'])
-@main_bp.route('/add-expense', methods=['POST'])
-def add_expense():
-    return redirect(url_for('main.stylist_dashboard'))
-
-@main_bp.route('/admin/add-product', methods=['POST'])
-@main_bp.route('/add-product', methods=['POST'])
-def add_product():
-    return redirect(url_for('main.stylist_dashboard'))
-
-@main_bp.route('/admin/create-purchase-order', methods=['POST'])
-@main_bp.route('/create-purchase-order', methods=['POST'])
-def create_purchase_order():
-    return redirect(url_for('main.stylist_dashboard'))
-
-@main_bp.route('/admin/add-service', methods=['POST'])
-@main_bp.route('/add-service', methods=['POST'])
-def add_service():
-    name = request.form.get('name', '').strip()
-    price = request.form.get('price', 0)
-    category = request.form.get('category', 'Haircut')
-    if name:
-        new_srv = BarberService(name=name, price=float(price), category=category)
-        db.session.add(new_srv)
-        db.session.commit()
-    return redirect(url_for('main.stylist_dashboard'))
-
-@main_bp.route('/admin/update-booking-status/<int:booking_id>', methods=['POST'])
-@main_bp.route('/update-booking-status/<int:booking_id>', methods=['POST'])
-def update_booking_status(booking_id):
-    booking = BarberBooking.query.get(booking_id)
-    if booking:
-        booking.status = request.form.get('status', 'Completed')
-        db.session.commit()
-    return redirect(url_for('main.stylist_dashboard'))
-
-@main_bp.route('/admin/export-tax-csv')
-@main_bp.route('/export-tax-csv')
-def export_tax_csv():
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(['Booking ID', 'Customer Name', 'Phone', 'Service', 'Price', 'Status'])
-    output.seek(0)
-    return Response(output.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=tax_report.csv"})
-
-# ==========================================
-# 6. WALK-IN KIOSK & GENERAL ROUTES
-# ==========================================
-@main_bp.route('/kiosk', methods=['GET', 'POST'])
-@main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
-def kiosk():
-    return render_template('kiosk.html', services=[])
-
-@main_bp.route('/kiosk', endpoint='walkin_kiosk')
-def walkin_kiosk():
-    return kiosk()
-
-@main_bp.route('/kiosk/success')
-def kiosk_success():
-    return render_template('kiosk_success.html', client_name="Client")
-
-@main_bp.route('/terms')
-def terms():
-    return render_template('terms.html')
-
-@main_bp.route('/privacy')
-def privacy():
-    return render_template('terms.html')
