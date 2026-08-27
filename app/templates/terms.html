@@ -5,30 +5,54 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-<div style="max-width: 580px; margin: 25px auto; padding: 30px 24px; background: #0a0a0a; border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 20px; color: #ddd; font-family: 'Montserrat', sans-serif; line-height: 1.6;">
+<div style="max-width: 580px; margin: 25px auto; padding: 25px 20px; background: #0a0a0a; border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 20px; color: #ddd; font-family: 'Montserrat', sans-serif; line-height: 1.6;">
     
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz" style="width: 100%; max-width: 320px; border-radius: 12px; margin: 0 auto 10px;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
-        <h2 style="color: #d4af37; margin-top: 10px; font-size: 1.4rem; letter-spacing: 1px;">TERMS & CONDITIONS</h2>
+    <!-- TOP LOGO BANNER WITH CLICKABLE HOTSPOTS -->
+    <div style="position: relative; max-width: 380px; margin: 0 auto 20px auto; text-align: center;">
+        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
+        
+        <!-- CLICKABLE ADDRESS (GOOGLE MAPS) -->
+        <a href="https://maps.google.com/?q=806-E+Airtex+Dr+Suite+105,+Houston,+TX+77073" target="_blank" title="Open in Google Maps" style="position: absolute; top: 48%; left: 8%; width: 84%; height: 16%; display: block; cursor: pointer; z-index: 10;"></a>
+        
+        <!-- CLICKABLE PHONE NUMBER -->
+        <a href="tel:8323534577" title="Call Jackiecutz" style="position: absolute; top: 64%; left: 15%; width: 70%; height: 14%; display: block; cursor: pointer; z-index: 10;"></a>
     </div>
 
+    <h2 style="color: #d4af37; text-align: center; margin: 0 0 20px 0; font-size: 1.25rem; letter-spacing: 1.5px; text-transform: uppercase;">Terms & Conditions</h2>
+
+    <!-- 1. APPOINTMENTS & PUNCTUALITY -->
     <div style="margin-bottom: 18px;">
-        <h4 style="color: #f3e5ab; margin: 0 0 4px 0; font-size: 0.95rem;">1. Appointments & Arrival</h4>
-        <p style="font-size: 0.88rem; color: #aaa; margin: 0;">Please arrive on time. A 15-minute grace period is allowed; arrivals after 15 minutes may require rescheduling or service adjustment.</p>
+        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">1. Appointments & Punctuality</h4>
+        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">Clients are encouraged to arrive 5 to 10 minutes prior to scheduled appointments. A strict 15-minute grace period applies. If you arrive more than 15 minutes late, your appointment may be shortened to accommodate subsequent clients or subject to rescheduling.</p>
     </div>
 
+    <!-- 2. CANCELLATION & NO-SHOW POLICY -->
     <div style="margin-bottom: 18px;">
-        <h4 style="color: #f3e5ab; margin: 0 0 4px 0; font-size: 0.95rem;">2. Cancellation Policy</h4>
-        <p style="font-size: 0.88rem; color: #aaa; margin: 0;">Please provide at least 24 hours advance notice for any appointment cancellations or rescheduling requests.</p>
+        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">2. 24-Hour Cancellation & No-Show Policy</h4>
+        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">We require a minimum of 24 hours advance notice to cancel or reschedule any appointment. If you need to cancel or change your time, please notify us at least 24 hours in advance by calling or texting <a href="tel:8323534577" style="color: #f3e5ab; text-decoration: underline; font-weight: 600;">(832) 353-4577</a> or through your client account. Cancellations made with less than 24 hours notice or missed appointments without notice (No-Shows) may require a non-refundable deposit for future bookings.</p>
     </div>
 
+    <!-- 3. SERVICES & PAYMENTS -->
     <div style="margin-bottom: 18px;">
-        <h4 style="color: #f3e5ab; margin: 0 0 4px 0; font-size: 0.95rem;">3. Payments & Services</h4>
-        <p style="font-size: 0.88rem; color: #aaa; margin: 0;">All haircuts, grooming services, and products are to be settled in person at Jackiecutz Studio upon completion.</p>
+        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">3. Services & Payments</h4>
+        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">All prices for haircutting, styling, beard trims, chemical treatments, and retail products are final. Payment in full is due immediately upon completion of services via approved studio payment methods.</p>
     </div>
 
-    <div style="text-align: center; margin-top: 25px;">
-        <a href="{{ url_for('main.login') }}" style="display: inline-block; padding: 14px 28px; background: #d4af37; color: #000; font-weight: 800; border-radius: 12px; text-decoration: none; text-transform: uppercase; font-size: 0.9rem;">Return to Log In</a>
+    <!-- 4. CLIENT SAFETY & STUDIO ETIQUETTE -->
+    <div style="margin-bottom: 18px;">
+        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">4. Client Safety & Studio Etiquette</h4>
+        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">We reserve the right to refuse service to anyone demonstrating disrespectful behavior, intoxication, or showing signs of contagious scalp/skin conditions to ensure health and hygiene standards.</p>
+    </div>
+
+    <!-- 5. PRIVACY & INFORMATION USE -->
+    <div style="margin-bottom: 18px;">
+        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">5. Privacy & Information Use</h4>
+        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">Customer contact information (name, phone number, email address, and birthday) is collected solely for appointment reminders, profile management, and studio updates. Information is strictly confidential and never sold to third parties.</p>
+    </div>
+
+    <!-- RETURN TO LOGIN BUTTON -->
+    <div style="text-align: center; margin-top: 25px; border-top: 1px solid #1a1a1a; padding-top: 20px;">
+        <a href="{{ url_for('main.login') }}" style="display: inline-block; width: 100%; max-width: 280px; padding: 14px 20px; background: #d4af37; color: #000; font-weight: 800; border-radius: 12px; text-decoration: none; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; box-sizing: border-box;">Return to Log In</a>
     </div>
 </div>
 {% endblock %}
