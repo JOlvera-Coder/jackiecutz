@@ -41,7 +41,7 @@
             <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 15px; background: #fffde7; border: 1px solid #d4af37; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
-        <!-- FIX 1 & 2: REMEMBER ME & DEDICATED FORGOT PASSWORD ROUTE -->
+        <!-- REMEMBER ME & DEDICATED FORGOT PASSWORD ROUTE -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem;">
             <label style="color: #aaa; display: flex; align-items: center; gap: 6px; cursor: pointer;">
                 <input type="checkbox" name="remember_me" style="accent-color: #d4af37;"> Remember Me
@@ -49,12 +49,10 @@
             <a href="{{ url_for('main.forgot_password') }}" style="color: #d4af37; text-decoration: none; font-weight: 600;">Forgot Password?</a>
         </div>
 
-        <!-- FIX 2 & 3: CENTERED DEDICATED TERMS & PRIVACY LINKS (NO MODALS) -->
+        <!-- SINGLE COMBINED TERMS, CONDITIONS & PRIVACY LINK -->
         <div style="margin: 0 auto 22px auto; max-width: 360px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
             By signing in, you agree to our 
-            <a href="{{ url_for('main.terms') }}" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Terms & Conditions</a> 
-            and 
-            <a href="{{ url_for('main.privacy') }}" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Privacy Policy</a>.
+            <a href="{{ url_for('main.terms') }}" style="color: #d4af37; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
         </div>
 
         <!-- SUBMIT BUTTON -->
@@ -69,7 +67,7 @@
         <a href="{{ url_for('main.register') }}" style="color: #d4af37; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Register</a>
     </div>
 
-    <!-- FIX 4: NO BACK BUTTON (STYLIST PORTAL ONLY) -->
+    <!-- STYLIST PORTAL ONLY (NO BACK BUTTON) -->
     <div style="text-align: center; margin-top: 20px; border-top: 1px solid #1a1a1a; padding-top: 14px;">
         <a href="{{ url_for('main.stylist_dashboard') }}" style="color: #666; font-size: 0.82rem; text-decoration: none; font-weight: 600;">Stylist Portal →</a>
     </div>
