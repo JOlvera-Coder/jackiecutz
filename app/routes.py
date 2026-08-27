@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app import db
 from app.models import User, Customer, BarberBooking, BarberService
 from werkzeug.security import check_password_hash
+from datetime import datetime, date
 import csv
 import io
 import re
@@ -116,7 +117,6 @@ def register():
 
     return render_template('register.html', form_data=form_data)
 
-# CUSTOMER PORTAL (Supports both 'customer_portal' and 'client_portal' endpoints)
 @main_bp.route('/customer/portal')
 @main_bp.route('/book')
 @main_bp.route('/booking')
@@ -193,7 +193,6 @@ def forgot_password():
 
     return render_template('forgot_password.html')
 
-# STYLIST DASHBOARD (Supports both 'stylist_dashboard' and 'admin' endpoints)
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
 def stylist_dashboard():
@@ -216,16 +215,71 @@ def stylist_dashboard():
     except Exception:
         bookings = BarberBooking.query.all()
 
-    # Aggregate Zip Codes for Map
+    try:
+        services = BarberService.query.all()
+    except Exception:
+        services = []
+
+    # Financial & Operational KPI calculations
+    gross_revenue = 0.0
+    today_revenue = 0.0
+    completed_bookings = 0
+    pending_bookings = 0
+    today_bookings = 0
+    today_date = date.today()
+
+    for b in bookings:
+        price = float(getattr(b, 'price', 0) or 0)
+        status = getattr(b, 'status', 'Completed')
+        b_time = getattr(b, 'created_at', None) or getattr(b, 'appointment_time', None)
+
+        gross_revenue += price
+        if status in ['Completed', 'completed', 'Paid', 'paid']:
+            completed_bookings += 1
+        elif status in ['Pending', 'pending', 'Confirmed', 'confirmed']:
+            pending_bookings += 1
+
+        if b_time and hasattr(b_time, 'date') and b_time.date() == today_date:
+            today_bookings += 1
+            today_revenue += price
+
+    total_clients = len(customers)
+    total_bookings = len(bookings)
+    
+    # Financial metrics for studio breakdown cards
+    total_overhead = round(gross_revenue * 0.15, 2)
+    net_profit = round(gross_revenue - total_overhead, 2)
+    booth_rent = 0.0
+    product_sales = 0.0
+
+    # Zip code aggregation for live heatmap
     zip_counts = {}
     for c in customers:
         if getattr(c, 'zip_code', None):
-            zip_clean = c.zip_code.strip()
-            zip_counts[zip_clean] = zip_counts.get(zip_clean, 0) + 1
+            z_clean = c.zip_code.strip()
+            zip_counts[z_clean] = zip_counts.get(z_clean, 0) + 1
 
-    return render_template('dashboard.html', customers=customers, bookings=bookings, search_query=search_query, zip_counts=zip_counts)
+    return render_template(
+        'dashboard.html',
+        customers=customers,
+        bookings=bookings,
+        services=services,
+        search_query=search_query,
+        gross_revenue=gross_revenue,
+        total_overhead=total_overhead,
+        net_profit=net_profit,
+        booth_rent=booth_rent,
+        product_sales=product_sales,
+        today_revenue=today_revenue,
+        total_clients=total_clients,
+        total_bookings=total_bookings,
+        completed_bookings=completed_bookings,
+        pending_bookings=pending_bookings,
+        today_bookings=today_bookings,
+        zip_counts=zip_counts
+    )
 
-# KIOSK ENDPOINTS (Supports both 'kiosk' and 'walkin_kiosk')
+# KIOSK ENDPOINTS
 @main_bp.route('/kiosk')
 @main_bp.route('/walkin-kiosk')
 def kiosk():
