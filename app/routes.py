@@ -1,4 +1,16 @@
-@main_bp.route('/register', methods=['GET', 'POST'])
+import re
+from datetime import datetime, date, time, timedelta
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from app import db
+from app.models import (
+    Customer, BarberService, BarberBooking, BookingStatus,
+    User, Product, PurchaseOrder, ProductSale, StudioExpense
+)
+
+main_bp = Blueprint('main', __name__)
+
+def clean_phone(phone_str):
+    return re.sub(r'\D', '', phone_str or '') @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         first_name = request.form.get('first_name', '').strip()
