@@ -27,7 +27,7 @@ def index():
     return redirect(url_for('main.login'))
 
 # ==========================================
-# 1. RETURNING CUSTOMER / STYLIST LOGIN
+# 1. AUTHENTICATION (USERNAME / PHONE / ADMIN)
 # ==========================================
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -37,7 +37,7 @@ def login():
         remember = bool(request.form.get('remember_me'))
         digits = clean_phone(identifier)
 
-        # 1. Check Stylist / Admin User
+        # 1. Stylist / Admin Check
         user = User.query.filter(
             (User.username.ilike(identifier)) | 
             (User.email.ilike(identifier))
@@ -51,12 +51,17 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # 2. Check Customer Account (by Name, Phone, or Email)
-        customer = Customer.query.filter(
-            (Customer.name.ilike(identifier)) |
-            (Customer.email.ilike(identifier)) |
-            (Customer.phone == digits if digits else False)
-        ).first()
+        # 2. Customer Lookup: Match Username, Full Name, Email, or Phone
+        customer = None
+        if digits and len(digits) >= 7:
+            customer = Customer.query.filter(Customer.phone == digits).first()
+
+        if not customer:
+            customer = Customer.query.filter(
+                (Customer.name.ilike(identifier)) |
+                (Customer.name.ilike(f"%{identifier}%")) |
+                (Customer.email.ilike(identifier))
+            ).first()
 
         if customer:
             session.clear()
@@ -77,7 +82,7 @@ def logout():
     return redirect(url_for('main.login'))
 
 # ==========================================
-# 2. NEW CUSTOMER REGISTRATION
+# 2. CUSTOMER REGISTRATION
 # ==========================================
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -86,6 +91,8 @@ def register():
         username = request.form.get('username', '').strip()
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
+        
+        # Preserve full name or explicit username
         full_name = f"{first_name} {last_name}".strip() if (first_name or last_name) else username
         
         phone_raw = request.form.get('phone', '')
@@ -107,15 +114,15 @@ def register():
         }
 
         missing = []
-        if not first_name:
-            missing.append("First Name")
+        if not first_name and not username:
+            missing.append("First Name or Username")
         if not phone or len(phone) < 10:
             missing.append("Valid 10-digit Phone Number")
         if not zip_code:
             missing.append("Zip Code")
 
         if missing:
-            flash(f"Please fill out required fields: {', '.join(missing)}.", "danger")
+            flash(f"Please fill out: {', '.join(missing)}.", "danger")
             return render_template('register.html', form_data=form_data)
 
         # Catch duplicate accounts
@@ -138,7 +145,6 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Route client directly into booking portal
         session.clear()
         session['customer_id'] = new_customer.id
         flash(f"Welcome to Jackiecutz, {new_customer.name}!", "success")
@@ -158,6 +164,7 @@ def forgot_password():
         customer = Customer.query.filter(
             (Customer.phone == digits if digits else False) |
             (Customer.name.ilike(identifier)) |
+            (Customer.name.ilike(f"%{identifier}%")) |
             (Customer.email.ilike(identifier))
         ).first()
 
@@ -167,7 +174,7 @@ def forgot_password():
             flash(f"Account verified! Welcome back, {customer.name}.", "success")
             return redirect(url_for('main.customer_portal'))
         else:
-            flash("No account matched that information. Please register below.", "danger")
+            flash("No account found. Please register below.", "danger")
             return redirect(url_for('main.register'))
 
     return render_template('forgot_password.html')
@@ -212,7 +219,7 @@ def book_service():
     booking_date = request.form.get('booking_date', date.today().strftime('%Y-%m-%d'))
     time_slot = request.form.get('time_slot', '10:00 AM')
 
-    srv_name = "Haircut & Styling"
+    srv_name = "Custom Haircut & Styling"
     srv_price = 25.00
     if service_id:
         srv = BarberService.query.get(service_id)
@@ -251,7 +258,7 @@ def update_profile():
 @main_bp.route('/customer/update-credentials', methods=['POST'])
 @main_bp.route('/update-credentials', methods=['POST'])
 def update_credentials():
-    flash("Security settings updated.", "success")
+    flash("Security credentials updated.", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/customer/add-family-member', methods=['POST'])
@@ -281,11 +288,11 @@ def delete_account():
             db.session.delete(customer)
             db.session.commit()
     session.clear()
-    flash("Your account has been deleted.", "info")
+    flash("Account deleted.", "info")
     return redirect(url_for('main.login'))
 
 # ==========================================
-# 5. STYLIST DASHBOARD & ALL ACTION ENDPOINTS
+# 5. STYLIST DASHBOARD & ACTION ENDPOINTS
 # ==========================================
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
