@@ -30,11 +30,11 @@
         <div style="display: flex; gap: 12px; margin-bottom: 15px;">
             <div style="flex: 1;">
                 <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">First Name *</label>
-                <input type="text" name="first_name" value="{{ form_data.get('first_name', '') }}" placeholder="First" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+                <input type="text" name="first_name" value="{{ form_data.first_name if form_data else '' }}" placeholder="First" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
             </div>
             <div style="flex: 1;">
                 <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Last Name *</label>
-                <input type="text" name="last_name" value="{{ form_data.get('last_name', '') }}" placeholder="Last" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+                <input type="text" name="last_name" value="{{ form_data.last_name if form_data else '' }}" placeholder="Last" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
             </div>
         </div>
 
@@ -43,13 +43,13 @@
             <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 6px; text-transform: uppercase;">Gender *</label>
             <div style="display: flex; gap: 10px;">
                 <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #1a1a1a; border: 1px solid #d4af37; border-radius: 10px; color: #fff; cursor: pointer; font-size: 0.85rem;">
-                    <input type="radio" name="gender" value="Female" {% if form_data.get('gender', 'Female') == 'Female' %}checked{% endif %}> Female
+                    <input type="radio" name="gender" value="Female" {% if not form_data or form_data.gender == 'Female' %}checked{% endif %}> Female
                 </label>
                 <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #1a1a1a; border: 1px solid #d4af37; border-radius: 10px; color: #fff; cursor: pointer; font-size: 0.85rem;">
-                    <input type="radio" name="gender" value="Male" {% if form_data.get('gender') == 'Male' %}checked{% endif %}> Male
+                    <input type="radio" name="gender" value="Male" {% if form_data and form_data.gender == 'Male' %}checked{% endif %}> Male
                 </label>
                 <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #1a1a1a; border: 1px solid #d4af37; border-radius: 10px; color: #fff; cursor: pointer; font-size: 0.85rem;">
-                    <input type="radio" name="gender" value="Other" {% if form_data.get('gender') == 'Other' %}checked{% endif %}> Other
+                    <input type="radio" name="gender" value="Other" {% if form_data and form_data.gender == 'Other' %}checked{% endif %}> Other
                 </label>
             </div>
         </div>
@@ -57,37 +57,37 @@
         <!-- BIRTHDAY -->
         <div style="margin-bottom: 15px;">
             <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Birthday (MM/DD/YYYY) *</label>
-            <input type="text" id="client-bday" name="birthday" value="{{ form_data.get('birthday', '') }}" placeholder="07/16/1986" maxlength="10" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            <input type="text" id="client-bday" name="birthday" value="{{ form_data.birthday if form_data else '' }}" placeholder="07/16/1986" maxlength="10" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
         <!-- EMAIL -->
         <div style="margin-bottom: 15px;">
             <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Email Address *</label>
-            <input type="email" name="email" value="{{ form_data.get('email', '') }}" placeholder="name@example.com" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            <input type="email" name="email" value="{{ form_data.email if form_data else '' }}" placeholder="name@example.com" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
         <!-- PHONE -->
         <div style="margin-bottom: 15px;">
             <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Phone Number *</label>
-            <input type="tel" id="client-phone" name="phone" value="{{ form_data.get('phone', '') }}" placeholder="832-000-0000" maxlength="12" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            <input type="tel" id="client-phone" name="phone" value="{{ form_data.phone if form_data else '' }}" placeholder="832-000-0000" maxlength="12" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
         <!-- ZIP CODE (REQUIRED) & ADDRESS (OPTIONAL) -->
         <div style="display: flex; gap: 12px; margin-bottom: 15px;">
             <div style="flex: 1;">
                 <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Zip Code *</label>
-                <input type="text" name="zip_code" value="{{ form_data.get('zip_code', '') }}" placeholder="77073" maxlength="5" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+                <input type="text" name="zip_code" value="{{ form_data.zip_code if form_data else '' }}" placeholder="77073" maxlength="5" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
             </div>
             <div style="flex: 1.5;">
                 <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Home Address (Optional)</label>
-                <input type="text" name="address" value="{{ form_data.get('address', '') }}" placeholder="123 Main St" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;">
+                <input type="text" name="address" value="{{ form_data.address if form_data else '' }}" placeholder="123 Main St" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;">
             </div>
         </div>
 
         <!-- USERNAME -->
         <div style="margin-bottom: 15px;">
             <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Username *</label>
-            <input type="text" name="username" value="{{ form_data.get('username', '') }}" placeholder="e.g. alex24" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            <input type="text" name="username" value="{{ form_data.username if form_data else '' }}" placeholder="e.g. alex24" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
         </div>
 
         <!-- PASSWORD -->
