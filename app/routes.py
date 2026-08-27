@@ -104,22 +104,32 @@ def register():
             flash("An account with that phone number already exists. Please log in.", "warning")
             return redirect(url_for('main.login'))
 
-        full_address = f"{address} {zip_code}".strip() if address else zip_code
-        meta_notes = f"Gender: {gender} | Birthday: {birthday}"
-        final_notes = f"{meta_notes} | {notes}".strip(" |") if notes else meta_notes
+        # Pack extra metadata into notes
+        meta_parts = []
+        if address:
+            meta_parts.append(f"Address: {address}")
+        if zip_code:
+            meta_parts.append(f"Zip: {zip_code}")
+        if gender:
+            meta_parts.append(f"Gender: {gender}")
+        if birthday:
+            meta_parts.append(f"DOB: {birthday}")
+        if notes:
+            meta_parts.append(f"Notes: {notes}")
+            
+        full_notes = " | ".join(meta_parts)
 
         new_customer = Customer(
             name=full_name,
             phone=phone,
             email=email,
-            address=full_address,
             password_hash=generate_password_hash(password),
-            notes=final_notes
+            notes=full_notes
         )
         db.session.add(new_customer)
         db.session.commit()
 
-        # Automatically log in and route directly to customer portal
+        # Log customer in and route straight to portal
         session['customer_id'] = new_customer.id
         flash(f"Welcome to Jackiecutz, {first_name or full_name}! Your account has been created.", "success")
         return redirect(url_for('main.customer_portal'))
