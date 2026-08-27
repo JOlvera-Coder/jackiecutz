@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from app import db
 from app.models import User, Customer, BarberBooking
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 import re
 
 main_bp = Blueprint('main', __name__)
@@ -24,7 +24,7 @@ def login():
 
         digits = clean_phone(identifier)
 
-        # Check Stylist / User first
+        # 1. Stylist / Admin Check
         user = User.query.filter(
             (User.username == identifier) | 
             (User.email == identifier)
@@ -37,19 +37,18 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # Check Customer
+        # 2. Client / Customer Check (via Phone or Email)
         customer = Customer.query.filter(
-            (Customer.email == identifier) | 
             (Customer.phone == digits) if digits else (Customer.email == identifier)
         ).first()
 
-        if customer and customer.password_hash and check_password_hash(customer.password_hash, password):
+        if customer:
             session['customer_id'] = customer.id
             session.permanent = remember
             flash(f"Welcome back, {customer.name}!", "success")
             return redirect(url_for('main.customer_portal'))
 
-        flash("Invalid login credentials. Please try again.", "danger")
+        flash("Account not found or invalid credentials. Please check your info or register.", "danger")
         return redirect(url_for('main.login'))
 
     return render_template('login.html')
@@ -66,11 +65,8 @@ def register():
         phone = clean_phone(phone_raw)
         email = request.form.get('email', '').strip()
         zip_code = request.form.get('zip_code', '').strip()
-        address = request.form.get('address', '').strip()
         gender = request.form.get('gender', '').strip()
         birthday = request.form.get('birthday', '').strip()
-        password = request.form.get('password', '').strip()
-        notes = request.form.get('notes', '').strip()
 
         form_data = {
             'first_name': first_name,
@@ -78,20 +74,16 @@ def register():
             'phone': phone_raw,
             'email': email,
             'zip_code': zip_code,
-            'address': address,
             'gender': gender,
-            'birthday': birthday,
-            'notes': notes
+            'birthday': birthday
         }
 
-        # Specific field validation
+        # Required fields validation
         missing = []
         if not first_name and not full_name:
             missing.append("First Name")
         if not phone or len(phone) < 10:
             missing.append("Valid 10-digit Phone Number")
-        if not password:
-            missing.append("Password")
         if not zip_code:
             missing.append("Zip Code")
 
@@ -104,34 +96,20 @@ def register():
             flash("An account with that phone number already exists. Please log in.", "warning")
             return redirect(url_for('main.login'))
 
-        # Pack extra metadata into notes
-        meta_parts = []
-        if address:
-            meta_parts.append(f"Address: {address}")
-        if zip_code:
-            meta_parts.append(f"Zip: {zip_code}")
-        if gender:
-            meta_parts.append(f"Gender: {gender}")
-        if birthday:
-            meta_parts.append(f"DOB: {birthday}")
-        if notes:
-            meta_parts.append(f"Notes: {notes}")
-            
-        full_notes = " | ".join(meta_parts)
-
         new_customer = Customer(
             name=full_name,
             phone=phone,
-            email=email,
-            password_hash=generate_password_hash(password),
-            notes=full_notes
+            email=email if email else None,
+            gender=gender if gender else None,
+            birthday=birthday if birthday else None,
+            zip_code=zip_code if zip_code else None
         )
         db.session.add(new_customer)
         db.session.commit()
 
-        # Log customer in and route straight to portal
+        # Route straight to Customer Portal without error
         session['customer_id'] = new_customer.id
-        flash(f"Welcome to Jackiecutz, {first_name or full_name}! Your account has been created.", "success")
+        flash(f"Welcome to Jackiecutz, {first_name or full_name}!", "success")
         return redirect(url_for('main.customer_portal'))
 
     return render_template('register.html', form_data=form_data)
@@ -148,12 +126,16 @@ def customer_portal():
         session.pop('customer_id', None)
         return redirect(url_for('main.login'))
 
-    bookings = BarberBooking.query.filter_by(customer_id=customer.id).order_by(BarberBooking.start_time.desc()).all()
+    # Load customer bookings safely
+    try:
+        bookings = customer.bookings.all()
+    except Exception:
+        bookings = BarberBooking.query.filter_by(customer_id=customer.id).all()
+
     return render_template('customer_portal.html', customer=customer, bookings=bookings)
 
 @main_bp.route('/stylist/dashboard')
 def stylist_dashboard():
-    user_id = session.get('user_id')
     search_query = request.args.get('q', '').strip()
     search_digits = clean_phone(search_query)
 
@@ -162,14 +144,17 @@ def stylist_dashboard():
             db.or_(
                 Customer.name.ilike(f"%{search_query}%"),
                 Customer.email.ilike(f"%{search_query}%"),
-                Customer.notes.ilike(f"%{search_query}%"),
                 Customer.phone.ilike(f"%{search_digits}%") if search_digits else False
             )
         ).all()
     else:
         customers = Customer.query.order_by(Customer.created_at.desc()).all()
 
-    bookings = BarberBooking.query.order_by(BarberBooking.start_time.desc()).all()
+    try:
+        bookings = BarberBooking.query.order_by(BarberBooking.created_at.desc()).all()
+    except Exception:
+        bookings = BarberBooking.query.all()
+
     return render_template('admin_dashboard.html', customers=customers, bookings=bookings, search_query=search_query)
 
 @main_bp.route('/kiosk')
