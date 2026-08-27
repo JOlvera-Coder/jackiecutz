@@ -30,7 +30,7 @@ def login():
 
         digits = clean_phone(identifier)
 
-        # 1. Check Stylist / Admin (redirects to Dashboard)
+        # Stylist / Admin Check
         user = User.query.filter(
             (User.username == identifier) | 
             (User.email == identifier)
@@ -43,7 +43,7 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # 2. Check Customer (redirects straight to Customer Booking Portal)
+        # Customer Check
         customer = Customer.query.filter(
             (Customer.name.ilike(identifier)) |
             (Customer.email == identifier) |
@@ -103,14 +103,12 @@ def register():
             flash(f"Please fill out required fields: {', '.join(missing)}.", "danger")
             return render_template('register.html', form_data=form_data)
 
-        # If phone already exists, log in and transition straight to booking
         existing = Customer.query.filter(Customer.phone == phone).first()
         if existing:
             session['customer_id'] = existing.id
             flash(f"Welcome back, {existing.name}!", "success")
             return redirect(url_for('main.customer_portal'))
 
-        # Create new customer record
         new_customer = Customer(
             name=full_name,
             phone=phone,
@@ -122,9 +120,8 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Log customer in and route to booking
         session['customer_id'] = new_customer.id
-        flash(f"Account successfully created! Welcome, {new_customer.name}.", "success")
+        flash(f"Account created! Welcome to Jackiecutz, {new_customer.name}.", "success")
         return redirect(url_for('main.customer_portal'))
 
     return render_template('register.html', form_data=form_data)
@@ -153,7 +150,7 @@ def forgot_password():
     return render_template('forgot_password.html')
 
 # ==========================================
-# 4. CUSTOMER BOOKING PORTAL & ACTIONS
+# 4. CUSTOMER BOOKING PORTAL & ALL ACTIONS
 # ==========================================
 @main_bp.route('/customer/portal')
 @main_bp.route('/book')
@@ -217,28 +214,32 @@ def cancel_booking(booking_id):
     flash("Appointment cancelled per studio policy.", "info")
     return redirect(url_for('main.customer_portal'))
 
+@main_bp.route('/customer/delete-account', methods=['POST'])
+@main_bp.route('/delete-account', methods=['POST'])
+def delete_account():
+    customer_id = session.get('customer_id')
+    if customer_id:
+        customer = Customer.query.get(customer_id)
+        if customer:
+            db.session.delete(customer)
+            db.session.commit()
+    session.clear()
+    flash("Your account has been deleted.", "info")
+    return redirect(url_for('main.login'))
+
 # ==========================================
-# 5. STYLIST COMMAND CENTER & ALL ACTIONS
+# 5. GENERAL & KIOSK / STYLIST ROUTES
 # ==========================================
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
 def stylist_dashboard():
     customers = Customer.query.order_by(Customer.created_at.desc()).all()
-    try:
-        bookings = BarberBooking.query.order_by(Customer.created_at.desc()).all()
-    except Exception:
-        bookings = BarberBooking.query.all()
-
-    try:
-        services = BarberService.query.all()
-    except Exception:
-        services = []
-
+    bookings = BarberBooking.query.all()
     return render_template(
         'dashboard.html',
         customers=customers,
         bookings=bookings,
-        services=services,
+        services=[],
         search_query="",
         gross_revenue=0.0,
         total_overhead=0.0,
@@ -262,41 +263,26 @@ def stylist_dashboard():
 @main_bp.route('/admin/add-expense', methods=['POST'])
 @main_bp.route('/add-expense', methods=['POST'])
 def add_expense():
-    flash("Expense recorded in studio accounting ledger.", "success")
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/add-product', methods=['POST'])
 @main_bp.route('/add-product', methods=['POST'])
 def add_product():
-    flash("Product registered successfully.", "success")
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/create-purchase-order', methods=['POST'])
 @main_bp.route('/create-purchase-order', methods=['POST'])
 def create_purchase_order():
-    flash("Purchase order submitted.", "success")
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/add-service', methods=['POST'])
 @main_bp.route('/add-service', methods=['POST'])
 def add_service():
-    name = request.form.get('name', '').strip()
-    price = request.form.get('price', 0)
-    category = request.form.get('category', 'Haircut')
-    if name:
-        new_srv = BarberService(name=name, price=float(price), category=category)
-        db.session.add(new_srv)
-        db.session.commit()
-        flash(f"Service '{name}' added.", "success")
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/update-booking-status/<int:booking_id>', methods=['POST'])
 @main_bp.route('/update-booking-status/<int:booking_id>', methods=['POST'])
 def update_booking_status(booking_id):
-    booking = BarberBooking.query.get(booking_id)
-    if booking:
-        booking.status = request.form.get('status', 'Completed')
-        db.session.commit()
     return redirect(url_for('main.stylist_dashboard'))
 
 @main_bp.route('/admin/export-tax-csv')
@@ -308,9 +294,6 @@ def export_tax_csv():
     output.seek(0)
     return Response(output.getvalue(), mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=tax_report.csv"})
 
-# ==========================================
-# 6. WALK-IN KIOSK & GENERAL ROUTES
-# ==========================================
 @main_bp.route('/kiosk', methods=['GET', 'POST'])
 @main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
 def kiosk():
