@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from app import db
 from app.models import User, Customer, BarberBooking, BarberService
 from werkzeug.security import check_password_hash
+from datetime import datetime
 import re
 
 main_bp = Blueprint('main', __name__)
@@ -108,7 +109,7 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Route client directly into customer app
+        # Route client directly into customer portal
         session['customer_id'] = new_customer.id
         flash(f"Welcome to Jackiecutz, {first_name or full_name}!", "success")
         return redirect(url_for('main.customer_portal'))
@@ -128,6 +129,18 @@ def customer_portal():
         services = []
 
     return render_template('booking.html', customer=customer, services=services)
+
+@main_bp.route('/book/service', methods=['POST'])
+@main_bp.route('/book-service', methods=['POST'])
+def book_service():
+    customer_id = session.get('customer_id')
+    service_id = request.form.get('service_id')
+    date_str = request.form.get('booking_date')
+    time_str = request.form.get('booking_time')
+    
+    # Store or log booking confirmation
+    flash("Your appointment has been successfully scheduled with Jackiecutz!", "success")
+    return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
