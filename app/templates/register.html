@@ -1,141 +1,97 @@
-{% extends "base.html" %}
-{% block title %}Register - Jackiecutz Hair Studio{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Create Account | Jackiecutz Hair Studio{% endblock %}
+
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<div style="max-width: 520px; margin: 30px auto; padding: 0 16px; text-align: center;">
 
-<div style="max-width: 480px; margin: 0 auto; padding: 20px 15px; font-family: 'Montserrat', sans-serif;">
-    
-    <!-- TOP LOGO BANNER -->
-    <div style="position: relative; max-width: 380px; margin: 0 auto 20px auto; text-align: center;">
-        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px; background-color: #000000; mix-blend-mode: screen;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
-        <a href="https://maps.google.com/?q=806-E+Airtex+Dr+Suite+105,+Houston,+TX+77073" target="_blank" title="Open in Google Maps" style="position: absolute; top: 48%; left: 8%; width: 84%; height: 16%; display: block; cursor: pointer; z-index: 10;"></a>
-        <a href="tel:8323534577" title="Call Jackiecutz" style="position: absolute; top: 64%; left: 15%; width: 70%; height: 14%; display: block; cursor: pointer; z-index: 10;"></a>
-    </div>
+  <!-- Studio Graphic Artwork Card -->
+  <div style="margin-bottom: 24px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.9); border: 1px solid #29241b;">
+    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block;">
+  </div>
 
-    <!-- FLASH NOTIFICATIONS -->
+  <!-- Registration Card -->
+  <div style="background: #0d0d0d; border: 1px solid #29241b; border-radius: 20px; padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: left;">
+    <h2 style="color: #fae498; text-align: center; font-size: 1.3rem; margin-top: 0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;">
+      Client Registration
+    </h2>
+    <p style="color: #a0a0a0; text-align: center; font-size: 0.85rem; margin-bottom: 22px;">
+      Create your studio profile for fast appointment booking.
+    </p>
+
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        {% for category, message in messages %}
-          <div style="background: rgba(220, 53, 69, 0.25); border: 1px solid #dc3545; color: #ff858d; padding: 12px 16px; border-radius: 12px; margin-bottom: 18px; font-size: 0.88rem; font-weight: bold; text-align: center;">
-            {{ message }}
+        {% for category, msg in messages %}
+          <div style="padding: 12px; margin-bottom: 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-align: center;
+                      {% if category == 'danger' or category == 'error' %}background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid #dc3545;
+                      {% elif category == 'warning' %}background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid #ffc107;
+                      {% else %}background: rgba(40, 167, 69, 0.2); color: #51cf66; border: 1px solid #28a745;{% endif %}">
+            {{ msg }}
           </div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('main.register') }}">
-        
-        <!-- USERNAME -->
-        <div style="margin-bottom: 16px;">
-            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">USERNAME *</label>
-            <input type="text" name="username" value="{{ form_data.username if form_data else '' }}" placeholder="Choose a username" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
-        </div>
+    <form method="POST" action="{{ url_for('main.register') }}" autocomplete="off">
+      <div style="margin-bottom: 16px;">
+        <label class="gold-label">Username (Optional Handle)</label>
+        <input type="text" name="username" class="gold-input" placeholder="e.g. IOlvera" value="{{ form_data.username if form_data else '' }}">
+      </div>
 
-        <!-- FIRST & LAST NAME -->
-        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-            <div style="flex: 1;">
-                <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">FIRST NAME *</label>
-                <input type="text" name="first_name" value="{{ form_data.first_name if form_data else '' }}" placeholder="First" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
-            </div>
-            <div style="flex: 1;">
-                <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">LAST NAME *</label>
-                <input type="text" name="last_name" value="{{ form_data.last_name if form_data else '' }}" placeholder="Last" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
-            </div>
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <div style="flex: 1;">
+          <label class="gold-label">First Name *</label>
+          <input type="text" name="first_name" class="gold-input" placeholder="First Name" required value="{{ form_data.first_name if form_data else '' }}">
         </div>
-
-        <!-- GENDER SELECTION -->
-        <div style="margin-bottom: 16px;">
-            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">GENDER</label>
-            <div style="display: flex; gap: 8px;">
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #121212; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    <input type="radio" name="gender" value="Female" {% if form_data and form_data.gender == 'Female' %}checked{% endif %} style="accent-color: #dfba75;"> Female
-                </label>
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #121212; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    <input type="radio" name="gender" value="Male" {% if not form_data or form_data.gender == 'Male' or not form_data.gender %}checked{% endif %} style="accent-color: #dfba75;"> Male
-                </label>
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #121212; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    <input type="radio" name="gender" value="Other" {% if form_data and form_data.gender == 'Other' %}checked{% endif %} style="accent-color: #dfba75;"> Other
-                </label>
-            </div>
+        <div style="flex: 1;">
+          <label class="gold-label">Last Name</label>
+          <input type="text" name="last_name" class="gold-input" placeholder="Last Name" value="{{ form_data.last_name if form_data else '' }}">
         </div>
+      </div>
 
-        <!-- BIRTHDAY -->
-        <div style="margin-bottom: 16px;">
-            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">BIRTHDAY <span style="font-weight: 400; color: #888;">(mm/dd/yyyy)</span></label>
-            <input type="text" id="reg-birthday" name="birthday" value="{{ form_data.birthday if form_data else '' }}" placeholder="MM/DD/YYYY" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;">
+      <div style="margin-bottom: 16px;">
+        <label class="gold-label">Phone Number *</label>
+        <input type="tel" name="phone" class="gold-input" placeholder="832-000-0000" required value="{{ form_data.phone if form_data else '' }}">
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label class="gold-label">Email Address</label>
+        <input type="email" name="email" class="gold-input" placeholder="name@example.com" value="{{ form_data.email if form_data else '' }}">
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <div style="flex: 1;">
+          <label class="gold-label">Zip Code *</label>
+          <input type="text" name="zip_code" class="gold-input" placeholder="77073" required value="{{ form_data.zip_code if form_data else '77073' }}">
         </div>
-
-        <!-- EMAIL ADDRESS -->
-        <div style="margin-bottom: 16px;">
-            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">EMAIL ADDRESS</label>
-            <input type="email" name="email" value="{{ form_data.email if form_data else '' }}" placeholder="name@example.com" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;">
+        <div style="flex: 1;">
+          <label class="gold-label">Gender</label>
+          <select name="gender" class="gold-input">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
+      </div>
 
-        <!-- PHONE NUMBER -->
-        <div style="margin-bottom: 16px;">
-            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">PHONE NUMBER *</label>
-            <input type="tel" id="reg-phone" name="phone" value="{{ form_data.phone if form_data else '' }}" placeholder="832-000-0000" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
-        </div>
+      <div style="margin-bottom: 22px;">
+        <label class="gold-label">Birthday (Optional)</label>
+        <input type="date" name="birthday" class="gold-input" value="{{ form_data.birthday if form_data else '' }}">
+      </div>
 
-        <!-- ZIP CODE & ADDRESS -->
-        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-            <div style="width: 35%;">
-                <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">ZIP CODE *</label>
-                <input type="text" name="zip_code" value="{{ form_data.zip_code if form_data else '' }}" placeholder="77073" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
-            </div>
-            <div style="width: 65%;">
-                <label style="color: #888; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">ADDRESS <span style="font-weight: 400;">(OPTIONAL)</span></label>
-                <input type="text" name="address" value="{{ form_data.address if form_data else '' }}" placeholder="123 Main St" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;">
-            </div>
-        </div>
-
-        <!-- PASSWORD -->
-        <div style="margin-bottom: 20px;">
-            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">CREATE PASSWORD *</label>
-            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
-        </div>
-
-        <!-- TERMS & POLICY LINK -->
-        <div style="margin: 0 auto 20px auto; max-width: 360px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
-            By registering, you agree to our 
-            <a href="{{ url_for('main.terms') }}" style="color: #dfba75; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
-        </div>
-
-        <!-- SUBMIT BUTTON -->
-        <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #f5d77f 0%, #c89e4b 100%); color: #000; font-weight: 800; font-size: 1rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Montserrat', sans-serif;">
-            Create Account
-        </button>
+      <button type="submit" class="gold-btn" style="width: 100%; padding: 16px;">
+        Create Account ✂️
+      </button>
     </form>
 
-    <!-- BACK TO LOGIN -->
-    <div style="text-align: center; margin-top: 20px;">
-        <span style="color: #888; font-size: 0.9rem;">Already have an account?</span>
-        <a href="{{ url_for('main.login') }}" style="color: #dfba75; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Log In</a>
+    <div style="margin-top: 20px; font-size: 0.85rem; color: #888; text-align: center;">
+      Already have an account? <a href="{{ url_for('main.login') }}" style="color: #fae498; text-decoration: none; font-weight: 700;">Sign In</a>
     </div>
-</div>
 
-<script>
-const phoneInput = document.getElementById('reg-phone');
-if (phoneInput) {
-    phoneInput.addEventListener('input', function(e) {
-        let val = e.target.value.replace(/\D/g, '');
-        let x = val.match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-        if (x[1]) {
-            e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-        }
-    });
-}
-const bdayInput = document.getElementById('reg-birthday');
-if (bdayInput) {
-    bdayInput.addEventListener('input', function(e) {
-        let val = e.target.value.replace(/\D/g, '');
-        let x = val.match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
-        if (x[1]) {
-            e.target.value = !x[2] ? x[1] : x[1] + '/' + x[2] + (x[3] ? '/' + x[3] : '');
-        }
-    });
-}
-</script>
+    <div style="margin-top: 14px; font-size: 0.75rem; color: #666; text-align: center;">
+      By signing up, you agree to our 
+      <a href="{{ url_for('main.terms') }}" style="color: #c89e4b; text-decoration: underline;">Terms</a> and 
+      <a href="{{ url_for('main.privacy') }}" style="color: #c89e4b; text-decoration: underline;">Privacy Policy</a>.
+    </div>
+  </div>
+</div>
 {% endblock %}

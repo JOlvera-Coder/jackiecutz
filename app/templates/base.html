@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Jackiecutz Hair Studio{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --gold-primary: #d4af37;
-            --gold-light: #f5d77f;
-            --gold-dark: #9e7526;
+            --gold-light: #fae498;
+            --gold-mid: #e5be58;
+            --gold-dark: #a07421;
             --gold-border: #c89e4b;
             --bg-dark: #050505;
+            --card-bg: #0d0d0d;
+            --input-bg: #141414;
         }
 
         body {
@@ -24,35 +27,62 @@
             min-height: 100vh;
         }
 
-        .gold-metallic-bg {
-            background: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #9e7526 100%) !important;
-            color: #000 !important;
+        /* Luminous Illuminating Champagne Gold Button */
+        .gold-btn, .gold-metallic-bg {
+            background: linear-gradient(135deg, #fae498 0%, #e5be58 45%, #d4af37 70%, #9e7526 100%) !important;
+            color: #111111 !important;
+            font-weight: 800 !important;
+            border: 1px solid #fae498 !important;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(229, 190, 88, 0.45), 0 0 10px rgba(250, 228, 152, 0.3) inset !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.25s ease-in-out;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .gold-btn:hover, .gold-metallic-bg:hover {
+            background: linear-gradient(135deg, #ffffff 0%, #fae498 35%, #e5be58 75%, #a07421 100%) !important;
+            box-shadow: 0 6px 28px rgba(229, 190, 88, 0.7), 0 0 15px rgba(255, 255, 255, 0.5) inset !important;
+            transform: translateY(-1px);
+        }
+
+        .gold-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--input-bg);
+            border: 1px solid #29241b;
+            border-radius: 8px;
+            color: #fae498;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .gold-input:focus {
+            outline: none;
+            border-color: #e5be58;
+            box-shadow: 0 0 12px rgba(229, 190, 88, 0.35);
+        }
+
+        .gold-label {
+            color: #c89e4b;
+            font-size: 0.78rem;
             font-weight: 800;
-            border: none;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
-        }
-
-        .gold-metallic-bg:hover {
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
-        }
-
-        .gold-metallic-text {
-            background: linear-gradient(135deg, #f5d77f 0%, #d4af37 60%, #aa7c11 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .gold-metallic-border {
-            border: 1px solid #c89e4b !important;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
         }
 
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus {
-            -webkit-text-fill-color: #f5d77f !important;
+            -webkit-text-fill-color: #fae498 !important;
             -webkit-box-shadow: 0 0 0px 1000px #141414 inset !important;
             border: 1px solid #c89e4b !important;
-            caret-color: #f5d77f !important;
+            caret-color: #fae498 !important;
         }
     </style>
 </head>

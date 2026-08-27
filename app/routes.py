@@ -48,7 +48,7 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # 2. Universal Customer Lookup (Username, Phone, Full Name, or Email)
+        # 2. Universal Customer Lookup
         customer = None
         if digits and len(digits) >= 7:
             customer = Customer.query.filter(Customer.phone == digits).first()
@@ -181,7 +181,7 @@ def walkin_kiosk():
         db.session.add(booking)
         db.session.commit()
 
-        flash(f"Thank you, {customer.name}! You are in line for {service_name}.", "success")
+        flash(f"Thank you, {customer.name}! You are on today's active chair waitlist for {service_name}.", "success")
         return redirect(url_for('main.walkin_kiosk'))
 
     services = BarberService.query.all()
@@ -215,6 +215,14 @@ def stylist_dashboard():
         chart_channel_data=chart_channel_data,
         recent_activity=recent_activity
     )
+
+@main_bp.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@main_bp.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
 
 @main_bp.route('/logout')
 def logout():

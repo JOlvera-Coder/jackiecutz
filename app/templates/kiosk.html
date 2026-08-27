@@ -1,86 +1,90 @@
 {% extends 'base.html' %}
-{% block title %}Walk-In Sign In | Jackiecutz Hair Studio{% endblock %}
+{% block title %}Walk-In Kiosk | Jackiecutz Hair Studio{% endblock %}
+
 {% block content %}
-<div class="min-h-screen flex flex-col justify-center items-center px-4 bg-black py-8 selection:bg-amber-400 selection:text-black">
-    <div class="max-w-md w-full bg-black border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_60px_rgba(218,165,32,0.25)] text-center relative">
-        
-        <!-- Header Logo -->
-        <div class="relative overflow-hidden mb-4 bg-transparent border-0 outline-none">
-            <img src="/static/img/card_bg.jpg" alt="Jackiecutz Hair Studio" class="w-full object-contain block border-0 outline-none shadow-none">
-        </div>
+<div style="max-width: 520px; margin: 20px auto 40px auto; padding: 0 16px; text-align: center;">
 
-        <div class="mb-4">
-            <h1 class="text-base font-black text-amber-400 uppercase tracking-widest">Walk-In Check-In Terminal</h1>
-            <p class="text-xs text-zinc-400 mt-0.5">Please sign in to join today's active chair waitlist.</p>
-        </div>
+  <!-- Top Command Center Quick Toggle -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+    <a href="{{ url_for('main.login') }}" style="color: #a07421; font-size: 0.78rem; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+      ← Client Login
+    </a>
+    <a href="{{ url_for('main.stylist_dashboard') }}" style="background: rgba(212, 175, 55, 0.12); color: #fae498; border: 1px solid #c89e4b; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; text-decoration: none; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+      ✂️ Command Center
+    </a>
+  </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, msg in messages %}
-              <div class="mb-4 p-3 rounded-xl text-xs bg-red-500/10 text-red-400 border border-red-500/20">
-                {{ msg }}
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+  <!-- Kiosk Graphic Artwork Banner -->
+  <div style="margin-bottom: 24px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.9); border: 1px solid #29241b;">
+    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block;">
+  </div>
 
-        <form method="POST" action="{{ url_for('main.walkin_kiosk') }}" class="space-y-3.5 text-left">
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">First Name</label>
-                    <input type="text" name="first_name" required placeholder="First" 
-                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-                </div>
-                <div>
-                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Last Name</label>
-                    <input type="text" name="last_name" required placeholder="Last" 
-                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-                </div>
-            </div>
+  <!-- Form Card -->
+  <div style="background: #0d0d0d; border: 1px solid #29241b; border-radius: 20px; padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: left;">
+    <h2 style="color: #fae498; text-align: center; font-size: 1.3rem; margin-top: 0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;">
+      Walk-In Check-In Terminal
+    </h2>
+    <p style="color: #a0a0a0; text-align: center; font-size: 0.85rem; margin-bottom: 22px;">
+      Please sign in to join today's active chair waitlist.
+    </p>
 
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Phone Number</label>
-                <input type="tel" name="phone" id="kiosk-phone" required placeholder="832-000-0000" maxlength="12"
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div style="padding: 12px; margin-bottom: 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-align: center;
+                      {% if category == 'danger' or category == 'error' %}background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid #dc3545;
+                      {% elif category == 'warning' %}background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid #ffc107;
+                      {% else %}background: rgba(40, 167, 69, 0.2); color: #51cf66; border: 1px solid #28a745;{% endif %}">
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Email Address <span class="text-[10px] text-zinc-500 font-normal lowercase">(for app link & receipt)</span></label>
-                <input type="email" name="email" required placeholder="name@example.com" 
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
+    <form method="POST" action="{{ url_for('main.walkin_kiosk') }}">
+      <div style="margin-bottom: 14px;">
+        <label class="gold-label">First Name *</label>
+        <input type="text" name="first_name" class="gold-input" required placeholder="First Name">
+      </div>
 
-            <div class="grid grid-cols-3 gap-2">
-                <div class="col-span-1">
-                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Zip Code</label>
-                    <input type="text" name="zip_code" placeholder="77073" maxlength="5"
-                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-                </div>
-                <div class="col-span-2">
-                    <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Select Service</label>
-                    <select name="service_id" required class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-                        {% for s in services %}
-                        <option value="{{ s.id }}">{{ s.name }} — ${{ "%.2f"|format(s.price) }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
+      <div style="margin-bottom: 14px;">
+        <label class="gold-label">Last Name *</label>
+        <input type="text" name="last_name" class="gold-input" required placeholder="Last Name">
+      </div>
 
-            <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-300 hover:from-amber-400 hover:to-amber-200 text-black font-black py-3.5 rounded-xl uppercase tracking-wider text-xs shadow-lg mt-3 transition">
-                Sign In & Join Waitlist ✂️
-            </button>
-        </form>
+      <div style="margin-bottom: 14px;">
+        <label class="gold-label">Phone Number *</label>
+        <input type="tel" name="phone" class="gold-input" required placeholder="832-000-0000">
+      </div>
 
-        <div class="mt-5 pt-3 border-t border-zinc-900 text-center">
-            <p class="text-[10px] text-zinc-500">Jackiecutz Hair Studio • Ivonne Gonzalez • Divine Salon Suite 105</p>
-        </div>
+      <div style="margin-bottom: 14px;">
+        <label class="gold-label">Email Address (for app link & receipt)</label>
+        <input type="email" name="email" class="gold-input" placeholder="name@example.com">
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label class="gold-label">Zip Code *</label>
+        <input type="text" name="zip_code" class="gold-input" value="77073">
+      </div>
+
+      <div style="margin-bottom: 22px;">
+        <label class="gold-label">Select Service *</label>
+        <select name="service" class="gold-input">
+          <option value="Signature Haircut">Signature Haircut</option>
+          <option value="Beard Trim & Shape">Beard Trim & Shape</option>
+          <option value="Haircut & Beard Combo">Haircut & Beard Combo</option>
+          <option value="Hot Towel Shave">Hot Towel Shave</option>
+        </select>
+      </div>
+
+      <button type="submit" class="gold-btn" style="width: 100%; padding: 16px;">
+        Sign In & Join Waitlist ✂️
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 22px; font-size: 0.78rem; color: #777;">
+      Jackiecutz Hair Studio • Ivonne Gonzalez • Divine Salon Suite 105
     </div>
+  </div>
 </div>
-
-<script>
-document.getElementById('kiosk-phone').addEventListener('input', function (e) {
-    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-    e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-});
-</script>
 {% endblock %}
