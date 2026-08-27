@@ -1,73 +1,93 @@
 {% extends "base.html" %}
-{% block title %}Log In - Jackiecutz Hair Studio{% endblock %}
+{% block title %}Sign In - Jackiecutz Hair Studio{% endblock %}
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 
-<div style="max-width: 460px; margin: 0 auto; padding: 20px 15px; font-family: 'Montserrat', sans-serif;">
-    
-    <!-- BRANDING CARD IMAGE -->
-    <div style="position: relative; max-width: 380px; margin: 0 auto 25px auto; text-align: center;">
-        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px; background-color: #000000; mix-blend-mode: screen;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
-        <a href="https://maps.google.com/?q=806-E+Airtex+Dr+Suite+105,+Houston,+TX+77073" target="_blank" title="Open in Google Maps" style="position: absolute; top: 48%; left: 8%; width: 84%; height: 16%; display: block; cursor: pointer; z-index: 10;"></a>
-        <a href="tel:8323534577" title="Call Jackiecutz" style="position: absolute; top: 64%; left: 15%; width: 70%; height: 14%; display: block; cursor: pointer; z-index: 10;"></a>
+<style>
+  body { background-color: #050505; color: #f3f3f3; font-family: 'Montserrat', sans-serif; }
+  .gold-gradient-text { background: linear-gradient(135deg, #f5d77f 0%, #c89e4b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .gold-btn { background: linear-gradient(135deg, #f5d77f 0%, #c89e4b 50%, #9e7526 100%); color: #000; font-weight: 800; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 15px rgba(200, 158, 75, 0.3); }
+  .gold-btn:hover { box-shadow: 0 6px 20px rgba(200, 158, 75, 0.5); transform: translateY(-1px); }
+  .gold-btn:active { transform: scale(0.98); }
+  
+  /* Input Metallic Gold Styling & Overriding Browser Pale Yellow Autofill */
+  .gold-input {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: #141414 !important;
+    border: 1px solid #3a3222 !important;
+    border-radius: 12px;
+    color: #f5d77f !important;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .gold-input:focus {
+    outline: none;
+    border-color: #c89e4b !important;
+    box-shadow: 0 0 10px rgba(200, 158, 75, 0.35);
+  }
+  .gold-input:-webkit-autofill,
+  .gold-input:-webkit-autofill:hover, 
+  .gold-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f5d77f !important;
+    -webkit-box-shadow: 0 0 0px 1000px #141414 inset !important;
+    border: 1px solid #c89e4b !important;
+    caret-color: #f5d77f !important;
+  }
+</style>
+
+<div style="max-width: 420px; margin: 0 auto; padding: 25px 15px; text-align: center;">
+
+    <!-- STUDIO BRAND LOGO -->
+    <div style="margin-bottom: 25px;">
+        <img src="{{ url_for('static', filename='img/jackie_logo.png') }}" alt="Jackiecutz" style="max-width: 220px; height: auto;" onerror="this.style.display='none'">
+        <div style="font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700;" class="gold-gradient-text">Jackiecutz</div>
+        <div style="font-size: 0.75rem; color: #a19275; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px;">Hair Studio • Houston, TX</div>
     </div>
 
     <!-- FLASH NOTIFICATIONS -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
-          <div style="background: rgba(197, 160, 89, 0.2); border: 1px solid #c5a059; color: #f3e5ab; padding: 12px 16px; border-radius: 12px; margin-bottom: 18px; font-size: 0.88rem; font-weight: bold; text-align: center;">
+          <div style="background: rgba(200, 158, 75, 0.1); border: 1px solid #c89e4b; color: #f5d77f; padding: 12px 14px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85rem; font-weight: 700;">
             {{ message }}
           </div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('main.login') }}">
+    <!-- SIGN IN CARD -->
+    <div style="background: #0d0d0d; border: 1px solid #29241b; border-radius: 20px; padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);">
         
-        <!-- USERNAME -->
-        <div style="margin-bottom: 18px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">USERNAME</label>
-            <input type="text" id="login-identifier" name="identifier" placeholder="Enter your username" style="width: 100%; padding: 15px; background: #161616; border: 1px solid #c5a059; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
+        <form method="POST" action="{{ url_for('main.login') }}" autocomplete="off">
+            <div style="text-align: left; margin-bottom: 18px;">
+                <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 6px;">Username, Name, or Phone</label>
+                <input type="text" name="identifier" class="gold-input" placeholder="Enter username, name, or phone" required autocomplete="off">
+            </div>
+
+            <div style="text-align: left; margin-bottom: 18px;">
+                <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 6px;">Password (Stylists / Registered)</label>
+                <input type="password" name="password" class="gold-input" placeholder="••••••••" autocomplete="new-password">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 0.82rem;">
+                <label style="color: #a19275; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" name="remember_me" style="accent-color: #c89e4b;"> Remember Me
+                </label>
+                <a href="{{ url_for('main.forgot_password') }}" style="color: #f5d77f; text-decoration: none; font-weight: 700;">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="gold-btn" style="width: 100%; padding: 15px;">
+                Log In
+            </button>
+        </form>
+
+        <div style="margin-top: 22px; font-size: 0.85rem; color: #888;">
+            Need an account? <a href="{{ url_for('main.register') }}" style="color: #f5d77f; font-weight: 700; text-decoration: none;">Register</a>
         </div>
-
-        <!-- PASSWORD -->
-        <div style="margin-bottom: 14px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">PASSWORD</label>
-            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 15px; background: #161616; border: 1px solid #c5a059; border-radius: 14px; font-size: 1rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
-        </div>
-
-        <!-- REMEMBER ME & FORGOT PASSWORD -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem;">
-            <label style="color: #aaa; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                <input type="checkbox" name="remember_me" style="accent-color: #c5a059;"> Remember Me
-            </label>
-            <a href="{{ url_for('main.forgot_password') }}" style="color: #c5a059; text-decoration: none; font-weight: 600;">Forgot Password?</a>
-        </div>
-
-        <!-- TERMS & POLICY -->
-        <div style="margin: 0 auto 22px auto; max-width: 360px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
-            By signing in, you agree to our 
-            <a href="{{ url_for('main.terms') }}" style="color: #c5a059; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
-        </div>
-
-        <!-- SUBMIT BUTTON -->
-        <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #d8b467 0%, #c5a059 100%); color: #000; font-weight: 800; font-size: 1.05rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Montserrat', sans-serif;">
-            Log In
-        </button>
-    </form>
-
-    <!-- REGISTER LINK -->
-    <div style="text-align: center; margin-top: 20px;">
-        <span style="color: #888; font-size: 0.9rem;">Need an account?</span>
-        <a href="{{ url_for('main.register') }}" style="color: #c5a059; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Register</a>
     </div>
 
-    <!-- STYLIST PORTAL -->
-    <div style="text-align: center; margin-top: 20px; border-top: 1px solid #1a1a1a; padding-top: 14px;">
-        <a href="{{ url_for('main.stylist_dashboard') }}" style="color: #666; font-size: 0.82rem; text-decoration: none; font-weight: 600;">Stylist Portal →</a>
-    </div>
 </div>
 {% endblock %}
