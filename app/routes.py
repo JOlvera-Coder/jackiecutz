@@ -117,6 +117,7 @@ def register():
 
     return render_template('register.html', form_data=form_data)
 
+# CUSTOMER PORTAL
 @main_bp.route('/customer/portal')
 @main_bp.route('/book')
 @main_bp.route('/booking')
@@ -193,6 +194,7 @@ def forgot_password():
 
     return render_template('forgot_password.html')
 
+# STYLIST COMMAND CENTER
 @main_bp.route('/stylist/dashboard')
 @main_bp.route('/admin')
 def stylist_dashboard():
@@ -220,7 +222,7 @@ def stylist_dashboard():
     except Exception:
         services = []
 
-    # Financial & Operational KPI calculations
+    # Financial & Operational Ledger Calculations
     gross_revenue = 0.0
     today_revenue = 0.0
     completed_bookings = 0
@@ -246,13 +248,16 @@ def stylist_dashboard():
     total_clients = len(customers)
     total_bookings = len(bookings)
     
-    # Financial metrics for studio breakdown cards
+    # Financial metrics for studio ledger cards
     total_overhead = round(gross_revenue * 0.15, 2)
     net_profit = round(gross_revenue - total_overhead, 2)
+    net_income = net_profit
     booth_rent = 0.0
     product_sales = 0.0
+    tax_deductible_overhead = total_overhead
+    tax_liability_est = round(net_income * 0.20, 2)
 
-    # Zip code aggregation for live heatmap
+    # Zip code aggregation for Houston Map
     zip_counts = {}
     for c in customers:
         if getattr(c, 'zip_code', None):
@@ -268,8 +273,11 @@ def stylist_dashboard():
         gross_revenue=gross_revenue,
         total_overhead=total_overhead,
         net_profit=net_profit,
+        net_income=net_income,
         booth_rent=booth_rent,
         product_sales=product_sales,
+        tax_deductible_overhead=tax_deductible_overhead,
+        tax_liability_est=tax_liability_est,
         today_revenue=today_revenue,
         total_clients=total_clients,
         total_bookings=total_bookings,
