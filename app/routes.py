@@ -1,152 +1,112 @@
-import re
-from datetime import datetime, date, time, timedelta
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from app import db
-from app.models import (
-    Customer, BarberService, BarberBooking, BookingStatus,
-    User, Product, PurchaseOrder, ProductSale, StudioExpense
-)
+from app.models import User, Customer, BarberBooking
+from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 main_bp = Blueprint('main', __name__)
 
 def clean_phone(phone_str):
-    return re.sub(r'\D', '', phone_str or '')
+    if not phone_str:
+        return ""
+    return re.sub(r'\D', '', str(phone_str))
 
 @main_bp.route('/')
 def index():
-    services = BarberService.query.filter_by(is_active=True).all()
-    return render_template('index.html', services=services)
-
-@main_bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        first_name = request.form.get('first_name', '').strip()
-        last_name = request.form.get('last_name', '').strip()
-        full_name = f"{first_name} {last_name}".strip()
-        gender = request.form.get('gender', '').strip()
-        birthday = request.form.get('birthday', '').strip()
-        email = request.form.get('email', '').strip()
-        phone = request.form.get('phone', '').strip()
-        zip_code = request.form.get('zip_code', '').strip()
-        address = request.form.get('address', '').strip()
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-
-        missing = []
-        if not first_name: missing.append("First Name")
-        if not last_name: missing.append("Last Name")
-        if not gender: missing.append("Gender")
-        if not birthday: missing.append("Birthday")
-        if not email: missing.append("Email Address")
-        if not phone: missing.append("Phone Number")
-        if not zip_code: missing.append("Zip Code")
-        if not username: missing.append("Username")
-        if not password: missing.append("Password")
-
-        if missing:
-            flash(f"Please fill out: {', '.join(missing)}", "error")
-            return render_template('register.html', form_data=request.form)
-
-        cleaned = clean_phone(phone)
-        existing_customer = Customer.query.filter(
-            (Customer.phone == cleaned) | (Customer.email == email)
-        ).first()
-
-        if existing_customer:
-            flash("An account with this phone number or email already exists. Please log in.", "error")
-            return render_template('register.html', form_data=request.form)
-
-        notes_detail = f"Zip: {zip_code}"
-        if address:
-            notes_detail += f" | Address: {address}"
-        notes_detail += f" | Username: {username}"
-
-        new_customer = Customer(
-            name=full_name,
-            phone=cleaned,
-            email=email,
-            gender=gender,
-            birthday=birthday,
-            notes=notes_detail
-        )
-        db.session.add(new_customer)
-        db.session.commit()
-
-        session['customer_id'] = new_customer.id
-        session['customer_name'] = new_customer.name
-        session['customer_phone'] = new_customer.phone
-
-        flash(f"Welcome, {first_name}! Your account has been created.", "success")
-        return redirect(url_for('main.index'))
-
-    return render_template('register.html', form_data={})
+    return redirect(url_for('main.login'))
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         identifier = request.form.get('identifier', '').strip()
-        cleaned = clean_phone(identifier)
-        customer = Customer.query.filter(
-            (Customer.phone == cleaned) | (Customer.email == identifier) | (Customer.notes.ilike(f"%Username: {identifier}%"))
+        password = request.form.get('password', '').strip()
+        remember = bool(request.form.get('remember_me'))
+
+        digits = clean_phone(identifier)
+
+        # Check Stylist / User first
+        user = User.query.filter(
+            (User.username == identifier) | 
+            (User.email == identifier)
         ).first()
-        
-        if customer:
+
+        if user and check_password_hash(user.password_hash, password):
+            session['user_id'] = user.id
+            session['is_admin'] = user.is_admin
+            session.permanent = remember
+            flash(f"Welcome back, {user.username}!", "success")
+            return redirect(url_for('main.stylist_dashboard'))
+
+        # Check Customer
+        customer = Customer.query.filter(
+            (Customer.email == identifier) | 
+            (Customer.phone == digits) if digits else (Customer.email == identifier)
+        ).first()
+
+        if customer and customer.password_hash and check_password_hash(customer.password_hash, password):
             session['customer_id'] = customer.id
-            session['customer_name'] = customer.name
-            session['customer_phone'] = customer.phone
+            session.permanent = remember
             flash(f"Welcome back, {customer.name}!", "success")
-            return redirect(url_for('main.index'))
-        else:
-            flash("Account not found. Please register.", "error")
-            return render_template('login.html')
-            
+            return redirect(url_for('main.customer_portal'))
+
+        flash("Invalid login credentials. Please try again.", "danger")
+        return redirect(url_for('main.login'))
+
     return render_template('login.html')
 
-@main_bp.route('/logout')
-def logout():
-    session.clear()
-    flash("You have been signed out.", "info")
-    return redirect(url_for('main.index'))
-
-@main_bp.route('/book', methods=['GET', 'POST'])
-def book():
-    services = BarberService.query.filter_by(is_active=True).all()
+@main_bp.route('/register', methods=['GET', 'POST'])
+def register():
     if request.method == 'POST':
-        customer_id = session.get('customer_id')
-        name = request.form.get('name')
-        phone = clean_phone(request.form.get('phone'))
-        service_id = request.form.get('service_id')
-        booking_date_str = request.form.get('booking_date')
-        booking_time_str = request.form.get('booking_time')
+        name = request.form.get('name', '').strip()
+        phone = clean_phone(request.form.get('phone', ''))
+        email = request.form.get('email', '').strip()
+        address = request.form.get('address', '').strip()
+        password = request.form.get('password', '').strip()
+        notes = request.form.get('notes', '').strip()
 
-        if not customer_id:
-            customer = Customer.query.filter_by(phone=phone).first()
-            if not customer:
-                customer = Customer(name=name, phone=phone)
-                db.session.add(customer)
-                db.session.commit()
-            customer_id = customer.id
+        if not name or not phone or not password:
+            flash("Name, phone, and password are required.", "danger")
+            return redirect(url_for('main.register'))
 
-        booking_dt = datetime.strptime(f"{booking_date_str} {booking_time_str}", "%Y-%m-%d %H:%M")
-        service = BarberService.query.get(service_id)
+        existing = Customer.query.filter(Customer.phone == phone).first()
+        if existing:
+            flash("An account with that phone number already exists. Please log in.", "warning")
+            return redirect(url_for('main.login'))
 
-        new_booking = BarberBooking(
-            customer_id=customer_id,
-            service_id=service_id,
-            start_time=booking_dt,
-            end_time=booking_dt + timedelta(minutes=service.duration_minutes if service else 30),
-            status=BookingStatus.CONFIRMED,
-            total_price=service.price if service else 0.0
+        new_customer = Customer(
+            name=name,
+            phone=phone,
+            email=email,
+            address=address,
+            password_hash=generate_password_hash(password),
+            notes=notes
         )
-        db.session.add(new_booking)
+        db.session.add(new_customer)
         db.session.commit()
-        flash("Appointment booked successfully!", "success")
-        return redirect(url_for('main.index'))
 
-    return render_template('book.html', services=services)
+        flash("Registration successful! You can now log in.", "success")
+        return redirect(url_for('main.login'))
 
-@main_bp.route('/admin/dashboard')
-def admin_dashboard():
+    return render_template('register.html')
+
+@main_bp.route('/customer/portal')
+def customer_portal():
+    customer_id = session.get('customer_id')
+    if not customer_id:
+        flash("Please log in to access your profile.", "warning")
+        return redirect(url_for('main.login'))
+
+    customer = Customer.query.get(customer_id)
+    if not customer:
+        session.pop('customer_id', None)
+        return redirect(url_for('main.login'))
+
+    bookings = BarberBooking.query.filter_by(customer_id=customer.id).order_by(BarberBooking.start_time.desc()).all()
+    return render_template('customer_portal.html', customer=customer, bookings=bookings)
+
+@main_bp.route('/stylist/dashboard')
+def stylist_dashboard():
+    user_id = session.get('user_id')
     search_query = request.args.get('q', '').strip()
     search_digits = clean_phone(search_query)
 
@@ -165,6 +125,10 @@ def admin_dashboard():
     bookings = BarberBooking.query.order_by(BarberBooking.start_time.desc()).all()
     return render_template('admin_dashboard.html', customers=customers, bookings=bookings, search_query=search_query)
 
+@main_bp.route('/kiosk')
+def kiosk():
+    return render_template('kiosk.html')
+
 @main_bp.route('/terms')
 def terms():
     return render_template('terms.html')
@@ -175,3 +139,9 @@ def forgot_password():
         flash("Password reset instructions have been sent if an account matches.", "info")
         return redirect(url_for('main.login'))
     return render_template('forgot_password.html')
+
+@main_bp.route('/logout')
+def logout():
+    session.clear()
+    flash("You have been logged out.", "info")
+    return redirect(url_for('main.login'))
