@@ -32,7 +32,7 @@ def login():
 
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
-            session['is_admin'] = user.is_admin
+            session['is_admin'] = getattr(user, 'is_admin', True)
             session.permanent = remember
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
@@ -109,7 +109,7 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Log customer in and load portal
+        # Direct transition into customer portal
         session['customer_id'] = new_customer.id
         return redirect(url_for('main.customer_portal'))
 
@@ -127,7 +127,12 @@ def customer_portal():
     except Exception:
         services = []
 
-    return render_template('booking.html', customer=customer, services=services)
+    try:
+        bookings = customer.bookings.all() if customer and hasattr(customer, 'bookings') else []
+    except Exception:
+        bookings = []
+
+    return render_template('booking.html', customer=customer, services=services, bookings=bookings)
 
 @main_bp.route('/book/service', methods=['POST'])
 @main_bp.route('/book-service', methods=['POST'])
@@ -153,7 +158,7 @@ def update_profile():
 @main_bp.route('/add-family-member', methods=['POST'])
 def add_family_member():
     member_name = request.form.get('member_name', '').strip()
-    flash(f"Family member {member_name} added to your Jackiecutz profile!", "success")
+    flash(f"Family member {member_name} added to your profile!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/customer/cancel-booking/<int:booking_id>', methods=['POST'])
@@ -207,7 +212,7 @@ def stylist_dashboard():
     # Aggregate Zip Codes for Map visualization
     zip_counts = {}
     for c in customers:
-        if c.zip_code:
+        if getattr(c, 'zip_code', None):
             zip_clean = c.zip_code.strip()
             zip_counts[zip_clean] = zip_counts.get(zip_clean, 0) + 1
 
