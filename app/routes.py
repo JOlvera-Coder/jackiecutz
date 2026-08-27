@@ -37,7 +37,7 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # 2. Client / Customer Check (via Username, Phone, or Email)
+        # 2. Customer Check
         customer = Customer.query.filter(
             (Customer.name.ilike(identifier)) |
             (Customer.email == identifier) |
@@ -109,7 +109,7 @@ def register():
         db.session.add(new_customer)
         db.session.commit()
 
-        # Direct transition into customer portal
+        # Log customer in and load portal
         session['customer_id'] = new_customer.id
         return redirect(url_for('main.customer_portal'))
 
@@ -133,6 +133,20 @@ def customer_portal():
 @main_bp.route('/book-service', methods=['POST'])
 def book_service():
     flash("Your appointment has been successfully scheduled!", "success")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/customer/update-profile', methods=['POST'])
+@main_bp.route('/update-profile', methods=['POST'])
+def update_profile():
+    customer_id = session.get('customer_id')
+    if customer_id:
+        customer = Customer.query.get(customer_id)
+        if customer:
+            customer.name = request.form.get('name', customer.name)
+            customer.email = request.form.get('email', customer.email)
+            customer.zip_code = request.form.get('zip_code', customer.zip_code)
+            db.session.commit()
+            flash("Profile updated successfully!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/forgot-password', methods=['GET', 'POST'])

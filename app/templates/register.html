@@ -29,82 +29,82 @@
         
         <!-- USERNAME -->
         <div style="margin-bottom: 16px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">USERNAME *</label>
-            <input type="text" name="username" value="{{ form_data.username if form_data else '' }}" placeholder="Choose a username" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
+            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">USERNAME *</label>
+            <input type="text" name="username" value="{{ form_data.username if form_data else '' }}" placeholder="Choose a username" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
         </div>
 
         <!-- FIRST & LAST NAME -->
         <div style="display: flex; gap: 12px; margin-bottom: 16px;">
             <div style="flex: 1;">
-                <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">FIRST NAME *</label>
-                <input type="text" name="first_name" value="{{ form_data.first_name if form_data else '' }}" placeholder="First" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
+                <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">FIRST NAME *</label>
+                <input type="text" name="first_name" value="{{ form_data.first_name if form_data else '' }}" placeholder="First" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
             </div>
             <div style="flex: 1;">
-                <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">LAST NAME *</label>
-                <input type="text" name="last_name" value="{{ form_data.last_name if form_data else '' }}" placeholder="Last" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
+                <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">LAST NAME *</label>
+                <input type="text" name="last_name" value="{{ form_data.last_name if form_data else '' }}" placeholder="Last" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
             </div>
         </div>
 
         <!-- GENDER SELECTION -->
         <div style="margin-bottom: 16px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">GENDER</label>
+            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">GENDER</label>
             <div style="display: flex; gap: 8px;">
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    <input type="radio" name="gender" value="Female" {% if form_data and form_data.gender == 'Female' %}checked{% endif %} style="accent-color: #c5a059;"> Female
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #121212; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="gender" value="Female" {% if form_data and form_data.gender == 'Female' %}checked{% endif %} style="accent-color: #dfba75;"> Female
                 </label>
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    <input type="radio" name="gender" value="Male" {% if not form_data or form_data.gender == 'Male' or not form_data.gender %}checked{% endif %} style="accent-color: #c5a059;"> Male
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #121212; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="gender" value="Male" {% if not form_data or form_data.gender == 'Male' or not form_data.gender %}checked{% endif %} style="accent-color: #dfba75;"> Male
                 </label>
-                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #111; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
-                    <input type="radio" name="gender" value="Other" {% if form_data and form_data.gender == 'Other' %}checked{% endif %} style="accent-color: #c5a059;"> Other
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #121212; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                    <input type="radio" name="gender" value="Other" {% if form_data and form_data.gender == 'Other' %}checked{% endif %} style="accent-color: #dfba75;"> Other
                 </label>
             </div>
         </div>
 
         <!-- BIRTHDAY -->
         <div style="margin-bottom: 16px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">BIRTHDAY <span style="font-weight: 400; color: #888;">(mm/dd/yyyy)</span></label>
-            <input type="text" id="reg-birthday" name="birthday" value="{{ form_data.birthday if form_data else '' }}" placeholder="MM/DD/YYYY" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;">
+            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">BIRTHDAY <span style="font-weight: 400; color: #888;">(mm/dd/yyyy)</span></label>
+            <input type="text" id="reg-birthday" name="birthday" value="{{ form_data.birthday if form_data else '' }}" placeholder="MM/DD/YYYY" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;">
         </div>
 
         <!-- EMAIL ADDRESS -->
         <div style="margin-bottom: 16px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">EMAIL ADDRESS</label>
-            <input type="email" name="email" value="{{ form_data.email if form_data else '' }}" placeholder="name@example.com" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;">
+            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">EMAIL ADDRESS</label>
+            <input type="email" name="email" value="{{ form_data.email if form_data else '' }}" placeholder="name@example.com" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;">
         </div>
 
         <!-- PHONE NUMBER -->
         <div style="margin-bottom: 16px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">PHONE NUMBER *</label>
-            <input type="tel" id="reg-phone" name="phone" value="{{ form_data.phone if form_data else '' }}" placeholder="832-000-0000" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
+            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">PHONE NUMBER *</label>
+            <input type="tel" id="reg-phone" name="phone" value="{{ form_data.phone if form_data else '' }}" placeholder="832-000-0000" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
         </div>
 
         <!-- ZIP CODE & ADDRESS -->
         <div style="display: flex; gap: 12px; margin-bottom: 16px;">
             <div style="width: 35%;">
-                <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">ZIP CODE *</label>
-                <input type="text" name="zip_code" value="{{ form_data.zip_code if form_data else '' }}" placeholder="77073" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
+                <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">ZIP CODE *</label>
+                <input type="text" name="zip_code" value="{{ form_data.zip_code if form_data else '' }}" placeholder="77073" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
             </div>
             <div style="width: 65%;">
-                <label style="color: #888; font-weight: 700; font-size: 0.82rem; display: block; margin-bottom: 6px;">ADDRESS <span style="font-weight: 400;">(OPTIONAL)</span></label>
-                <input type="text" name="address" value="{{ form_data.address if form_data else '' }}" placeholder="123 Main St" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;">
+                <label style="color: #888; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">ADDRESS <span style="font-weight: 400;">(OPTIONAL)</span></label>
+                <input type="text" name="address" value="{{ form_data.address if form_data else '' }}" placeholder="123 Main St" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;">
             </div>
         </div>
 
         <!-- PASSWORD -->
         <div style="margin-bottom: 20px;">
-            <label style="color: #c5a059; font-weight: 800; font-size: 0.82rem; display: block; margin-bottom: 6px;">CREATE PASSWORD *</label>
-            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 14px; background: #161616; border: 1px solid #c5a059; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #fff; box-sizing: border-box;" required>
+            <label style="color: #e2c974; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">CREATE PASSWORD *</label>
+            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 14px; background: #121212; border: 1px solid #be9648; border-radius: 12px; font-size: 0.95rem; font-weight: 600; color: #ffffff; box-sizing: border-box;" required>
         </div>
 
         <!-- TERMS & POLICY LINK -->
         <div style="margin: 0 auto 20px auto; max-width: 360px; font-size: 0.82rem; color: #aaa; line-height: 1.5; text-align: center;">
             By registering, you agree to our 
-            <a href="{{ url_for('main.terms') }}" style="color: #c5a059; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
+            <a href="{{ url_for('main.terms') }}" style="color: #dfba75; text-decoration: underline; font-weight: 600;">Terms, Conditions & Privacy Policy</a>.
         </div>
 
         <!-- SUBMIT BUTTON -->
-        <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #d8b467 0%, #c5a059 100%); color: #000; font-weight: 800; font-size: 1rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Montserrat', sans-serif;">
+        <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #f5d77f 0%, #c89e4b 100%); color: #000; font-weight: 800; font-size: 1rem; border: none; border-radius: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; font-family: 'Montserrat', sans-serif;">
             Create Account
         </button>
     </form>
@@ -112,7 +112,7 @@
     <!-- BACK TO LOGIN -->
     <div style="text-align: center; margin-top: 20px;">
         <span style="color: #888; font-size: 0.9rem;">Already have an account?</span>
-        <a href="{{ url_for('main.login') }}" style="color: #c5a059; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Log In</a>
+        <a href="{{ url_for('main.login') }}" style="color: #dfba75; font-weight: 700; text-decoration: none; margin-left: 6px; font-size: 0.9rem;">Log In</a>
     </div>
 </div>
 
