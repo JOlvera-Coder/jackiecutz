@@ -132,7 +132,7 @@ def customer_portal():
 @main_bp.route('/book/service', methods=['POST'])
 @main_bp.route('/book-service', methods=['POST'])
 def book_service():
-    flash("Your appointment has been successfully scheduled!", "success")
+    flash("Your appointment has been successfully scheduled with Jackiecutz!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/customer/update-profile', methods=['POST'])
@@ -147,6 +147,19 @@ def update_profile():
             customer.zip_code = request.form.get('zip_code', customer.zip_code)
             db.session.commit()
             flash("Profile updated successfully!", "success")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/customer/add-family-member', methods=['POST'])
+@main_bp.route('/add-family-member', methods=['POST'])
+def add_family_member():
+    member_name = request.form.get('member_name', '').strip()
+    flash(f"Family member {member_name} added to your Jackiecutz profile!", "success")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/customer/cancel-booking/<int:booking_id>', methods=['POST'])
+@main_bp.route('/cancel-booking/<int:booking_id>', methods=['POST'])
+def cancel_booking(booking_id):
+    flash("Appointment cancelled per studio policy.", "info")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/forgot-password', methods=['GET', 'POST'])
@@ -191,7 +204,14 @@ def stylist_dashboard():
     except Exception:
         bookings = BarberBooking.query.all()
 
-    return render_template('dashboard.html', customers=customers, bookings=bookings, search_query=search_query)
+    # Aggregate Zip Codes for Map visualization
+    zip_counts = {}
+    for c in customers:
+        if c.zip_code:
+            zip_clean = c.zip_code.strip()
+            zip_counts[zip_clean] = zip_counts.get(zip_clean, 0) + 1
+
+    return render_template('dashboard.html', customers=customers, bookings=bookings, search_query=search_query, zip_counts=zip_counts)
 
 @main_bp.route('/kiosk')
 def kiosk():
