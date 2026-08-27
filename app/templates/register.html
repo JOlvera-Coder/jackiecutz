@@ -1,165 +1,128 @@
-{% extends 'base.html' %}
-{% block title %}Client Registration | Jackiecutz{% endblock %}
+{% extends "base.html" %}
+{% block title %}Register - Jackiecutz Hair Studio{% endblock %}
 {% block content %}
-<div class="min-h-screen flex flex-col justify-center items-center px-4 bg-black py-8 selection:bg-amber-400 selection:text-black">
-    <div class="max-w-md w-full bg-black border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(218,165,32,0.2)] text-center relative">
+<div style="max-width: 500px; margin: 20px auto; padding: 25px 20px; background: rgba(15, 15, 15, 0.95); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+    
+    <!-- BRANDING HEADER -->
+    <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="font-family: 'Cinzel', serif; color: #d4af37; font-size: 1.8rem; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 2px;">Jackiecutz</h1>
+        <p style="color: #f3e5ab; font-size: 0.85rem; margin-bottom: 2px; letter-spacing: 1px;">HAIR STUDIO</p>
+        <p style="color: #aaa; font-size: 0.75rem;">📍 806-E Airtex Dr Suite 105, Houston, TX 77073 &bull; 📱 (832) 353-4577</p>
+        <p style="font-family: 'Great Vibes', cursive; color: #d4af37; font-size: 1.4rem; margin-top: 6px;">Ivonne Gonzalez</p>
+    </div>
+
+    <h2 style="text-align: center; color: #d4af37; font-size: 1.15rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Create Client Account</h2>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background: rgba(220, 53, 69, 0.25); border: 1px solid #dc3545; color: #ff858d; padding: 12px 16px; border-radius: 12px; margin-bottom: 18px; font-size: 0.88rem; font-weight: bold; text-align: center;">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('main.register') }}">
         
-        <!-- Borderless Logo Section -->
-        <div class="relative overflow-hidden mb-6 bg-transparent border-0 outline-none">
-            <img src="/static/img/card_bg.jpg" alt="Jackiecutz Hair Studio" class="w-full object-contain block border-0 outline-none shadow-none">
-            
-            <!-- Address Hotspot -->
-            <a href="https://www.google.com/maps/search/?api=1&query=806-E+Airtex+Dr+Suite+105+Houston+TX+77073" 
-               target="_blank" rel="noopener noreferrer" title="Open in Google Maps"
-               class="absolute left-[8%] right-[8%] top-[45%] bottom-[38%] z-20 cursor-pointer rounded hover:bg-amber-400/10 active:bg-amber-400/20 transition-all">
-            </a>
-
-            <!-- Phone Hotspot -->
-            <a href="tel:8323534577" title="Call (832) 353-4577"
-               class="absolute left-[15%] right-[15%] top-[62%] bottom-[18%] z-20 cursor-pointer rounded hover:bg-amber-400/10 active:bg-amber-400/20 transition-all">
-            </a>
-        </div>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, msg in messages %}
-              <div class="mb-4 p-3 rounded-xl text-xs bg-red-500/10 text-red-400 border border-red-500/20">
-                {{ msg }}
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="{{ url_for('main.register') }}" class="space-y-3.5 text-left">
-            <!-- 1. Full Name -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Your Full Name</label>
-                <input type="text" name="name" required placeholder="John Doe" 
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
+        <!-- FIRST NAME & LAST NAME -->
+        <div style="display: flex; gap: 12px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">First Name *</label>
+                <input type="text" name="first_name" value="{{ form_data.get('first_name', '') }}" placeholder="First" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
             </div>
-
-            <!-- 2. Gender -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Gender</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <label class="flex items-center justify-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-2 cursor-pointer hover:border-amber-400/50 has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10 transition">
-                        <input type="radio" name="gender" value="Female" checked class="accent-amber-400">
-                        <span class="text-xs text-white">Female</span>
-                    </label>
-                    <label class="flex items-center justify-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-2 cursor-pointer hover:border-amber-400/50 has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10 transition">
-                        <input type="radio" name="gender" value="Male" class="accent-amber-400">
-                        <span class="text-xs text-white">Male</span>
-                    </label>
-                    <label class="flex items-center justify-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-2 cursor-pointer hover:border-amber-400/50 has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10 transition">
-                        <input type="radio" name="gender" value="Other" class="accent-amber-400">
-                        <span class="text-xs text-white">Other</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- 3. Birthday -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Birthday <span class="text-[10px] text-zinc-500 font-normal lowercase">(mm/dd/yyyy)</span></label>
-                <input type="text" name="birthday" id="client-bday" placeholder="07/16/1986" maxlength="10"
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
-
-            <!-- 4. Email Address -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Email Address</label>
-                <input type="email" name="email" required placeholder="name@example.com" 
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
-
-            <!-- 5. Phone Number -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Phone Number</label>
-                <input type="tel" name="phone" id="client-phone" placeholder="832-000-0000" maxlength="12"
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
-
-            <!-- 6. Username -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Username</label>
-                <input type="text" name="username" required placeholder="e.g. alex24" 
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
-
-            <!-- 7. Password -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Password</label>
-                <input type="password" name="password" required placeholder="••••••••" 
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
-
-            <!-- 8. Confirm Password -->
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Confirm Password</label>
-                <input type="password" name="confirm_password" required placeholder="••••••••" 
-                       class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-3 text-black text-xs font-medium focus:outline-none focus:border-amber-400 transition">
-            </div>
-
-            <!-- Discrete Clickable Terms & Privacy Link (Opens in New Tab) -->
-            <div class="pt-2 pb-1 text-[11px] text-zinc-400 text-center leading-relaxed">
-                By clicking Complete Sign Up, you agree to our 
-                <a href="{{ url_for('main.terms_privacy') }}" target="_blank" rel="noopener noreferrer" 
-                   class="text-amber-400 hover:text-amber-300 underline font-semibold transition">
-                    Studio Terms, Privacy & Policy Details ↗
-                </a>
-            </div>
-
-            <!-- Complete Sign Up Button -->
-            <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-amber-300 hover:from-amber-400 hover:to-amber-200 text-black font-extrabold py-3.5 rounded-xl transition duration-200 uppercase tracking-wider text-xs shadow-lg mt-2">
-                COMPLETE SIGN UP
-            </button>
-        </form>
-
-        <div class="mt-6 pt-4 border-t border-zinc-900 text-center space-y-2">
-            <div>
-                <a href="{{ url_for('main.login') }}" class="text-xs text-zinc-400 hover:text-amber-300 transition">
-                    Already have an account? <span class="text-amber-400 underline font-bold">Sign In</span>
-                </a>
-            </div>
-            <div>
-                <a href="{{ url_for('main.forgot_password') }}" class="text-xs text-zinc-500 hover:text-amber-300 transition">
-                    Forgot password? <span class="underline">Reset</span>
-                </a>
+            <div style="flex: 1;">
+                <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Last Name *</label>
+                <input type="text" name="last_name" value="{{ form_data.get('last_name', '') }}" placeholder="Last" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
             </div>
         </div>
+
+        <!-- GENDER -->
+        <div style="margin-bottom: 15px;">
+            <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 6px; text-transform: uppercase;">Gender *</label>
+            <div style="display: flex; gap: 10px;">
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #1a1a1a; border: 1px solid #d4af37; border-radius: 10px; color: #fff; cursor: pointer; font-size: 0.85rem;">
+                    <input type="radio" name="gender" value="Female" {% if form_data.get('gender', 'Female') == 'Female' %}checked{% endif %}> Female
+                </label>
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #1a1a1a; border: 1px solid #d4af37; border-radius: 10px; color: #fff; cursor: pointer; font-size: 0.85rem;">
+                    <input type="radio" name="gender" value="Male" {% if form_data.get('gender') == 'Male' %}checked{% endif %}> Male
+                </label>
+                <label style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: #1a1a1a; border: 1px solid #d4af37; border-radius: 10px; color: #fff; cursor: pointer; font-size: 0.85rem;">
+                    <input type="radio" name="gender" value="Other" {% if form_data.get('gender') == 'Other' %}checked{% endif %}> Other
+                </label>
+            </div>
+        </div>
+
+        <!-- BIRTHDAY -->
+        <div style="margin-bottom: 15px;">
+            <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Birthday (MM/DD/YYYY) *</label>
+            <input type="text" id="client-bday" name="birthday" value="{{ form_data.get('birthday', '') }}" placeholder="07/16/1986" maxlength="10" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        </div>
+
+        <!-- EMAIL -->
+        <div style="margin-bottom: 15px;">
+            <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Email Address *</label>
+            <input type="email" name="email" value="{{ form_data.get('email', '') }}" placeholder="name@example.com" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        </div>
+
+        <!-- PHONE -->
+        <div style="margin-bottom: 15px;">
+            <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Phone Number *</label>
+            <input type="tel" id="client-phone" name="phone" value="{{ form_data.get('phone', '') }}" placeholder="832-000-0000" maxlength="12" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        </div>
+
+        <!-- ZIP CODE (REQUIRED) & ADDRESS (OPTIONAL) -->
+        <div style="display: flex; gap: 12px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Zip Code *</label>
+                <input type="text" name="zip_code" value="{{ form_data.get('zip_code', '') }}" placeholder="77073" maxlength="5" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+            </div>
+            <div style="flex: 1.5;">
+                <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Home Address (Optional)</label>
+                <input type="text" name="address" value="{{ form_data.get('address', '') }}" placeholder="123 Main St" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;">
+            </div>
+        </div>
+
+        <!-- USERNAME -->
+        <div style="margin-bottom: 15px;">
+            <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Username *</label>
+            <input type="text" name="username" value="{{ form_data.get('username', '') }}" placeholder="e.g. alex24" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        </div>
+
+        <!-- PASSWORD -->
+        <div style="margin-bottom: 22px;">
+            <label style="color: #d4af37; font-weight: bold; display: block; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase;">Password *</label>
+            <input type="password" name="password" placeholder="••••••••" style="width: 100%; padding: 12px; background: #fffde7; border: 1px solid #d4af37; border-radius: 10px; font-weight: 600; color: #111; box-sizing: border-box;" required>
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #d4af37, #aa820a); color: #000; font-weight: bold; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;">
+            Create Account & Continue
+        </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 18px;">
+        <span style="color: #888; font-size: 0.85rem;">Already have an account?</span>
+        <a href="{{ url_for('main.login') }}" style="color: #d4af37; font-weight: bold; text-decoration: none; margin-left: 6px; font-size: 0.85rem;">Sign In</a>
     </div>
 </div>
 
 <script>
-// Phone Dashes Auto-Formatter
-document.getElementById('client-phone').addEventListener('input', function (e) {
-    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-    e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
-});
+const phoneInput = document.getElementById('client-phone');
+if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+        e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+    });
+}
 
-// Birthday Auto-Formatter and Text Parser
 const bdayInput = document.getElementById('client-bday');
-
-bdayInput.addEventListener('input', function (e) {
-    let val = e.target.value;
-    if (/^[\d/]+$/.test(val)) {
-        let x = val.replace(/\D/g, '').match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
+if (bdayInput) {
+    bdayInput.addEventListener('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,2})(\d{0,4})/);
         e.target.value = !x[2] ? x[1] : x[1] + '/' + x[2] + (x[3] ? '/' + x[3] : '');
-    }
-});
-
-bdayInput.addEventListener('blur', function (e) {
-    let raw = e.target.value.trim();
-    if (!raw) return;
-    let parsed = Date.parse(raw);
-    if (!isNaN(parsed)) {
-        let d = new Date(parsed);
-        let mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-        let dd = String(d.getUTCDate()).padStart(2, '0');
-        let yyyy = d.getUTCFullYear();
-        if (yyyy > 1900 && yyyy <= 2026) {
-            e.target.value = `${mm}/${dd}/${yyyy}`;
-        }
-    }
-});
+    });
+}
 </script>
 {% endblock %}
