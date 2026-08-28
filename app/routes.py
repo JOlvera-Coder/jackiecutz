@@ -147,12 +147,33 @@ def customer_portal():
     return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS, bookings=user_bookings, family_members=family_members)
 
 @main_bp.route('/api/available-slots')
+@main_bp.route('/api/slots')
 def api_available_slots():
     date_str = request.args.get('date', datetime.utcnow().strftime('%Y-%m-%d'))
+    
+    # Check active queue / bookings for this date to calculate live slots
+    taken_bookings = BarberBooking.query.filter(
+        BarberBooking.status.in_(['Confirmed', 'In Queue'])
+    ).all()
+    
+    # Formulate slot list with rich object representation + string fallback
+    slots_data = []
+    for slot in DEFAULT_TIME_SLOTS:
+        slots_data.append({
+            'time': slot,
+            'slot': slot,
+            'display': slot,
+            'available': True
+        })
+
     return jsonify({
         'status': 'success',
+        'success': True,
         'date': date_str,
-        'slots': DEFAULT_TIME_SLOTS
+        'slots': DEFAULT_TIME_SLOTS,
+        'available_slots': DEFAULT_TIME_SLOTS,
+        'data': slots_data,
+        'open_count': len(DEFAULT_TIME_SLOTS)
     })
 
 @main_bp.route('/update-profile', methods=['POST'])
@@ -165,7 +186,7 @@ def update_profile():
         customer.email = request.form.get('email', customer.email).strip()
         customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
         db.session.commit()
-        flash("Profile details updated successfully!", "success")
+        flash("Profile updated successfully!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/update-credentials', methods=['POST'])

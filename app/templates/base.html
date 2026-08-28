@@ -12,8 +12,8 @@
         :root {
             /* True Illuminating Metallic Champagne Gold Spectrum */
             --champagne-highlight: #ffffff;
-            --champagne-light: #fff6d6;
-            --champagne-cream: #faeac0;
+            --champagne-light: #fffaf0;
+            --champagne-ivory: #fffaea;
             --champagne-gold: #dfba6b;
             --champagne-deep: #b5872a;
             --champagne-bronze: #694a11;
@@ -69,12 +69,12 @@
             transform: translateY(-1px);
         }
 
-        /* Matching Champagne Gold Input Fields */
+        /* Matching Champagne Ivory Input Fields (#fffaea) */
         .gold-input, input[type="text"], input[type="tel"], input[type="email"], input[type="date"], select {
-            background: #fffdf5 !important;
-            color: #111111 !important;
+            background: #fffaea !important;
+            color: #000000 !important;
             border: 1px solid #d8b056 !important;
-            font-weight: 600;
+            font-weight: 700 !important;
         }
 
         .gold-label {
@@ -87,7 +87,7 @@
             margin-bottom: 6px;
         }
 
-        /* Available Live Time Slots (Matching Pill Tabs & Visible Typography) */
+        /* Available Live Time Slots (Exact Match to #fffaea Date Input Tab) */
         #slots-container button, 
         #time-slots-container button, 
         #slots-grid button,
@@ -96,15 +96,15 @@
         button[data-slot], 
         button[data-time],
         [id^="slot-"] {
-            background: linear-gradient(135deg, #fffcf0 0%, #faeac0 50%, #ecd08c 100%) !important;
-            color: #1a1508 !important;
+            background: #fffaea !important;
+            color: #000000 !important;
             border: 1px solid #d8b056 !important;
-            font-size: 0.8rem !important;
+            font-size: 0.82rem !important;
             font-weight: 800 !important;
             border-radius: 9999px !important;
-            padding: 9px 12px !important;
+            padding: 8px 12px !important;
             text-align: center !important;
-            box-shadow: 0 2px 8px rgba(216, 176, 86, 0.25) !important;
+            box-shadow: 0 2px 6px rgba(216, 176, 86, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
             cursor: pointer !important;
             display: flex !important;
@@ -112,7 +112,7 @@
             justify-content: center !important;
         }
 
-        /* Slot Hover State (Illuminated Glow) */
+        /* Slot Hover State (Illuminated White Gold Glow) */
         #slots-container button:hover, 
         #time-slots-container button:hover, 
         #slots-grid button:hover,
@@ -121,14 +121,14 @@
         button[data-slot]:hover, 
         button[data-time]:hover,
         [id^="slot-"]:hover {
-            background: linear-gradient(135deg, #ffffff 0%, #fff7dc 40%, #e0b85c 100%) !important;
+            background: #ffffff !important;
             color: #000000 !important;
             border-color: #ffffff !important;
             box-shadow: 0 0 16px rgba(223, 186, 107, 0.7) !important;
             transform: translateY(-1px);
         }
 
-        /* Slot Active/Selected State (Deep Champagne Gold with High Glow) */
+        /* Slot Active/Selected State (Solid Metallic Gold with Clear Text) */
         #slots-container button.selected, 
         #time-slots-container button.selected, 
         #slots-grid button.selected,
