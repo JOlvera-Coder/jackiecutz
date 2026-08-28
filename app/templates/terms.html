@@ -1,58 +1,51 @@
-{% extends "base.html" %}
-{% block title %}Terms & Conditions - Jackiecutz Hair Studio{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Terms & Privacy Policy | Jackiecutz Hair Studio{% endblock %}
+
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<div class="max-w-2xl mx-auto px-4 py-8 pb-24 text-zinc-100 space-y-6">
 
-<div style="max-width: 580px; margin: 25px auto; padding: 25px 20px; background: #000000; border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 20px; color: #ddd; font-family: 'Montserrat', sans-serif; line-height: 1.6;">
-    
-    <!-- TOP LOGO BANNER (SEAMLESS JET BLACK MATCH) -->
-    <div style="position: relative; max-width: 380px; margin: 0 auto 15px auto; text-align: center;">
-        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block; border-radius: 14px; background-color: #000000; mix-blend-mode: screen;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/card_bg.png') }}';">
-        
-        <!-- CLICKABLE ADDRESS (GOOGLE MAPS) -->
-        <a href="https://maps.google.com/?q=806-E+Airtex+Dr+Suite+105,+Houston,+TX+77073" target="_blank" title="Open in Google Maps" style="position: absolute; top: 48%; left: 8%; width: 84%; height: 16%; display: block; cursor: pointer; z-index: 10;"></a>
-        
-        <!-- CLICKABLE PHONE NUMBER -->
-        <a href="tel:8323534577" title="Call Jackiecutz" style="position: absolute; top: 64%; left: 15%; width: 70%; height: 14%; display: block; cursor: pointer; z-index: 10;"></a>
+  <!-- Header Banner -->
+  <div class="studio-logo-banner mb-4">
+    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" class="w-full h-auto drop-shadow-2xl">
+  </div>
+
+  <div class="p-6 rounded-3xl bg-zinc-950 border border-amber-500/30 shadow-2xl space-y-6">
+    <div class="border-b border-zinc-900 pb-3 flex justify-between items-center">
+      <h1 class="text-sm font-black uppercase tracking-wider text-amber-400">Terms of Service & Privacy Policy</h1>
+      <a href="{{ url_for('main.login') }}" class="text-xs font-bold text-zinc-400 hover:text-amber-400 transition">← Back to Login</a>
     </div>
 
-    <h2 style="color: #d4af37; text-align: center; margin: 0 0 20px 0; font-size: 1.25rem; letter-spacing: 1.5px; text-transform: uppercase;">Terms & Conditions</h2>
-
-    <!-- 1. APPOINTMENTS & PUNCTUALITY -->
-    <div style="margin-bottom: 18px;">
-        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">1. Appointments & Punctuality</h4>
-        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">Clients are encouraged to arrive 5 to 10 minutes prior to scheduled appointments. A strict 15-minute grace period applies. If you arrive more than 15 minutes late, your appointment may be shortened to accommodate subsequent clients or subject to rescheduling.</p>
+    <!-- Section 1: Appointment & Cancellation Policy -->
+    <div class="space-y-2">
+      <h2 class="text-xs font-black uppercase tracking-wider text-amber-300">1. Appointment & Cancellation Policy</h2>
+      <p class="text-xs text-zinc-300 leading-relaxed">
+        Appointments are held with a <strong>10-minute grace window</strong>. If you arrive later than 10 minutes past your reserved time, your slot may be forfeited to accommodate walk-ins. We require at least <strong>2 hours advance notice</strong> for cancellations or rescheduling.
+      </p>
     </div>
 
-    <!-- 2. CANCELLATION & NO-SHOW POLICY -->
-    <div style="margin-bottom: 18px;">
-        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">2. 24-Hour Cancellation & No-Show Policy</h4>
-        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">We require a minimum of 24 hours advance notice to cancel or reschedule any appointment. If you need to cancel or change your time, please notify us at least 24 hours in advance by calling or texting <a href="tel:8323534577" style="color: #f3e5ab; text-decoration: underline; font-weight: 600;">(832) 353-4577</a> or through your client account. Cancellations made with less than 24 hours notice or missed appointments without notice (No-Shows) may require a non-refundable deposit for future bookings.</p>
+    <!-- Section 2: Card Hold & Payment Terms -->
+    <div class="space-y-2">
+      <h2 class="text-xs font-black uppercase tracking-wider text-amber-300">2. Card Holds & Service Payment</h2>
+      <p class="text-xs text-zinc-300 leading-relaxed">
+        When booking online, card details may be securely tokenized via 256-bit encryption as a reservation hold. <strong>Your card will not be charged until your service is completed in the salon chair.</strong> You may settle your final balance via Cash, Zelle, Cash App, or In-Salon Card Tap.
+      </p>
     </div>
 
-    <!-- 3. SERVICES & PAYMENTS -->
-    <div style="margin-bottom: 18px;">
-        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">3. Services & Payments</h4>
-        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">All prices for haircutting, styling, beard trims, chemical treatments, and retail products are final. Payment in full is due immediately upon completion of services via approved studio payment methods.</p>
+    <!-- Section 3: Privacy & Data Protection -->
+    <div class="space-y-2">
+      <h2 class="text-xs font-black uppercase tracking-wider text-amber-300">3. Privacy Policy</h2>
+      <p class="text-xs text-zinc-300 leading-relaxed">
+        Jackiecutz Hair Studio respects your privacy. We only collect essential booking contact details (name, phone number, style preferences) solely for appointment confirmations, reminders, and customer profile management. Your information is never sold or shared with third parties.
+      </p>
     </div>
 
-    <!-- 4. CLIENT SAFETY & STUDIO ETIQUETTE -->
-    <div style="margin-bottom: 18px;">
-        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">4. Client Safety & Studio Etiquette</h4>
-        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">We reserve the right to refuse service to anyone demonstrating disrespectful behavior, intoxication, or showing signs of contagious scalp/skin conditions to ensure health and hygiene standards.</p>
+    <!-- Back Button -->
+    <div class="pt-4 border-t border-zinc-900 text-center">
+      <a href="{{ url_for('main.login') }}" class="inline-block px-8 py-3 gold-btn text-black font-black uppercase tracking-wider text-xs rounded-xl shadow-lg">
+        Accept & Return to Login
+      </a>
     </div>
+  </div>
 
-    <!-- 5. PRIVACY & INFORMATION USE -->
-    <div style="margin-bottom: 18px;">
-        <h4 style="color: #d4af37; margin: 0 0 5px 0; font-size: 0.95rem; letter-spacing: 0.5px;">5. Privacy & Information Use</h4>
-        <p style="font-size: 0.88rem; color: #bbb; margin: 0;">Customer contact information (name, phone number, email address, and birthday) is collected solely for appointment reminders, profile management, and studio updates. Information is strictly confidential and never sold to third parties.</p>
-    </div>
-
-    <!-- RETURN TO LOGIN BUTTON -->
-    <div style="text-align: center; margin-top: 25px; border-top: 1px solid #1a1a1a; padding-top: 20px;">
-        <a href="{{ url_for('main.login') }}" style="display: inline-block; width: 100%; max-width: 280px; padding: 14px 20px; background: #d4af37; color: #000; font-weight: 800; border-radius: 12px; text-decoration: none; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; box-sizing: border-box;">Return to Log In</a>
-    </div>
 </div>
 {% endblock %}

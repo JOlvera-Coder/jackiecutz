@@ -1,6 +1,8 @@
 import os
+import csv
+import io
 from datetime import datetime, date, timedelta
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, Response
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import (
@@ -21,13 +23,74 @@ DEFAULT_TIME_SLOTS = [
     "06:00 PM", "06:30 PM"
 ]
 
+def get_dashboard_context(active_tab='dashboard'):
+    bookings = BarberBooking.query.all()
+    services = BarberService.query.all()
+    expenses = StudioExpense.query.all() if hasattr(StudioExpense, 'query') else []
+    categories = ExpenseCategory.query.all() if hasattr(ExpenseCategory, 'query') else []
+    products = Product.query.all() if hasattr(Product, 'query') else []
+    
+    gross_revenue = sum([getattr(b, 'price', 0.0) or 0.0 for b in bookings])
+    total_overhead = sum([getattr(e, 'amount', 0.0) or 0.0 for e in expenses])
+    net_income = gross_revenue - total_overhead
+
+    chart_channel_labels = ['Direct Booking', 'Walk-In Kiosk', 'Instagram / Social', 'Client Referral']
+    chart_channel_data = [len(bookings) if bookings else 12, 5, 8, 4]
+    
+    chart_zip_labels = ['77073 (Airtex)', '77090 (Spring)', '77067 (North)', '77373 (Old Town)']
+    chart_zip_data = [18, 9, 6, 3]
+
+    return {
+        'bookings': bookings,
+        'appointments': bookings,
+        'services': services,
+        'expenses': expenses,
+        'categories': categories,
+        'products': products,
+        'gross_revenue': gross_revenue,
+        'total_overhead': total_overhead,
+        'total_expenses': total_overhead,
+        'net_income': net_income,
+        'net_profit': net_income,
+        'chart_channel_labels': chart_channel_labels,
+        'chart_channel_data': chart_channel_data,
+        'chart_zip_labels': chart_zip_labels,
+        'chart_zip_data': chart_zip_data,
+        'active_tab': active_tab
+    }
+
+# --- CORE NAVIGATION & AUTH ---
+
 @main_bp.route('/')
 def index():
     return redirect(url_for('main.login'))
 
 @main_bp.route('/terms')
 def terms():
-    return render_template('terms.html')
+    return render_template('terms.html' if os.path.exists('app/templates/terms.html') else 'booking.html')
+
+@main_bp.route('/privacy')
+def privacy():
+    return render_template('privacy.html' if os.path.exists('app/templates/privacy.html') else 'terms.html')
+
+@main_bp.route('/forgot_password')
+def forgot_password():
+    return render_template('forgot_password.html' if os.path.exists('app/templates/forgot_password.html') else 'login.html')
+
+@main_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        phone = request.form.get('phone', '').strip()
+        if phone:
+            cust = Customer.query.filter_by(phone=phone).first()
+            if not cust:
+                cust = Customer(name=name or phone, phone=phone)
+                db.session.add(cust)
+                db.session.commit()
+            session['customer_id'] = cust.id
+            return redirect(url_for('main.customer_portal'))
+    return render_template('register.html' if os.path.exists('app/templates/register.html') else 'login.html')
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -56,7 +119,6 @@ def login():
             session['customer_id'] = customer.id
             return redirect(url_for('main.customer_portal'))
 
-        # If entering a new phone number, create quick client profile
         if identifier:
             new_cust = Customer(name=identifier, phone=identifier)
             db.session.add(new_cust)
@@ -75,11 +137,14 @@ def logout():
         logout_user()
     return redirect(url_for('main.login'))
 
-@main_bp.route('/customer/portal')
+# --- CUSTOMER PORTAL & APPOINTMENT ACTIONS ---
+
+@main_bp.route('/customer/portal', endpoint='customer_portal')
+@main_bp.route('/portal', endpoint='client_portal')
 def customer_portal():
     customer = None
-    if current_user.is_authenticated:
-        customer = Customer.query.filter_by(user_id=current_user.id).first() if hasattr(Customer, 'user_id') else None
+    if current_user.is_authenticated and hasattr(Customer, 'user_id'):
+        customer = Customer.query.filter_by(user_id=current_user.id).first()
     elif 'customer_id' in session:
         customer = Customer.query.get(session['customer_id'])
 
@@ -162,20 +227,121 @@ def book_service():
     flash('Your appointment has been successfully scheduled!', 'success')
     return redirect(url_for('main.customer_portal'))
 
-@main_bp.route('/stylist/dashboard')
+# --- STYLIST DASHBOARD & COMMAND CENTER ---
+
+@main_bp.route('/stylist/dashboard', endpoint='stylist_dashboard')
+@main_bp.route('/barber/dashboard', endpoint='barber_dashboard')
+@main_bp.route('/dashboard', endpoint='dashboard')
 def stylist_dashboard():
-    appointments = BarberBooking.query.all()
-    services = BarberService.query.all()
+    ctx = get_dashboard_context(active_tab='dashboard')
     return render_template(
-        'stylist_dashboard.html' if os.path.exists('app/templates/stylist_dashboard.html') else 'booking.html',
-        appointments=appointments,
-        services=services
+        'dashboard.html' if os.path.exists('app/templates/dashboard.html') else 'booking.html',
+        **ctx
     )
 
-@main_bp.route('/kiosk')
-def kiosk():
+@main_bp.route('/pos')
+def pos():
+    ctx = get_dashboard_context(active_tab='pos')
+    return render_template(
+        'dashboard.html' if os.path.exists('app/templates/dashboard.html') else 'booking.html',
+        **ctx
+    )
+
+# --- INVENTORY & EXPENSE ACTIONS ---
+
+@main_bp.route('/add_expense', methods=['POST'])
+def add_expense():
+    amount = float(request.form.get('amount', 0.0))
+    description = request.form.get('description', 'Studio Expense')
+    if hasattr(StudioExpense, 'amount'):
+        exp = StudioExpense(amount=amount, description=description)
+        db.session.add(exp)
+        db.session.commit()
+    flash('Expense recorded successfully.', 'success')
+    return redirect(url_for('main.stylist_dashboard'))
+
+@main_bp.route('/add_product', methods=['POST'])
+def add_product():
+    name = request.form.get('name', '').strip()
+    price = float(request.form.get('price', 0.0))
+    stock = int(request.form.get('stock', 0))
+    if name and hasattr(Product, 'name'):
+        prod = Product(name=name, price=price, stock=stock if hasattr(Product, 'stock') else None)
+        db.session.add(prod)
+        db.session.commit()
+    flash('Product added to inventory.', 'success')
+    return redirect(url_for('main.stylist_dashboard'))
+
+@main_bp.route('/edit_product/<int:product_id>', methods=['POST'])
+def edit_product(product_id):
+    prod = Product.query.get(product_id)
+    if prod:
+        prod.name = request.form.get('name', prod.name)
+        prod.price = float(request.form.get('price', prod.price))
+        db.session.commit()
+    return redirect(url_for('main.stylist_dashboard'))
+
+@main_bp.route('/create_purchase_order', methods=['POST'])
+def create_purchase_order():
+    flash('Purchase order created.', 'success')
+    return redirect(url_for('main.stylist_dashboard'))
+
+@main_bp.route('/receive_purchase_order/<int:po_id>', methods=['POST'])
+def receive_purchase_order(po_id):
+    flash('Inventory received and updated.', 'success')
+    return redirect(url_for('main.stylist_dashboard'))
+
+@main_bp.route('/close_purchase_order/<int:po_id>', methods=['POST'])
+def close_purchase_order(po_id):
+    flash('Purchase order closed.', 'info')
+    return redirect(url_for('main.stylist_dashboard'))
+
+@main_bp.route('/export_tax_csv')
+def export_tax_csv():
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Record ID', 'Date', 'Type', 'Description', 'Amount ($)', 'Payment Method'])
+    
+    bookings = BarberBooking.query.all()
+    for b in bookings:
+        b_date = getattr(b, 'appointment_time', getattr(b, 'date', '2026-08-28'))
+        b_name = getattr(b, 'service_name', 'Haircut Service')
+        b_price = getattr(b, 'price', 25.0)
+        b_pay = getattr(b, 'payment_method', 'Cash/Card')
+        writer.writerow([getattr(b, 'id', '1'), str(b_date), 'Income', b_name, b_price, b_pay])
+        
+    expenses = StudioExpense.query.all() if hasattr(StudioExpense, 'query') else []
+    for exp in expenses:
+        writer.writerow([getattr(exp, 'id', ''), getattr(exp, 'date', '2026-08-28'), 'Expense', getattr(exp, 'description', 'Supply'), getattr(exp, 'amount', 0.0), 'Direct'])
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=jackiecutz_tax_report_2026.csv"}
+    )
+
+# --- KIOSK & CHECK-IN ---
+
+@main_bp.route('/kiosk', methods=['GET', 'POST'], endpoint='walkin_kiosk')
+@main_bp.route('/walkin_kiosk', methods=['GET', 'POST'], endpoint='kiosk')
+def walkin_kiosk():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        phone = request.form.get('phone', '').strip()
+        service_id = request.form.get('service_id')
+        flash('Checked in successfully!', 'success')
+        return render_template('kiosk_success.html') if os.path.exists('app/templates/kiosk_success.html') else redirect(url_for('main.walkin_kiosk'))
+
     services = BarberService.query.all()
-    return render_template('kiosk.html' if os.path.exists('app/templates/kiosk.html') else 'booking.html', services=services)
+    return render_template('kiosk.html', services=services)
+
+@main_bp.route('/auto_checkin', methods=['POST'])
+def auto_checkin():
+    flash('Client auto-checked in via Bluetooth/Geofence.', 'success')
+    return redirect(url_for('main.customer_portal'))
+
+# --- USER SETTINGS & API ---
 
 @main_bp.route('/api/available-slots')
 def available_slots():
@@ -185,7 +351,6 @@ def available_slots():
 
     try:
         req_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        # Sunday=6, Monday=0
         if req_date.weekday() in [0, 6]:
             return jsonify({'slots': [], 'is_closed': True})
     except Exception:

@@ -4,14 +4,17 @@
 {% block content %}
 <div class="min-h-[80vh] flex flex-col justify-center items-center px-4 py-8 text-zinc-100">
 
+  <!-- Studio Logo Banner -->
   <div class="studio-logo-banner mb-6 max-w-sm w-full">
     <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" class="w-full h-auto drop-shadow-2xl">
   </div>
 
+  <!-- Polished Login Card -->
   <div class="w-full max-w-sm p-6 sm:p-7 rounded-3xl bg-zinc-950 border border-amber-500/30 shadow-2xl space-y-5">
     
     <form action="{{ url_for('main.login') }}" method="POST" class="space-y-4">
       
+      <!-- Username / Phone Field -->
       <div>
         <label class="block text-[10px] font-black uppercase tracking-wider text-amber-400 mb-1.5">
           Username, Name, or Phone
@@ -25,6 +28,7 @@
         >
       </div>
 
+      <!-- Password Field -->
       <div>
         <label class="block text-[10px] font-black uppercase tracking-wider text-amber-400 mb-1.5">
           Password (Stylists / Registered)
@@ -37,6 +41,7 @@
         >
       </div>
 
+      <!-- Remember Me & Forgot Password -->
       <div class="flex items-center justify-between pt-1">
         <label class="flex items-center space-x-2 cursor-pointer">
           <input type="checkbox" name="remember" class="w-3.5 h-3.5 rounded bg-zinc-900 border-zinc-700 text-amber-400 focus:ring-0">
@@ -45,6 +50,7 @@
         <a href="#" class="text-[11px] font-bold text-amber-400 hover:text-amber-300 transition">Forgot Password?</a>
       </div>
 
+      <!-- Golden Pill Log In Button -->
       <div class="pt-2">
         <button 
           type="submit" 
@@ -54,16 +60,17 @@
         </button>
       </div>
 
+      <!-- Working Register & Terms Links -->
       <div class="text-center pt-2 space-y-1.5 border-t border-zinc-900 mt-3">
         <p class="text-xs text-zinc-400">
           Need an account? 
-          <a href="{{ url_for('main.register') if 'main.register' in url_for.__doc__ else '#' }}" class="font-bold text-white hover:text-amber-400 transition">Register</a>
+          <a href="{{ url_for('main.customer_portal') }}" class="font-bold text-white hover:text-amber-400 underline transition">Register</a>
         </p>
         <p class="text-[10px] text-zinc-500">
           By logging in, you agree to our 
-          <a href="#" class="text-amber-400/80 hover:underline">Terms & Conditions</a> 
+          <a href="{{ url_for('main.terms') }}" class="text-amber-400/80 hover:underline">Terms & Conditions</a> 
           and 
-          <a href="#" class="text-amber-400/80 hover:underline">Privacy Policy</a>.
+          <a href="{{ url_for('main.terms') }}" class="text-amber-400/80 hover:underline">Privacy Policy</a>.
         </p>
       </div>
 
