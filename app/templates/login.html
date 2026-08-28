@@ -2,56 +2,54 @@
 {% block title %}Sign In | Jackiecutz Hair Studio{% endblock %}
 
 {% block content %}
-<div style="max-width: 480px; margin: 30px auto; padding: 0 16px; text-align: center;">
+<div style="max-width: 480px; margin: 20px auto 40px auto; padding: 0 16px; text-align: center; background: #000000;">
 
-  <!-- Full Graphic Studio Artwork Card -->
-  <div style="margin-bottom: 24px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.9); border: 1px solid #29241b;">
-    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block;">
+  <!-- Pure Studio Logo Banner (Seamless Jet Black All Around) -->
+  <div class="studio-logo-banner">
+    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio">
   </div>
 
   <!-- Sign-In Form Container -->
-  <div style="background: #0d0d0d; border: 1px solid #29241b; border-radius: 20px; padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+  <div style="background: #080808; border: 1px solid #1c1810; border-radius: 20px; padding: 28px 22px; box-shadow: 0 12px 35px rgba(0,0,0,0.95);">
 
+    {# Show ONLY Error and Danger alerts on login #}
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, msg in messages %}
-          <div style="padding: 12px; margin-bottom: 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-align: center;
-                      {% if category == 'danger' or category == 'error' %}background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid #dc3545;
-                      {% elif category == 'warning' %}background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid #ffc107;
-                      {% else %}background: rgba(40, 167, 69, 0.2); color: #51cf66; border: 1px solid #28a745;{% endif %}">
-            {{ msg }}
-          </div>
+          {% if category in ['danger', 'error'] %}
+            <div style="padding: 12px; margin-bottom: 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-align: center; background: rgba(220, 53, 69, 0.18); color: #ff6b6b; border: 1px solid #dc3545;">
+              {{ msg }}
+            </div>
+          {% endif %}
         {% endfor %}
       {% endif %}
     {% endwith %}
 
     <form method="POST" action="{{ url_for('main.login') }}" autocomplete="off">
       <div style="text-align: left; margin-bottom: 18px;">
-        <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">USERNAME, NAME, OR PHONE</label>
-        <input type="text" name="identifier" class="gold-input" placeholder="Enter username, name, or phone" required
-               style="width: 100%; padding: 12px; background: #141414; border: 1px solid #29241b; border-radius: 8px; color: #f5d77f; box-sizing: border-box; margin-top: 6px; font-size: 0.95rem;">
+        <label class="gold-label">USERNAME, NAME, OR PHONE</label>
+        <input type="text" name="identifier" class="gold-input" placeholder="Enter username, name, or phone" required>
       </div>
 
       <div style="text-align: left; margin-bottom: 18px;">
-        <label style="color: #c89e4b; font-size: 0.78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">PASSWORD (STYLISTS / REGISTERED)</label>
-        <input type="password" name="password" class="gold-input" placeholder="••••••••" autocomplete="new-password"
-               style="width: 100%; padding: 12px; background: #141414; border: 1px solid #29241b; border-radius: 8px; color: #f5d77f; box-sizing: border-box; margin-top: 6px; font-size: 0.95rem;">
+        <label class="gold-label">PASSWORD (STYLISTS / REGISTERED)</label>
+        <input type="password" name="password" class="gold-input" placeholder="••••••••" autocomplete="new-password">
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 0.82rem;">
         <label style="color: #a19275; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-          <input type="checkbox" name="remember_me" style="accent-color: #c89e4b;"> Remember Me
+          <input type="checkbox" name="remember_me" style="accent-color: #e6c36a;"> Remember Me
         </label>
-        <a href="{{ url_for('main.forgot_password') }}" style="color: #f5d77f; text-decoration: none; font-weight: 700;">Forgot Password?</a>
+        <a href="{{ url_for('main.forgot_password') }}" style="color: #e6c36a; text-decoration: none; font-weight: 700;">Forgot Password?</a>
       </div>
 
-      <button type="submit" class="gold-metallic-bg" style="width: 100%; padding: 15px; border-radius: 10px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px;">
+      <button type="submit" class="gold-btn" style="width: 100%; padding: 16px;">
         LOG IN
       </button>
     </form>
 
-    <div style="margin-top: 20px; font-size: 0.85rem; color: #888;">
-      Need an account? <a href="{{ url_for('main.register') }}" style="color: #f5d77f; text-decoration: none; font-weight: 700;">Register</a>
+    <div style="margin-top: 22px; font-size: 0.85rem; color: #888;">
+      Need an account? <a href="{{ url_for('main.register') }}" style="color: #fff0b3; text-decoration: none; font-weight: 700;">Register</a>
     </div>
   </div>
 </div>

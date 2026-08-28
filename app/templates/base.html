@@ -8,18 +8,17 @@
     
     <style>
         :root {
-            --gold-primary: #d4af37;
-            --gold-light: #fae498;
-            --gold-mid: #e5be58;
-            --gold-dark: #a07421;
-            --gold-border: #c89e4b;
-            --bg-dark: #050505;
-            --card-bg: #0d0d0d;
-            --input-bg: #141414;
+            --gold-bright: #fff0b3;
+            --gold-primary: #e6c36a;
+            --gold-deep: #b88628;
+            --gold-shadow: #54390b;
+            --bg-jet-black: #000000;
+            --card-jet-black: #080808;
+            --input-jet-black: #111111;
         }
 
-        body {
-            background-color: var(--bg-dark);
+        html, body {
+            background-color: #000000 !important;
             color: #f3f3f3;
             font-family: 'Montserrat', sans-serif;
             margin: 0;
@@ -27,34 +26,52 @@
             min-height: 100vh;
         }
 
-        /* Luminous Illuminating Champagne Gold Button */
+        /* Pure Studio Artwork Container (Seamless Jet Black, No Outlines) */
+        .studio-logo-banner {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto 20px auto;
+            background: #000000 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .studio-logo-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: none !important;
+            background: #000000 !important;
+        }
+
+        /* Luminous Rich Champagne Gold Button */
         .gold-btn, .gold-metallic-bg {
-            background: linear-gradient(135deg, #fae498 0%, #e5be58 45%, #d4af37 70%, #9e7526 100%) !important;
-            color: #111111 !important;
+            background: linear-gradient(135deg, #fff3cc 0%, #e6c36a 28%, #d4af37 55%, #b88628 85%, #6b4e12 100%) !important;
+            color: #080808 !important;
             font-weight: 800 !important;
-            border: 1px solid #fae498 !important;
+            border: 1px solid #fff0b3 !important;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(229, 190, 88, 0.45), 0 0 10px rgba(250, 228, 152, 0.3) inset !important;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 22px rgba(230, 195, 106, 0.45), 0 0 12px rgba(255, 243, 204, 0.35) inset !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
             cursor: pointer;
-            transition: all 0.25s ease-in-out;
+            transition: all 0.22s ease-in-out;
             letter-spacing: 1.5px;
             text-transform: uppercase;
         }
 
         .gold-btn:hover, .gold-metallic-bg:hover {
-            background: linear-gradient(135deg, #ffffff 0%, #fae498 35%, #e5be58 75%, #a07421 100%) !important;
-            box-shadow: 0 6px 28px rgba(229, 190, 88, 0.7), 0 0 15px rgba(255, 255, 255, 0.5) inset !important;
+            background: linear-gradient(135deg, #ffffff 0%, #fff0b3 25%, #e6c36a 60%, #b88628 100%) !important;
+            box-shadow: 0 6px 30px rgba(230, 195, 106, 0.75), 0 0 16px rgba(255, 255, 255, 0.6) inset !important;
             transform: translateY(-1px);
         }
 
         .gold-input {
             width: 100%;
             padding: 12px 14px;
-            background: var(--input-bg);
-            border: 1px solid #29241b;
+            background: var(--input-jet-black);
+            border: 1px solid #201a12;
             border-radius: 8px;
-            color: #fae498;
+            color: #fff0b3;
             font-size: 0.95rem;
             box-sizing: border-box;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -62,12 +79,12 @@
 
         .gold-input:focus {
             outline: none;
-            border-color: #e5be58;
-            box-shadow: 0 0 12px rgba(229, 190, 88, 0.35);
+            border-color: #e6c36a;
+            box-shadow: 0 0 12px rgba(230, 195, 106, 0.4);
         }
 
         .gold-label {
-            color: #c89e4b;
+            color: #e6c36a;
             font-size: 0.78rem;
             font-weight: 800;
             letter-spacing: 1.5px;
@@ -79,14 +96,14 @@
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus {
-            -webkit-text-fill-color: #fae498 !important;
-            -webkit-box-shadow: 0 0 0px 1000px #141414 inset !important;
-            border: 1px solid #c89e4b !important;
-            caret-color: #fae498 !important;
+            -webkit-text-fill-color: #fff0b3 !important;
+            -webkit-box-shadow: 0 0 0px 1000px #111111 inset !important;
+            border: 1px solid #e6c36a !important;
+            caret-color: #fff0b3 !important;
         }
     </style>
 </head>
-<body>
+<body style="background-color: #000000 !important;">
     {% block content %}{% endblock %}
 </body>
 </html>

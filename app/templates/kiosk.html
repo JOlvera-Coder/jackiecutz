@@ -2,29 +2,29 @@
 {% block title %}Walk-In Kiosk | Jackiecutz Hair Studio{% endblock %}
 
 {% block content %}
-<div style="max-width: 520px; margin: 20px auto 40px auto; padding: 0 16px; text-align: center;">
+<div style="max-width: 520px; margin: 15px auto 40px auto; padding: 0 16px; text-align: center; background: #000000;">
 
-  <!-- Top Command Center Quick Toggle -->
+  <!-- Quick Switch Header -->
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-    <a href="{{ url_for('main.login') }}" style="color: #a07421; font-size: 0.78rem; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+    <a href="{{ url_for('main.login') }}" style="color: #8f6a22; font-size: 0.78rem; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
       ← Client Login
     </a>
-    <a href="{{ url_for('main.stylist_dashboard') }}" style="background: rgba(212, 175, 55, 0.12); color: #fae498; border: 1px solid #c89e4b; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; text-decoration: none; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+    <a href="{{ url_for('main.stylist_dashboard') }}" style="background: rgba(230, 195, 106, 0.1); color: #fff0b3; border: 1px solid #b88628; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; text-decoration: none; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
       ✂️ Command Center
     </a>
   </div>
 
-  <!-- Kiosk Graphic Artwork Banner -->
-  <div style="margin-bottom: 24px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.9); border: 1px solid #29241b;">
-    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block;">
+  <!-- Pure Studio Logo Banner (Seamless Jet Black All Around) -->
+  <div class="studio-logo-banner">
+    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio">
   </div>
 
   <!-- Form Card -->
-  <div style="background: #0d0d0d; border: 1px solid #29241b; border-radius: 20px; padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: left;">
-    <h2 style="color: #fae498; text-align: center; font-size: 1.3rem; margin-top: 0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;">
+  <div style="background: #080808; border: 1px solid #1c1810; border-radius: 20px; padding: 28px 22px; box-shadow: 0 12px 35px rgba(0,0,0,0.95); text-align: left;">
+    <h2 style="color: #fff0b3; text-align: center; font-size: 1.3rem; margin-top: 0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;">
       Walk-In Check-In Terminal
     </h2>
-    <p style="color: #a0a0a0; text-align: center; font-size: 0.85rem; margin-bottom: 22px;">
+    <p style="color: #999; text-align: center; font-size: 0.85rem; margin-bottom: 22px;">
       Please sign in to join today's active chair waitlist.
     </p>
 
@@ -82,7 +82,7 @@
       </button>
     </form>
 
-    <div style="text-align: center; margin-top: 22px; font-size: 0.78rem; color: #777;">
+    <div style="text-align: center; margin-top: 22px; font-size: 0.78rem; color: #666;">
       Jackiecutz Hair Studio • Ivonne Gonzalez • Divine Salon Suite 105
     </div>
   </div>

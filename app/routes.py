@@ -34,7 +34,7 @@ def login():
         remember = bool(request.form.get('remember_me'))
         digits = clean_phone(identifier)
 
-        # 1. Stylist / Admin Check (Ivonne)
+        # 1. Stylist / Admin Check
         user = User.query.filter(
             (User.username.ilike(identifier)) | 
             (User.email.ilike(identifier))
@@ -48,15 +48,15 @@ def login():
             flash(f"Welcome back, {user.username}!", "success")
             return redirect(url_for('main.stylist_dashboard'))
 
-        # 2. Universal Customer Lookup
+        # 2. Universal Customer Lookup (Username, Phone, Name, or Email)
         customer = None
         if digits and len(digits) >= 7:
             customer = Customer.query.filter(Customer.phone == digits).first()
 
-        if not customer and hasattr(Customer, 'username'):
+        if not customer and hasattr(Customer, 'username') and identifier:
             customer = Customer.query.filter(Customer.username.ilike(identifier)).first()
 
-        if not customer:
+        if not customer and identifier:
             customer = Customer.query.filter(
                 (Customer.name.ilike(identifier)) |
                 (Customer.name.ilike(f"%{identifier}%")) |
@@ -70,7 +70,7 @@ def login():
             flash(f"Welcome back, {customer.name}!", "success")
             return redirect(url_for('main.customer_portal'))
 
-        flash("Account not found or invalid credentials.", "danger")
+        flash("Username, phone, or credentials not recognized. Please try again or register.", "danger")
         return redirect(url_for('main.login'))
 
     return render_template('login.html')
@@ -103,19 +103,20 @@ def register():
         }
 
         if not first_name and not username:
-            flash("Please provide a First Name or Username.", "danger")
+            flash("Please enter a name or username.", "danger")
             return render_template('register.html', form_data=form_data)
         if not phone or len(phone) < 10:
-            flash("Please provide a valid 10-digit phone number.", "danger")
+            flash("Please enter a valid 10-digit phone number.", "danger")
             return render_template('register.html', form_data=form_data)
         if not zip_code:
-            flash("Please provide a zip code.", "danger")
+            flash("Please enter a zip code.", "danger")
             return render_template('register.html', form_data=form_data)
 
         existing_phone = Customer.query.filter(Customer.phone == phone).first()
         if existing_phone:
-            flash("An account with this phone number already exists. Please sign in.", "warning")
-            return redirect(url_for('main.login'))
+            session.clear()
+            session['customer_id'] = existing_phone.id
+            return redirect(url_for('main.customer_portal'))
 
         new_customer = Customer(
             username=username if username else None,
@@ -131,7 +132,6 @@ def register():
 
         session.clear()
         session['customer_id'] = new_customer.id
-        flash(f"Welcome to Jackiecutz, {new_customer.name}!", "success")
         return redirect(url_for('main.customer_portal'))
 
     return render_template('register.html', form_data=form_data)
@@ -143,7 +143,32 @@ def customer_portal():
     if 'customer_id' in session:
         customer = Customer.query.get(session['customer_id'])
     services = BarberService.query.all()
-    return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS)
+    user_bookings = BarberBooking.query.filter_by(customer_id=customer.id).all() if customer else []
+    return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS, bookings=user_bookings)
+
+@main_bp.route('/book-service', methods=['POST'])
+def book_service():
+    customer = None
+    if 'customer_id' in session:
+        customer = Customer.query.get(session['customer_id'])
+    
+    service_id = request.form.get('service_id')
+    service = BarberService.query.get(service_id) if service_id else None
+    service_name = service.name if service else request.form.get('service_name', 'Haircut')
+    price = service.price if service else 35.0
+
+    booking = BarberBooking(
+        customer_id=customer.id if customer else None,
+        service_name=service_name,
+        price=price,
+        status="Confirmed",
+        appointment_time=datetime.utcnow()
+    )
+    db.session.add(booking)
+    db.session.commit()
+
+    flash(f"Appointment booked successfully for {service_name}!", "success")
+    return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
 def walkin_kiosk():
