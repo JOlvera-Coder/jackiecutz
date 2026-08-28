@@ -3,147 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jackie Cutz — Walk-In Check-In Terminal</title>
+    <title>Walk-In Check-In Terminal — Jackie Cutz</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #000; color: #fdfaf6; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px 15px; }
-        
-        .header-section { text-align: center; margin-bottom: 25px; }
-        .logo-img { max-width: 220px; height: auto; margin-bottom: 8px; }
-        .salon-address { color: #ff3333; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .salon-phone { color: #d4af37; font-size: 0.95rem; font-weight: 700; margin-top: 4px; }
-        .stylist-name { font-family: 'Brush Script MT', 'Great Vibes', cursive; font-size: 2rem; color: #fff; margin-top: 6px; letter-spacing: 1px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
 
-        .terminal-card {
-            background: #050505;
-            border: 1.5px solid #d4af37;
-            border-radius: 24px;
-            padding: 30px 25px;
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 35px 20px 60px 20px;
+        }
+
+        /* Branding Header */
+        .branding-header {
+            text-align: center;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-logo {
+            max-width: 290px;
             width: 100%;
-            max-width: 520px;
+            height: auto;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .address-text {
+            color: #ff3333;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .phone-text {
+            color: #d4af37;
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .signature-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.9rem;
+            color: #ffffff;
+            font-weight: 400;
+            margin-top: 6px;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+        }
+
+        /* Gold Bordered Terminal Card */
+        .kiosk-card {
+            background: #000000;
+            border: 1.5px solid #d4af37;
+            border-radius: 34px;
+            padding: 40px 35px 35px 35px;
+            width: 100%;
+            max-width: 530px;
             box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
         }
 
         .terminal-title {
-            color: #d4af37;
-            font-size: 1.25rem;
-            font-weight: 800;
+            color: #e5c158;
+            font-size: 1.35rem;
+            font-weight: 900;
             text-align: center;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.8px;
             text-transform: uppercase;
         }
 
         .terminal-subtitle {
-            color: #8c9ba5;
-            font-size: 0.88rem;
+            color: #8ec5fc;
+            font-size: 0.9rem;
+            font-weight: 500;
             text-align: center;
-            margin-top: 6px;
-            margin-bottom: 22px;
+            margin-top: 8px;
+            margin-bottom: 28px;
         }
 
-        .form-row { display: flex; gap: 12px; }
-        .form-group { margin-bottom: 16px; flex: 1; }
-        .form-label { display: block; font-size: 0.75rem; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-        
-        .form-control {
+        /* Form Fields */
+        .form-row {
+            display: flex;
+            gap: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            flex: 1;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .input-pill {
             width: 100%;
-            background: #fffdfa;
-            border: 1px solid #d4af37;
-            border-radius: 14px;
-            padding: 12px 16px;
+            background-color: #fffdf2;
+            border: 1.5px solid #d4af37;
+            border-radius: 22px;
+            padding: 13px 20px;
             font-size: 0.95rem;
-            color: #111;
+            color: #1a1a1a;
+            font-weight: 600;
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-pill::placeholder {
+            color: #8c9ba5;
             font-weight: 600;
         }
-        .form-control::placeholder { color: #88929b; font-weight: 500; }
-        
-        .submit-btn {
+
+        .input-pill:focus {
+            border-color: #ffffff;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+        }
+
+        select.input-pill {
+            appearance: auto;
+            cursor: pointer;
+        }
+
+        .btn-submit {
             width: 100%;
             background: linear-gradient(180deg, #e5c158 0%, #b8860b 100%);
             border: none;
-            border-radius: 14px;
-            padding: 15px;
+            border-radius: 22px;
+            padding: 16px;
             font-size: 1.05rem;
-            font-weight: 800;
-            color: #111;
+            font-weight: 900;
+            color: #111111;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             cursor: pointer;
             margin-top: 10px;
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            transition: transform 0.1s, filter 0.2s;
         }
 
-        .footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: #8c9ba5; }
-        .footer-link a { color: #fff; font-weight: 700; text-decoration: underline; }
+        .btn-submit:active {
+            transform: scale(0.99);
+            filter: brightness(0.95);
+        }
+
+        .kiosk-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.88rem;
+            color: #8c9ba5;
+            font-weight: 500;
+        }
+
+        .kiosk-footer a {
+            color: #ffffff;
+            font-weight: 800;
+            text-decoration: underline;
+        }
 
         /* 6-Second Confirmation Overlay */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(0, 0, 0, 0.93);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 9999;
         }
+
         .modal-card {
-            background: #0a0a0a;
-            border: 2px solid #d4af37;
-            border-radius: 20px;
-            padding: 35px 25px;
+            background: #000000;
+            border: 1.5px solid #d4af37;
+            border-radius: 28px;
+            padding: 40px 30px;
             text-align: center;
             max-width: 440px;
             width: 90%;
-            box-shadow: 0 0 35px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
         }
     </style>
 </head>
 <body>
 
-    <!-- Header / Branding -->
-    <div class="header-section">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo-img" alt="Jackie Cutz Logo">
-        <div class="salon-address">📍 Divine Salon: 806-E Airtex Dr Suite 105, Houston, TX 77073</div>
-        <div class="salon-phone">📞 (832) 353-4577</div>
-        <div class="stylist-name">Ivonne Gonzalez</div>
+    <!-- Header Section -->
+    <div class="branding-header">
+        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" class="header-logo" alt="Jackie Cutz">
+        <div class="address-text">📍 Divine Salon: 806-E Airtex Dr Suite 105, Houston, TX 77073.</div>
+        <div class="phone-text">📱 (832) 353-4577</div>
+        <div class="signature-title">Ivonne Gonzalez</div>
     </div>
 
-    <!-- Check-In Terminal Card -->
-    <div class="terminal-card">
-        <div class="terminal-title">Walk-In Check-In Terminal</div>
+    <!-- Walk-In Check-In Terminal -->
+    <div class="kiosk-card">
+        <div class="terminal-title">WALK-IN CHECK-IN TERMINAL</div>
         <div class="terminal-subtitle">Please sign in to join today's active chair waitlist.</div>
 
         <form method="POST" action="{{ url_for('main.walkin_kiosk') }}">
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">First Name *</label>
-                    <input type="text" name="first_name" class="form-control" placeholder="First Name" required>
+                    <label class="field-label">FIRST NAME *</label>
+                    <input type="text" name="first_name" class="input-pill" placeholder="First Name" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" name="last_name" class="form-control" placeholder="Last Name">
+                    <label class="field-label">LAST NAME</label>
+                    <input type="text" name="last_name" class="input-pill" placeholder="Last Name">
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Phone Number *</label>
-                <input type="tel" name="phone" class="form-control" placeholder="832-000-0000" required>
+                <label class="field-label">PHONE NUMBER *</label>
+                <input type="tel" name="phone" class="input-pill" placeholder="832-000-0000" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Email Address (For Receipt & Queue Alerts)</label>
-                <input type="email" name="email" class="form-control" placeholder="name@example.com">
+                <label class="field-label">EMAIL ADDRESS (FOR RECEIPT & QUEUE ALERTS)</label>
+                <input type="email" name="email" class="input-pill" placeholder="name@example.com">
             </div>
 
             <div class="form-group">
-                <label class="form-label">Zip Code *</label>
-                <input type="text" name="zip_code" class="form-control" placeholder="77073" required>
+                <label class="field-label">ZIP CODE *</label>
+                <input type="text" name="zip_code" class="input-pill" placeholder="77073" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Select Service *</label>
-                <select name="service_id" class="form-control" required>
+                <label class="field-label">SELECT SERVICE *</label>
+                <select name="service_id" class="input-pill" required>
                     {% if services %}
                         {% for s in services %}
                             <option value="{{ s.id }}">{{ s.name }} — ${{ "%.2f"|format(s.price) }}</option>
@@ -157,36 +268,36 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Payment Preference *</label>
-                <select name="payment_method" class="form-control">
+                <label class="field-label">PAYMENT PREFERENCE *</label>
+                <select name="payment_method" class="input-pill">
                     <option value="in_app">📱 Client App / Card / Digital Pay</option>
                     <option value="cash">💵 Cash at Register</option>
                 </select>
             </div>
 
-            <button type="submit" class="submit-btn">SIGN IN & JOIN WAITLIST ✂️</button>
+            <button type="submit" class="btn-submit">SIGN IN & JOIN WAITLIST ✂️</button>
         </form>
 
-        <div class="footer-link">
+        <div class="kiosk-footer">
             Prefer to book for a future date? <a href="{{ url_for('main.login') }}">Book Online</a>
         </div>
     </div>
 
-    <!-- 6-Second Confirmation Modal -->
+    <!-- 6-Second Auto Reset Confirmation -->
     {% if success_client %}
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-card">
-            <div style="font-size: 2.5rem; margin-bottom: 10px;">✂️</div>
-            <div style="color: #d4af37; font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">You're on the list!</div>
-            <div style="font-size: 1.1rem; font-weight: 700; color: #fff; margin: 12px 0;">Welcome, {{ success_client.name }}</div>
+            <div style="font-size: 2.6rem; margin-bottom: 12px;">✂️</div>
+            <div style="color: #e5c158; font-size: 1.35rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">YOU'RE ON THE LIST!</div>
+            <div style="font-size: 1.2rem; font-weight: 800; color: #ffffff; margin: 12px 0;">Welcome, {{ success_client.name }}</div>
             
-            <div style="background: #161410; border: 1px solid #d4af37; border-radius: 12px; padding: 15px; margin: 15px 0;">
-                <div style="color: #a89f91; font-size: 0.85rem; text-transform: uppercase;">Your Queue Position</div>
-                <div style="font-size: 2.2rem; font-weight: 800; color: #e5c158;">#{{ success_client.position }}</div>
+            <div style="background: #0d0d0d; border: 1.5px solid #d4af37; border-radius: 18px; padding: 18px; margin: 18px 0;">
+                <div style="color: #8c9ba5; font-size: 0.8rem; font-weight: 800; text-transform: uppercase;">YOUR CHAIR POSITION</div>
+                <div style="font-size: 2.4rem; font-weight: 900; color: #e5c158;">#{{ success_client.position }}</div>
             </div>
 
-            <p style="color: #8c9ba5; font-size: 0.85rem;">Ivonne will call you when your chair is ready.</p>
-            <div style="margin-top: 15px; color: #d4af37; font-size: 0.8rem;">Screen resetting in <span id="timer">6</span>s...</div>
+            <p style="color: #8c9ba5; font-size: 0.85rem; font-weight: 500;">Ivonne will call you as soon as your chair is open.</p>
+            <div style="margin-top: 16px; color: #d4af37; font-size: 0.82rem; font-weight: 700;">Screen resetting in <span id="timer">6</span>s...</div>
         </div>
     </div>
 
