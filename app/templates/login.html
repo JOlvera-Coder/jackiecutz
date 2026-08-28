@@ -1,91 +1,80 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-black">
-    <div class="max-w-md w-full space-y-6 bg-zinc-950/80 border border-amber-500/30 p-8 rounded-3xl backdrop-blur-md shadow-2xl shadow-amber-500/10 text-center">
-        
-        <!-- Studio Branding Header -->
-        <div class="flex flex-col items-center">
-            <div class="relative mb-2">
-                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" 
-                     alt="JackieCutz Studio" 
-                     class="w-24 h-24 rounded-full border-2 border-amber-400 object-cover shadow-lg shadow-amber-400/20"
-                     onerror="this.style.display='none'">
-            </div>
-            <h1 class="text-3xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 font-serif">
-                Jackiecutz
-            </h1>
-            <p class="text-xs uppercase tracking-widest text-zinc-400 font-bold mt-1">Hair Studio</p>
-            <p class="text-[11px] text-zinc-400 mt-1 font-mono">
-                📍 806-E Airtex Dr Suite 105, Houston, TX 77073
-            </p>
-            <p class="text-[11px] text-amber-400/90 font-mono mt-0.5">
-                📞 (832) 353-4577 • <span class="italic font-serif">Ivonne Gonzalez</span>
-            </p>
-        </div>
+<div class="min-h-screen flex flex-col items-center justify-center py-10 px-4 bg-black">
+    
+    <!-- Top Branding Graphic Header (Exact Shot #1) -->
+    <div class="w-full max-w-sm flex justify-center mb-4">
+        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" 
+             alt="JackieCutz Studio - Ivonne Gonzalez" 
+             class="w-full max-w-xs object-contain drop-shadow-2xl">
+    </div>
+
+    <!-- Login Box Card -->
+    <div class="w-full max-w-sm bg-black border border-amber-500/40 p-6 sm:p-8 rounded-[2rem] shadow-2xl shadow-amber-500/10 text-center">
 
         <!-- Flash Alert Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="p-3 rounded-xl text-xs font-bold {% if category == 'danger' %}bg-red-500/10 border border-red-500/40 text-red-400{% else %}bg-amber-500/10 border border-amber-500/40 text-amber-300{% endif %}">
+                    <div class="mb-4 p-3 rounded-xl text-xs font-bold {% if category == 'danger' %}bg-red-500/10 border border-red-500/40 text-red-400{% else %}bg-amber-500/10 border border-amber-500/40 text-amber-300{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
-        <!-- Login Form -->
-        <form method="POST" action="{{ url_for('main.login') }}" class="space-y-4 text-left mt-4">
+        <!-- Form -->
+        <form method="POST" action="{{ url_for('main.login') }}" class="space-y-4 text-left">
             <div>
-                <label class="block text-[10px] font-black uppercase text-amber-400 tracking-wider mb-1">
-                    Username, Name, or Phone
+                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    USERNAME, NAME, OR PHONE
                 </label>
                 <input type="text" name="username" required 
-                       class="w-full bg-[#fffee0] border border-zinc-700 rounded-2xl px-4 py-3 text-sm text-black font-semibold focus:border-amber-400 focus:outline-none placeholder-zinc-500"
-                       placeholder="Enter phone or username">
+                       class="w-full bg-[#fffee0] border border-amber-400/30 rounded-2xl px-4 py-3 text-sm text-black font-semibold focus:border-amber-400 focus:outline-none placeholder-zinc-500"
+                       placeholder="">
             </div>
 
             <div>
-                <label class="block text-[10px] font-black uppercase text-amber-400 tracking-wider mb-1">
-                    Password (Stylists / Registered)
+                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    PASSWORD (STYLISTS / REGISTERED)
                 </label>
                 <input type="password" name="password" 
-                       class="w-full bg-[#fffee0] border border-zinc-700 rounded-2xl px-4 py-3 text-sm text-black font-semibold focus:border-amber-400 focus:outline-none placeholder-zinc-500"
-                       placeholder="••••••••••••">
+                       class="w-full bg-[#fffee0] border border-amber-400/30 rounded-2xl px-4 py-3 text-sm text-black font-semibold focus:border-amber-400 focus:outline-none placeholder-zinc-500"
+                       placeholder="">
             </div>
 
             <!-- Remember Me & Forgot Password -->
             <div class="flex items-center justify-between pt-1">
                 <label class="flex items-center space-x-2 cursor-pointer">
                     <input type="checkbox" name="remember" class="rounded bg-zinc-900 border-zinc-700 text-amber-400 focus:ring-amber-400 h-4 w-4">
-                    <span class="text-xs text-zinc-400">Remember Me</span>
+                    <span class="text-xs text-zinc-300">Remember Me</span>
                 </label>
                 <a href="{{ url_for('main.forgot_password') }}" class="text-xs font-bold text-amber-400 hover:text-amber-300 transition">
                     Forgot Password?
                 </a>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Log In Button -->
             <button type="submit" 
-                    class="w-full py-3 px-4 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-black font-black uppercase tracking-wider text-sm rounded-2xl shadow-lg shadow-amber-500/20 transition duration-200 transform hover:scale-[1.01]">
-                Log In
+                    class="w-full py-3 px-4 bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-500 text-black font-black uppercase tracking-wider text-sm rounded-2xl shadow-lg shadow-amber-500/20 transition duration-200 transform hover:scale-[1.01] mt-2">
+                LOG IN
             </button>
         </form>
 
-        <!-- Register & Terms Footer -->
-        <div class="pt-4 border-t border-zinc-800/80 space-y-2 text-center">
-            <p class="text-xs text-zinc-400">
+        <!-- Footer Links -->
+        <div class="pt-5 mt-4 border-t border-zinc-900 space-y-2 text-center">
+            <p class="text-xs text-zinc-300">
                 Need an account? 
-                <a href="{{ url_for('main.register') }}" class="font-bold text-amber-400 hover:underline transition">
+                <a href="{{ url_for('main.register') }}" class="font-bold text-white underline hover:text-amber-400 transition">
                     Register
                 </a>
             </p>
-            <p class="text-[11px] text-zinc-500 leading-tight">
+            <p class="text-[11px] text-zinc-300 leading-normal">
                 By logging in, you agree to our 
-                <a href="{{ url_for('main.terms') }}" class="text-amber-400/80 hover:underline">Terms & Conditions</a> 
+                <a href="{{ url_for('main.terms') }}" class="text-white hover:text-amber-400 underline">Terms & Conditions</a> 
                 and 
-                <a href="{{ url_for('main.privacy') }}" class="text-amber-400/80 hover:underline">Privacy Policy</a>.
+                <a href="{{ url_for('main.privacy') }}" class="text-white hover:text-amber-400 underline">Privacy Policy</a>.
             </p>
         </div>
 
