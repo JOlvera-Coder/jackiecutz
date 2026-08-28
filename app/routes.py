@@ -188,7 +188,7 @@ def api_available_slots():
     service_id = request.args.get('service_id', '')
     is_kiosk = request.args.get('kiosk', '0') == '1'
 
-    # 1. Fetch Service Duration (Concealed from Client UI, used for Slot Math)
+    # 1. Fetch Service Duration
     service_duration = 30
     if service_id:
         svc = BarberService.query.get(service_id)
@@ -218,22 +218,13 @@ def api_available_slots():
     
     taken_times = [b.appointment_time.strftime('%I:%M %p') for b in taken_bookings]
 
-    slots_payload = []
-    slots_strings = []
+    available_slot_strings = []
     for s in base_slots:
-        is_avail = s not in taken_times
-        slots_payload.append({
-            'time': s,
-            'slot': s,
-            'display': s,
-            'name': s,
-            'label': s,
-            'duration_minutes': service_duration,
-            'available': is_avail,
-            'status': 'available' if is_avail else 'booked'
-        })
-        if is_avail:
-            slots_strings.append(s)
+        if s not in taken_times:
+            available_slot_strings.append(s)
+
+    # Fallback to base_slots if all clear
+    final_slot_list = available_slot_strings if available_slot_strings else base_slots
 
     is_tuesday = target_dt.weekday() == 1
     return jsonify({
@@ -245,11 +236,11 @@ def api_available_slots():
         'is_appointment_only': is_tuesday,
         'is_closed': len(base_slots) == 0 and not is_tuesday,
         'duration_minutes': service_duration,
-        'slots': slots_strings if slots_strings else base_slots,
-        'available_slots': slots_strings if slots_strings else base_slots,
-        'all_slots': slots_payload,
-        'data': slots_payload,
-        'open_count': len(slots_strings) if slots_strings else len(base_slots)
+        # Direct string lists so JS instantly injects exact readable time text
+        'slots': final_slot_list,
+        'available_slots': final_slot_list,
+        'data': final_slot_list,
+        'open_count': len(final_slot_list)
     })
 
 @main_bp.route('/update-profile', methods=['POST'])
