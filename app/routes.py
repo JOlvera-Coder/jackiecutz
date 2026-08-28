@@ -53,6 +53,22 @@ def get_services_list():
         pass
     return FALLBACK_SERVICES
 
+def format_slot_objects(slot_strings, target_date_str):
+    slot_objs = []
+    for s in slot_strings:
+        try:
+            dt = datetime.strptime(f"{target_date_str} {s}", "%Y-%m-%d %I:%M %p")
+            iso_val = dt.strftime("%Y-%m-%dT%H:%M:%S")
+        except Exception:
+            iso_val = f"{target_date_str}T{s}"
+        slot_objs.append({
+            "time_str": s,
+            "iso_val": iso_val,
+            "time": s,
+            "label": s
+        })
+    return slot_objs
+
 def get_dashboard_context(active_tab='dashboard'):
     bookings = BarberBooking.query.all() if hasattr(BarberBooking, 'query') else []
     services = get_services_list()
@@ -234,8 +250,11 @@ def book_service():
     service_price = service.price if service else 35.0
 
     try:
-        combined_dt_str = f"{appointment_date} {time_slot}"
-        appointment_dt = datetime.strptime(combined_dt_str, "%Y-%m-%d %I:%M %p")
+        if 'T' in str(time_slot):
+            appointment_dt = datetime.strptime(str(time_slot), "%Y-%m-%dT%H:%M:%S")
+        else:
+            combined_dt_str = f"{appointment_date} {time_slot}"
+            appointment_dt = datetime.strptime(combined_dt_str, "%Y-%m-%d %I:%M %p")
     except Exception:
         appointment_dt = datetime.now()
 
@@ -349,7 +368,7 @@ def export_tax_csv():
         headers={"Content-Disposition": "attachment;filename=jackiecutz_tax_report_2026.csv"}
     )
 
-# --- WALK-IN KIOSK (FULL DISCRETION: ALWAYS OPEN FOR WALK-IN CHECK-INS) ---
+# --- WALK-IN KIOSK ---
 
 @main_bp.route('/kiosk', methods=['GET', 'POST'], endpoint='walkin_kiosk')
 @main_bp.route('/walkin_kiosk', methods=['GET', 'POST'], endpoint='kiosk')
@@ -359,14 +378,12 @@ def walkin_kiosk():
         phone = request.form.get('phone', '').strip()
         service_id = request.form.get('service_id')
 
-        # Create or find walk-in client profile
         customer = Customer.query.filter_by(phone=phone).first() if phone else None
         if not customer and (name or phone):
             customer = Customer(name=name or 'Walk-in Client', phone=phone or 'N/A')
             db.session.add(customer)
             db.session.commit()
 
-        # Add walk-in directly to the studio queue/bookings at current chair time
         service = BarberService.query.get(service_id) if (service_id and str(service_id).isdigit()) else None
         walkin_booking = BarberBooking(
             customer_id=customer.id if customer else 1,
@@ -392,60 +409,46 @@ def auto_checkin():
     flash('Client auto-checked in via Bluetooth/Geofence.', 'success')
     return redirect(url_for('main.customer_portal'))
 
-# --- REAL-TIME ONLINE BOOKING SLOTS (30 MIN PRE-CLOSE CUTOFF) ---
+# --- REAL-TIME ONLINE BOOKING SLOTS (MATCHES JS OBJECT SCHEMA) ---
 
 @main_bp.route('/api/available-slots')
 def available_slots():
-    date_str = request.args.get('date')
-    if not date_str:
-        return jsonify({
-            'slots': ONLINE_WEEKEND_SLOTS,
-            'time_slots': ONLINE_WEEKEND_SLOTS,
-            'closed': False,
-            'is_closed': False,
-            'count': len(ONLINE_WEEKEND_SLOTS)
-        })
-
+    date_str = request.args.get('date', datetime.today().strftime('%Y-%m-%d'))
     try:
         req_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        # Sunday (6), Monday (0): Closed for online bookings
-        if req_date.weekday() in [0, 6]:
-            return jsonify({
-                'slots': [],
-                'time_slots': [],
-                'closed': True,
-                'is_closed': True,
-                'count': 0
-            })
-        
-        # Tuesday (1), Wednesday (2), Thursday (3): Closes 6:00 PM -> Online slots cut off at 5:30 PM
-        if req_date.weekday() in [1, 2, 3]:
-            return jsonify({
-                'slots': ONLINE_WEEKDAY_SLOTS,
-                'time_slots': ONLINE_WEEKDAY_SLOTS,
-                'closed': False,
-                'is_closed': False,
-                'count': len(ONLINE_WEEKDAY_SLOTS)
-            })
-            
-        # Friday (4), Saturday (5): Closes 7:00 PM -> Online slots cut off at 6:30 PM
-        if req_date.weekday() in [4, 5]:
-            return jsonify({
-                'slots': ONLINE_WEEKEND_SLOTS,
-                'time_slots': ONLINE_WEEKEND_SLOTS,
-                'closed': False,
-                'is_closed': False,
-                'count': len(ONLINE_WEEKEND_SLOTS)
-            })
     except Exception:
-        pass
+        req_date = datetime.today().date()
+        date_str = req_date.strftime('%Y-%m-%d')
 
+    # Sunday (6), Monday (0): Closed for online bookings
+    if req_date.weekday() in [0, 6]:
+        return jsonify({
+            'slots': [],
+            'time_slots': [],
+            'closed': True,
+            'is_closed': True,
+            'count': 0
+        })
+
+    # Tuesday (1), Wednesday (2), Thursday (3): 10am - 6pm (Cutoff 5:30 PM)
+    if req_date.weekday() in [1, 2, 3]:
+        slot_objs = format_slot_objects(ONLINE_WEEKDAY_SLOTS, date_str)
+        return jsonify({
+            'slots': slot_objs,
+            'time_slots': ONLINE_WEEKDAY_SLOTS,
+            'closed': False,
+            'is_closed': False,
+            'count': len(slot_objs)
+        })
+
+    # Friday (4), Saturday (5): 10am - 7pm (Cutoff 6:30 PM)
+    slot_objs = format_slot_objects(ONLINE_WEEKEND_SLOTS, date_str)
     return jsonify({
-        'slots': ONLINE_WEEKEND_SLOTS,
+        'slots': slot_objs,
         'time_slots': ONLINE_WEEKEND_SLOTS,
         'closed': False,
         'is_closed': False,
-        'count': len(ONLINE_WEEKEND_SLOTS)
+        'count': len(slot_objs)
     })
 
 @main_bp.route('/update_profile', methods=['POST'])
