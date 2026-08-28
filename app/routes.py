@@ -115,7 +115,7 @@ def logout():
 
 
 # -------------------------------------------------------------
-# CLIENT DASHBOARD & BOOKING
+# CLIENT DASHBOARD, BOOKING & CUSTOMER PORTAL
 # -------------------------------------------------------------
 @main_bp.route('/dashboard')
 @login_required
@@ -123,6 +123,12 @@ def client_dashboard():
     services = Service.query.all()
     user_appts = Appointment.query.filter_by(user_id=current_user.id).order_by(Appointment.id.desc()).all()
     return render_template('booking.html', services=services, appointments=user_appts)
+
+
+@main_bp.route('/portal')
+@main_bp.route('/customer-portal')
+def customer_portal():
+    return redirect(url_for('main.walkin_kiosk'))
 
 
 @main_bp.route('/booking', methods=['GET', 'POST'])
