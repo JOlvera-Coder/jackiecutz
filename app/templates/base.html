@@ -48,7 +48,7 @@
             background: #000000 !important;
         }
 
-        /* Shot #3: Bright Luminous Metallic Champagne Gold Button */
+        /* Confirm & Reserve Spot Button: Bright Luminous Metallic Champagne Gold */
         .gold-btn, 
         .gold-metallic-bg,
         #btn-submit-booking,
@@ -182,39 +182,41 @@
             font-weight: 800 !important;
         }
 
-        /* Shot #1: Payment & Card Method Tabs - Uniform Rounded Shape & Solid Cream (#fffaea) Interior */
-        div[id*="pay"] button,
-        div[id*="payment"] button,
-        div[class*="grid-cols-4"] > button,
-        div[class*="grid-cols-4"] > div,
-        div.grid.grid-cols-2.sm\:grid-cols-4 > button,
-        div.grid.grid-cols-2.sm\:grid-cols-4 > div,
-        button[onclick*="selectPayment"],
-        button[onclick*="setPayment"],
-        button[id*="pay-"],
-        button[data-payment],
+        /* Payment & Card Method Tabs: Uniform Rounded Shape & Solid Cream (#fffaea) Interior */
+        label:has(input[name="payment_method"]),
+        label:has(#txt-pay-card),
+        label:has(#txt-pay-salon),
+        label:has(#txt-pay-zelle-sub),
+        div:has(> input[name="payment_method"]),
+        div.grid.grid-cols-2.sm\:grid-cols-4 > label,
+        div.grid.grid-cols-4 > label,
+        div.grid.grid-cols-2 > label,
         .payment-tab,
         .pay-option {
             background-color: #fffaea !important;
             background: #fffaea !important;
             border: 1.5px solid #dfba6b !important;
-            border-radius: 16px !important; /* Forces all 4 tabs to be completely uniform */
+            border-radius: 16px !important; /* Uniform rounded shape across all 4 tabs */
             box-shadow: 0 2px 6px rgba(216, 176, 86, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
+            padding: 10px 8px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
         }
 
-        /* Payment Tab Active/Selected Glow */
-        div[id*="pay"] button.selected,
-        div[id*="payment"] button.selected,
-        button[id*="pay-"].active,
-        button[data-payment].active,
+        /* Payment Method Active/Checked State Glow */
+        label:has(input[name="payment_method"]:checked),
+        label:has(input[name="payment_method"].selected),
         .payment-tab.selected,
         .pay-option.selected {
             border: 2px solid #ffffff !important;
             box-shadow: 0 0 16px rgba(223, 186, 107, 0.9), 0 0 6px #ffffff inset !important;
         }
 
-        /* Shot #2: Legible High-Contrast Text for Policy & Footer Notices */
+        /* Policy & Footer Notices: Restored to 0.75rem Size, 400 Regular Weight, High Contrast */
         #txt-card-hold-desc,
         #txt-policy-footer,
         div.card-hold-desc,
@@ -225,9 +227,9 @@
         p:contains("Your card is held"),
         p:contains("Appointments held with") {
             color: #f0ece1 !important;
-            font-size: 0.82rem !important;
-            font-weight: 600 !important;
-            line-height: 1.5 !important;
+            font-size: 0.75rem !important;
+            font-weight: 400 !important;
+            line-height: 1.4 !important;
             opacity: 1 !important;
         }
 
