@@ -14,40 +14,44 @@ def clean_phone(phone_str):
         return ""
     return re.sub(r'\D', '', str(phone_str))
 
-# Exact Studio Hours Based on Jackiecutz Schedule Banner
+# Exact Studio Hours & Calculated Final Booking Slots Based on Jackiecutz Schedule Banner
 def get_schedule_for_date(target_date, is_walkin_kiosk=False):
     # weekday(): 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
     weekday = target_date.weekday()
     
-    if weekday in [0, 6]:  # Sunday & Monday: Closed
+    # Sunday & Monday: Closed
+    if weekday in [0, 6]:
         return [], "Closed"
     
-    if weekday == 1:  # Tuesday: 10am - 6pm (Appointment Only)
-        if is_walkin_kiosk:
-            return [], "Tuesday is Appointment Only. Please book in advance online."
-        return [
+    # Tuesday: 10:00 AM - 6:00 PM (Appointment Only -> Last Slot 5:30 PM)
+    if weekday == 1:
+        slots = [
             "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
             "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
             "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
             "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM"
-        ], "10:00 AM - 6:00 PM (Appt Only)"
+        ]
+        return slots, "10:00 AM - 6:00 PM (Appt Only)"
     
-    if weekday in [2, 3]:  # Wednesday & Thursday: 10am - 6pm
-        return [
+    # Wednesday & Thursday: 10:00 AM - 6:00 PM (Last Slot 5:30 PM)
+    if weekday in [2, 3]:
+        slots = [
             "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
             "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
             "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
             "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM"
-        ], "10:00 AM - 6:00 PM"
+        ]
+        return slots, "10:00 AM - 6:00 PM"
         
-    # Friday & Saturday: 10am - 7pm
-    return [
+    # Friday & Saturday: 10:00 AM - 7:00 PM (Last Slot 6:30 PM)
+    slots = [
         "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
         "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
         "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
         "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM",
         "06:00 PM", "06:30 PM"
-    ], "10:00 AM - 7:00 PM"
+    ]
+    return slots, "10:00 AM - 7:00 PM"
 
 DEFAULT_TIME_SLOTS = [
     "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
@@ -188,7 +192,7 @@ def api_available_slots():
     service_id = request.args.get('service_id', '')
     is_kiosk = request.args.get('kiosk', '0') == '1'
 
-    # 1. Fetch Service Duration (Concealed from client UI)
+    # 1. Fetch Service Duration
     service_duration = 30
     if service_id:
         svc = BarberService.query.get(service_id)
@@ -203,10 +207,10 @@ def api_available_slots():
     except Exception:
         target_dt = datetime.utcnow()
 
-    # 2. Get Operating Hours for the Date (Tuesday Appt-Only Aware)
+    # 2. Get Operating Schedule & Correct Last Booking Cutoff
     base_slots, schedule_label = get_schedule_for_date(target_dt, is_walkin_kiosk=is_kiosk)
 
-    # 3. Query Booked/Queued Appointments for That Day
+    # 3. Cross-reference Active Bookings for Selected Date
     day_start = datetime(target_dt.year, target_dt.month, target_dt.day, 0, 0, 0)
     day_end = datetime(target_dt.year, target_dt.month, target_dt.day, 23, 59, 59)
     
@@ -218,7 +222,7 @@ def api_available_slots():
     
     taken_times = [b.appointment_time.strftime('%I:%M %p') for b in taken_bookings]
 
-    # 4. Formulate Exact Object Array with time_str for Line 677 of booking.html
+    # 4. Return Formatted Slot Objects with time_str for booking.html rendering
     slots_objects = []
     for s in base_slots:
         if s not in taken_times:
@@ -376,13 +380,7 @@ def reschedule_booking(booking_id):
 
 @main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
 def walkin_kiosk():
-    is_tuesday = datetime.utcnow().weekday() == 1
-    
     if request.method == 'POST':
-        if is_tuesday:
-            flash("Tuesday is by Appointment Only. Please schedule your appointment in advance.", "warning")
-            return redirect(url_for('main.walkin_kiosk'))
-
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
         full_name = f"{first_name} {last_name}".strip()
@@ -420,7 +418,7 @@ def walkin_kiosk():
         return redirect(url_for('main.walkin_kiosk'))
 
     services = BarberService.query.all()
-    return render_template('kiosk.html', services=services, is_tuesday=is_tuesday)
+    return render_template('kiosk.html', services=services)
 
 @main_bp.route('/admin')
 @main_bp.route('/stylist/dashboard')
@@ -433,6 +431,7 @@ def stylist_dashboard():
     total_clients = Customer.query.count()
     active_bookings = BarberBooking.query.order_by(BarberBooking.appointment_time.desc()).limit(15).all()
 
+    # Dynamic metrics connected with Walk-in Kiosk and Online Booking
     walkin_count = BarberBooking.query.filter(BarberBooking.status == 'In Queue').count()
     online_count = BarberBooking.query.filter(BarberBooking.status == 'Confirmed').count()
     completed_count = BarberBooking.query.filter(BarberBooking.status == 'Completed').count()
