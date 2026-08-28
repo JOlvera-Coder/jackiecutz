@@ -15,11 +15,17 @@ def create_app():
     login_manager.init_app(flask_app)
     login_manager.login_view = 'main.login'
 
+    # Register Flask-Login user_loader
+    from app.models import User
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
     from app.routes import main_bp
     flask_app.register_blueprint(main_bp)
 
     with flask_app.app_context():
-        import app.models
         db.create_all()
 
     return flask_app
