@@ -5,6 +5,7 @@ import math
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, Response
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import or_, func
 
 from app import db
 from app.models import User, Service, Appointment
@@ -48,7 +49,8 @@ def privacy():
 
 
 # -------------------------------------------------------------
-# AUTHENTICATION & CORE USER ROUTES
+# AUTHENTICATION & UNIVERSAL LOGIN
+# Matches Username, Name (e.g. 'Ian', 'Ivonne'), Phone, or Email
 # -------------------------------------------------------------
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -58,16 +60,34 @@ def login():
         return redirect(url_for('main.client_dashboard'))
 
     if request.method == 'POST':
-        email = request.form.get('email', '').strip()
+        identifier = (
+            request.form.get('username') or 
+            request.form.get('identifier') or 
+            request.form.get('email', '')
+        ).strip()
         password = request.form.get('password', '')
 
-        user = User.query.filter_by(email=email).first()
+        clean_phone = ''.join(c for c in identifier if c.isdigit())
+
+        # Match username/name prefix, exact email, or phone number
+        user = User.query.filter(
+            or_(
+                func.lower(User.email) == identifier.lower(),
+                func.lower(User.name) == identifier.lower(),
+                func.lower(User.name).like(f"{identifier.lower()}%"),
+                (User.phone == clean_phone) if clean_phone else False,
+                (User.phone == identifier) if identifier else False
+            )
+        ).first()
+
         if user and check_password_hash(user.password_hash, password):
-            login_user(user)
+            remember = True if request.form.get('remember') else False
+            login_user(user, remember=remember)
             if user.role == 'stylist':
                 return redirect(url_for('main.stylist_dashboard'))
             return redirect(url_for('main.client_dashboard'))
-        flash('Invalid email or password.', 'error')
+
+        flash('Invalid username, name, phone, or password.', 'error')
 
     return render_template('login.html')
 
@@ -102,7 +122,7 @@ def register():
 @main_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        flash('Password reset instructions have been sent if the email exists.', 'info')
+        flash('Password reset instructions have been sent if the account exists.', 'info')
         return redirect(url_for('main.login'))
     return render_template('forgot_password.html')
 
@@ -195,7 +215,7 @@ def walkin_kiosk():
 
 
 # -------------------------------------------------------------
-# LIVE TV DISPLAY (Accessible at both /queue and /tv)
+# LIVE TV DISPLAY
 # -------------------------------------------------------------
 @main_bp.route('/queue')
 @main_bp.route('/tv')
@@ -288,7 +308,6 @@ def add_product():
 @main_bp.route('/stylist/export-tax-csv')
 @login_required
 def export_tax_csv():
-    """Export completed client checkout transactions for IRS / accounting."""
     completed = Appointment.query.filter_by(status='completed').all()
     output = io.StringIO()
     writer = csv.writer(output)
