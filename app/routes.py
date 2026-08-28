@@ -156,7 +156,7 @@ def update_profile():
         customer.email = request.form.get('email', customer.email).strip()
         customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
         db.session.commit()
-        flash("Profile details updated successfully!", "success")
+        flash("Profile updated successfully!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/update-credentials', methods=['POST'])
@@ -177,8 +177,22 @@ def update_credentials():
             customer.username = new_username
 
         db.session.commit()
-        flash("Account credentials updated successfully!", "success")
+        flash("Credentials updated successfully!", "success")
     return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/delete-account', methods=['POST'])
+def delete_account():
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    customer = Customer.query.get(session['customer_id'])
+    if customer:
+        BarberBooking.query.filter_by(customer_id=customer.id).delete()
+        FamilyMember.query.filter_by(customer_id=customer.id).delete()
+        db.session.delete(customer)
+        db.session.commit()
+    session.clear()
+    flash("Your account and associated profile data have been deleted.", "info")
+    return redirect(url_for('main.login'))
 
 @main_bp.route('/add-family-member', methods=['POST'])
 def add_family_member():
