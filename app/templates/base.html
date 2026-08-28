@@ -48,7 +48,7 @@
             background: #000000 !important;
         }
 
-        /* Confirm & Reserve Spot Button */
+        /* Confirm & Reserve Spot Button: Bright Luminous Metallic Champagne Gold */
         .gold-btn, 
         .gold-metallic-bg,
         #btn-submit-booking,
@@ -217,8 +217,7 @@
             box-shadow: 0 0 16px rgba(223, 186, 107, 0.9), 0 0 6px #ffffff inset !important;
         }
 
-        /* High-Contrast Legible Lettering for All 4 Payment Tabs on Cream Background */
-        /* 1. Card Hold */
+        /* High-Contrast Legible Lettering for All 4 Payment Tabs */
         #txt-pay-card,
         label:has(#txt-pay-card) span:first-of-type,
         span.text-white[id*="pay"] {
@@ -228,7 +227,6 @@
             font-size: 0.8rem !important;
         }
 
-        /* 2. Zelle (Rich Deep Purple) */
         span.text-purple-400,
         span[class*="text-purple"] {
             color: #581c87 !important;
@@ -237,7 +235,6 @@
             font-size: 0.8rem !important;
         }
 
-        /* 3. Cash App (Deep Rich Emerald) */
         span.text-emerald-400,
         span[class*="text-emerald"] {
             color: #065f46 !important;
@@ -246,7 +243,6 @@
             font-size: 0.8rem !important;
         }
 
-        /* 4. In-Salon (Deep Bronze Amber) */
         #txt-pay-salon,
         span.text-amber-300,
         span[class*="text-amber-300"] {
@@ -256,7 +252,6 @@
             font-size: 0.8rem !important;
         }
 
-        /* Subtext Under All 4 Tabs (Dark Charcoal & High Legibility) */
         label:has(input[name="payment_method"]) span.text-\[9px\],
         label:has(input[name="payment_method"]) span[class*="text-zinc"],
         label:has(input[name="payment_method"]) span:last-child,
@@ -271,21 +266,41 @@
             margin-top: 2px !important;
         }
 
-        /* Policy & Grace Period Notices */
+        /* Highly Legible Policy & Grace Period Notices */
         #txt-card-hold-desc,
         #txt-policy-footer,
+        div#card-gateway p,
+        div:has(> #txt-card-hold-desc) p,
+        p#txt-card-hold-desc,
+        p#txt-policy-footer,
         div.card-hold-desc,
+        div.space-y-4 p,
+        form p.text-zinc-500,
+        form p.text-zinc-400,
+        form p.text-xs,
+        div.text-center.mt-4 p,
         p.text-zinc-500,
         p.text-zinc-400,
         p.text-xs.text-zinc-400,
-        p.text-xs.text-zinc-500,
-        p:contains("Your card is held"),
-        p:contains("Appointments held with") {
-            color: #f0ece1 !important;
-            font-size: 0.75rem !important;
-            font-weight: 400 !important;
-            line-height: 1.4 !important;
+        p.text-xs.text-zinc-500 {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
+            line-height: 1.5 !important;
             opacity: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        /* Bold Emphasis Inside Policy Notice */
+        #txt-card-hold-desc strong,
+        #txt-card-hold-desc b,
+        p#txt-card-hold-desc strong,
+        p#txt-card-hold-desc b {
+            color: #fff0b3 !important;
+            -webkit-text-fill-color: #fff0b3 !important;
+            font-weight: 800 !important;
         }
 
         /* "Estimated Total (Pay Upon Service)" Bar */
