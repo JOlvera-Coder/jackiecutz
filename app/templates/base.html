@@ -127,31 +127,34 @@
             font-size: 0.78rem !important;
         }
 
-        /* 1. "+ Add Additional Person / Child" Tab Styling (#fffaea Cream) */
-        button[id*="add-person"],
-        button[id*="add-child"],
+        /* 1. "+ Add Additional Person / Child" Pill Button */
+        #btn-add-person,
+        #btn-add-child,
+        #txt-add-person-btn,
+        button#btn-add-person,
         button[onclick*="addPerson"],
         button[onclick*="addChild"],
-        #btn-add-person,
-        .btn-add-client,
-        form button:has(span:contains("Add Additional Person")),
-        div:has(> button:contains("Add Additional Person")) button {
+        button.w-full.py-2\.5.border,
+        button.w-full.py-2\.5,
+        div:has(> #txt-add-person-btn) button,
+        button:has(#txt-add-person-btn) {
             background-color: #fffaea !important;
             background: #fffaea !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             border: 1px solid #d8b056 !important;
             font-weight: 800 !important;
-            border-radius: 12px !important;
+            border-radius: 9999px !important;
             box-shadow: 0 2px 8px rgba(216, 176, 86, 0.25) !important;
             transition: all 0.2s ease-in-out !important;
         }
 
-        /* Universal catch for "+ Add Additional Person / Child" */
-        button:is([id*="add"], [class*="add"]) {
-            background-color: #fffaea !important;
+        #btn-add-person *,
+        #btn-add-child *,
+        #txt-add-person-btn,
+        button#btn-add-person * {
             color: #000000 !important;
-            border-color: #d8b056 !important;
+            -webkit-text-fill-color: #000000 !important;
             font-weight: 800 !important;
         }
 
@@ -163,8 +166,8 @@
         button[data-payment],
         .payment-tab,
         .pay-option,
-        label:has(input[name="payment_method"]),
-        div:has(> input[name="payment_method"]) {
+        div.grid.grid-cols-2.sm\:grid-cols-4 button,
+        div.grid.grid-cols-4 button {
             background-color: #fffaea !important;
             background: #fffaea !important;
             color: #000000 !important;
@@ -175,48 +178,43 @@
             transition: all 0.2s ease-in-out !important;
         }
 
-        /* Payment Tab Text Elements */
         div[id*="pay-method"] button *,
         div[class*="grid-cols-4"] button *,
         button[id^="pay-"] *,
         button[data-payment] *,
         .payment-tab *,
-        .pay-option * {
+        .pay-option *,
+        div.grid.grid-cols-2.sm\:grid-cols-4 button * {
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             font-weight: 800 !important;
         }
 
-        /* Payment Tab Selected/Active State (Highlighted Gold Ring) */
-        div[id*="pay-method"] button.selected,
-        button[id^="pay-"].active,
-        button[data-payment].active,
-        .payment-tab.selected,
-        .pay-option.selected {
-            background: linear-gradient(135deg, #ffffff 0%, #fff2cb 50%, #e5c16d 100%) !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0 0 16px rgba(223, 186, 107, 0.7) !important;
-        }
-
         /* 3. "Estimated Total (Pay Upon Service)" Bar */
-        div[id*="total-container"],
-        div[class*="total"],
-        div:has(> #booking-total-price),
-        div:has(> span:contains("ESTIMATED TOTAL")),
-        div:has(> p:contains("ESTIMATED TOTAL")) {
+        #total-container,
+        #booking-total-container,
+        div.flex.justify-between.items-center.p-3.bg-zinc-950,
+        div.flex.justify-between.items-center.p-3.bg-black,
+        div.flex.justify-between.items-center.p-3.rounded-xl,
+        div.flex.justify-between.items-center.p-3.rounded-2xl,
+        div.flex.justify-between.items-center:has(#booking-total-price),
+        div.flex.justify-between.items-center:has(#txt-total-label),
+        div:has(> #booking-total-price) {
             background-color: #fffaea !important;
             background: #fffaea !important;
             border: 1px solid #d8b056 !important;
             border-radius: 9999px !important;
             box-shadow: 0 2px 8px rgba(216, 176, 86, 0.25) !important;
+            padding: 12px 18px !important;
         }
 
         /* Estimated Total Bar Typography */
-        div[id*="total-container"] *,
-        div[class*="total"] *,
+        #total-container *,
+        #booking-total-container *,
         #booking-total-price,
-        span[id*="total"],
-        p[id*="total"] {
+        #txt-total-label,
+        div:has(> #booking-total-price) *,
+        div.flex.justify-between.items-center:has(#booking-total-price) * {
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             font-weight: 900 !important;
