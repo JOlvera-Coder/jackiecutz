@@ -188,7 +188,7 @@ def api_available_slots():
     service_id = request.args.get('service_id', '')
     is_kiosk = request.args.get('kiosk', '0') == '1'
 
-    # 1. Fetch Service Duration
+    # 1. Fetch Service Duration (Concealed from client UI)
     service_duration = 30
     if service_id:
         svc = BarberService.query.get(service_id)
@@ -203,7 +203,7 @@ def api_available_slots():
     except Exception:
         target_dt = datetime.utcnow()
 
-    # 2. Get Operating Hours for the Selected Date
+    # 2. Get Operating Hours for the Date (Tuesday Appt-Only Aware)
     base_slots, schedule_label = get_schedule_for_date(target_dt, is_walkin_kiosk=is_kiosk)
 
     # 3. Query Booked/Queued Appointments for That Day
@@ -218,13 +218,20 @@ def api_available_slots():
     
     taken_times = [b.appointment_time.strftime('%I:%M %p') for b in taken_bookings]
 
-    available_slot_strings = []
+    # 4. Formulate Exact Object Array with time_str for Line 677 of booking.html
+    slots_objects = []
     for s in base_slots:
         if s not in taken_times:
-            available_slot_strings.append(s)
-
-    # Fallback to base_slots if all clear
-    final_slot_list = available_slot_strings if available_slot_strings else base_slots
+            slots_objects.append({
+                'time_str': s,
+                'time': s,
+                'slot': s,
+                'display': s,
+                'label': s,
+                'duration_minutes': service_duration,
+                'available': True,
+                'status': 'available'
+            })
 
     is_tuesday = target_dt.weekday() == 1
     return jsonify({
@@ -236,11 +243,10 @@ def api_available_slots():
         'is_appointment_only': is_tuesday,
         'is_closed': len(base_slots) == 0 and not is_tuesday,
         'duration_minutes': service_duration,
-        # Direct string lists so JS instantly injects exact readable time text
-        'slots': final_slot_list,
-        'available_slots': final_slot_list,
-        'data': final_slot_list,
-        'open_count': len(final_slot_list)
+        'slots': slots_objects,
+        'available_slots': slots_objects,
+        'data': slots_objects,
+        'open_count': len(slots_objects)
     })
 
 @main_bp.route('/update-profile', methods=['POST'])
