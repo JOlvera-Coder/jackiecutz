@@ -4,21 +4,17 @@
 <div class="min-h-screen bg-black text-white p-3 sm:p-6 pb-24 flex justify-center">
     <div class="w-full max-w-xl space-y-6">
 
-        <!-- TOP BAR: User Greeting & Controls -->
+        <!-- TOP BAR -->
         <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
             <div class="flex items-center space-x-3">
-                <button type="button" onclick="toggleDrawer()" class="p-2 bg-zinc-950 border border-[#e6c280]/40 rounded-xl text-[#f7e3af] hover:border-[#f7e3af] hover:shadow-[0_0_10px_rgba(247,227,175,0.3)] transition">
+                <button type="button" class="p-2 bg-zinc-950 border border-[#e6c280]/40 rounded-xl text-[#f7e3af] hover:border-[#f7e3af] transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-                <div>
-                    <h1 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
-                        Welcome, {{ customer.name if customer else 'Client' }} ✨
-                    </h1>
-                </div>
+                <h1 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
+                    Welcome, {{ customer.name if customer else 'Client' }} ✨
+                </h1>
             </div>
-            <div class="flex items-center space-x-2">
-                <a href="{{ url_for('main.logout') }}" class="text-xs text-zinc-400 hover:text-[#f7e3af] font-semibold transition">Sign Out</a>
-            </div>
+            <a href="{{ url_for('main.logout') }}" class="text-xs text-zinc-400 hover:text-[#f7e3af] font-semibold transition">Sign Out</a>
         </div>
 
         <!-- LANGUAGE SWITCHER -->
@@ -78,21 +74,33 @@
 
             <form method="POST" action="{{ url_for('main.book_service') }}" class="space-y-5" id="booking-form">
                 
-                <!-- STEP 1: SERVICE & DATE -->
+                <!-- STEP 1: STYLIST, SERVICE & DATE -->
                 <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-4 space-y-4">
                     <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
                         <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
-                            1. CHOOSE SERVICE & BOOKING DATE
+                            1. CHOOSE STYLIST, SERVICE & BOOKING DATE
                         </span>
                         <span class="text-[10px] text-zinc-500 uppercase font-mono">Primary Client</span>
                     </div>
 
-                    <!-- Service Selection -->
+                    <!-- Stylist / Barber Preference -->
                     <div>
-                        <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1">Service</label>
+                        <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1">Select Stylist / Barber</label>
+                        <select name="stylist_name" id="stylist_select" onchange="filterServicesByStylist()" class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#f7e3af]">
+                            {% for person in staff %}
+                                <option value="{{ person.name }}" data-specialties="{{ person.specialties|join(',') }}">
+                                    {{ person.name }} ({{ person.role }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtered Service Selection -->
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1">Service (Filtered to Stylist Specialty)</label>
                         <select name="service_id" id="service_id" onchange="onServiceChanged()" class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#f7e3af]">
                             {% for s in services %}
-                                <option value="{{ s.id }}" data-price="{{ s.price }}">
+                                <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category if s.category else 'Haircuts' }}">
                                     {{ s.name }} ({{ s.category if s.category else 'Studio' }}) — ${{ "%.2f"|format(s.price) }}
                                 </option>
                             {% endfor %}
@@ -118,43 +126,34 @@
                         </div>
                         <input type="hidden" name="time_slot" id="selected_time_slot" required>
                         <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-black rounded-2xl border border-zinc-900">
-                            <!-- Populated dynamically -->
                         </div>
                     </div>
 
-                    <!-- Primary Contact Details -->
+                    <!-- Contact Details -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                         <div>
                             <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Your Full Name</label>
                             <input type="text" name="name" required placeholder="Full Name" value="{{ customer.name if customer else '' }}"
-                                   class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
+                                   class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Phone Number</label>
                             <input type="tel" name="phone" required placeholder="832-000-0000" value="{{ customer.phone if customer else '' }}"
-                                   class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
+                                   class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- ADD ADDITIONAL GUEST / CHILD BUTTON -->
-                <div class="text-center">
-                    <button type="button" onclick="addGuestField()" class="w-full py-2.5 bg-[#fffee0] border border-zinc-800 hover:border-[#f7e3af] text-black font-black uppercase text-xs rounded-2xl transition">
-                        + Add Additional Person / Child
-                    </button>
-                    <div id="additional-guests-container" class="space-y-3 mt-3"></div>
-                </div>
-
-                <!-- NOTES / STYLE PREFERENCES -->
+                <!-- NOTES -->
                 <div>
                     <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                         NOTES / STYLE PREFERENCES
                     </label>
                     <input type="text" name="notes" placeholder="e.g. Skin fade with scissors on top, beard lineup"
-                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af] placeholder-zinc-500">
+                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
                 </div>
 
-                <!-- PAYMENT & CARD HOLD METHOD -->
+                <!-- PAYMENT METHODS -->
                 <div class="space-y-3 pt-2">
                     <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                         PAYMENT & CARD HOLD METHOD
@@ -182,30 +181,6 @@
                             <span class="text-[9px] font-bold text-zinc-600">Cash Preferred</span>
                         </label>
                     </div>
-
-                    <!-- Card Hold Details Box -->
-                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-zinc-300 font-bold">Card Hold (Pay After Service)</span>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
-                                🔒 256-Bit Encrypted
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-zinc-400">
-                            Your card is held to secure your time slot. <strong>You will not be charged until your service is completed in the chair.</strong>
-                        </p>
-                        <div>
-                            <input type="text" placeholder="Name as shown on card" class="w-full bg-[#fffee0] border border-zinc-700 rounded-xl px-3 py-2 text-xs text-black font-medium focus:outline-none">
-                        </div>
-                        <div>
-                            <input type="text" placeholder="4000 1234 5678 9010" class="w-full bg-[#fffee0] border border-zinc-700 rounded-xl px-3 py-2 text-xs text-black font-medium focus:outline-none">
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <input type="text" placeholder="MM/YY" class="bg-[#fffee0] border border-zinc-700 rounded-xl px-3 py-2 text-xs text-black font-medium focus:outline-none">
-                            <input type="text" placeholder="CVV" class="bg-[#fffee0] border border-zinc-700 rounded-xl px-3 py-2 text-xs text-black font-medium focus:outline-none">
-                            <input type="text" placeholder="77073" value="77073" class="bg-[#fffee0] border border-zinc-700 rounded-xl px-3 py-2 text-xs text-black font-medium focus:outline-none">
-                        </div>
-                    </div>
                 </div>
 
                 <!-- ESTIMATED TOTAL & SUBMIT BUTTON -->
@@ -214,7 +189,6 @@
                     <span class="text-base font-black text-black" id="estimated-total-display">$35.00</span>
                 </div>
 
-                <!-- Metallic Champagne Gold Action Button -->
                 <div class="pt-2">
                     <button type="submit" id="btn-submit-booking"
                             class="w-full py-3.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
@@ -227,12 +201,44 @@
     </div>
 </div>
 
-<!-- CLIENT SCRIPTS -->
 <script>
-let currentLang = 'en';
+let allServiceOptions = [];
+
+function initServicesList() {
+    const sel = document.getElementById('service_id');
+    allServiceOptions = Array.from(sel.options).map(opt => ({
+        value: opt.value,
+        text: opt.text,
+        price: opt.getAttribute('data-price'),
+        category: opt.getAttribute('data-category')
+    }));
+}
+
+function filterServicesByStylist() {
+    const stylistSel = document.getElementById('stylist_select');
+    const serviceSel = document.getElementById('service_id');
+    if (!stylistSel || !serviceSel) return;
+
+    const opt = stylistSel.options[stylistSel.selectedIndex];
+    const rawSpecs = opt ? opt.getAttribute('data-specialties') : '';
+    const specs = rawSpecs ? rawSpecs.split(',') : [];
+
+    serviceSel.innerHTML = '';
+    const filtered = allServiceOptions.filter(s => specs.includes(s.category) || specs.length === 0);
+
+    (filtered.length > 0 ? filtered : allServiceOptions).forEach(s => {
+        const option = document.createElement('option');
+        option.value = s.value;
+        option.textContent = s.text;
+        option.setAttribute('data-price', s.price);
+        option.setAttribute('data-category', s.category);
+        serviceSel.appendChild(option);
+    });
+
+    onServiceChanged();
+}
 
 function setLanguage(lang) {
-    currentLang = lang;
     const flyer = document.getElementById('flyer-img');
     const btnEn = document.getElementById('btn-lang-en');
     const btnEs = document.getElementById('btn-lang-es');
@@ -304,21 +310,9 @@ async function fetchLiveSlots() {
     }
 }
 
-function addGuestField() {
-    const container = document.getElementById('additional-guests-container');
-    const div = document.createElement('div');
-    div.className = 'bg-zinc-950 p-3 rounded-2xl border border-zinc-800 space-y-2';
-    div.innerHTML = `
-        <div class="flex justify-between items-center">
-            <span class="text-[10px] font-black uppercase text-[#f7e3af]">Additional Guest</span>
-            <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-[10px] text-red-400 font-bold hover:underline">Remove</button>
-        </div>
-        <input type="text" placeholder="Guest Name" class="w-full bg-[#fffee0] border border-zinc-700 rounded-xl px-3 py-2 text-xs text-black font-medium">
-    `;
-    container.appendChild(div);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
+    initServicesList();
+    filterServicesByStylist();
     const dateInput = document.getElementById('appointment_date');
     if (dateInput && !dateInput.value) {
         const today = new Date().toISOString().split('T')[0];

@@ -1,6 +1,7 @@
 import os
 import csv
 import io
+import json
 from datetime import datetime, date, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, Response
 from flask_login import login_user, logout_user, login_required, current_user
@@ -33,12 +34,19 @@ ONLINE_WEEKEND_SLOTS = [
 
 DEFAULT_TIME_SLOTS = ONLINE_WEEKEND_SLOTS
 
+# Service Fallback Menu with Categories
 FALLBACK_SERVICES = [
     {"id": 1, "name": "Studio Signature Haircut", "price": 35.0, "duration": 30, "category": "Haircuts"},
     {"id": 2, "name": "Skin Fade & Line Up", "price": 40.0, "duration": 35, "category": "Haircuts"},
     {"id": 3, "name": "Beard Sculpt & Razor Edge", "price": 25.0, "duration": 20, "category": "Beard & Shave"},
-    {"id": 4, "name": "Full Service VIP (Cut + Beard + Hot Towel)", "price": 60.0, "duration": 50, "category": "Combos"},
+    {"id": 4, "name": "Full Service VIP (Cut + Beard + Hot Towel)", "price": 60.0, "duration": 50, "category": "VIP Combos"},
     {"id": 5, "name": "Kids / Junior Haircut (12 & under)", "price": 25.0, "duration": 25, "category": "Kids"}
+]
+
+# Default Staff Rosters with Specialties
+FALLBACK_STAFF = [
+    {"id": 1, "name": "Ivonne Gonzalez (Master Stylist / Owner)", "role": "Master Stylist", "specialties": ["Haircuts", "Beard & Shave", "VIP Combos", "Kids", "Color", "Waxing"]},
+    {"id": 2, "name": "Studio Barber / Associate", "role": "Barber", "specialties": ["Haircuts", "Beard & Shave", "Kids"]}
 ]
 
 def get_services_list():
@@ -49,6 +57,29 @@ def get_services_list():
     except Exception:
         pass
     return FALLBACK_SERVICES
+
+def get_staff_list():
+    try:
+        users = User.query.filter(User.role.in_(['stylist', 'barber', 'owner', 'admin'])).all()
+        if users and len(users) > 0:
+            staff_data = []
+            for u in users:
+                specs = ["Haircuts", "Beard & Shave", "VIP Combos", "Kids"]
+                if hasattr(u, 'specialties') and u.specialties:
+                    try:
+                        specs = json.loads(u.specialties) if isinstance(u.specialties, str) else u.specialties
+                    except Exception:
+                        specs = [s.strip() for s in str(u.specialties).split(',')]
+                staff_data.append({
+                    "id": u.id,
+                    "name": getattr(u, 'name', u.username),
+                    "role": getattr(u, 'role', 'Stylist').capitalize(),
+                    "specialties": specs
+                })
+            return staff_data
+    except Exception:
+        pass
+    return FALLBACK_STAFF
 
 def format_slot_objects(slot_strings, target_date_str):
     slot_objs = []
@@ -69,6 +100,7 @@ def format_slot_objects(slot_strings, target_date_str):
 def get_dashboard_context(active_tab='dashboard'):
     bookings = BarberBooking.query.all() if hasattr(BarberBooking, 'query') else []
     services = get_services_list()
+    staff = get_staff_list()
     expenses = StudioExpense.query.all() if hasattr(StudioExpense, 'query') else []
     categories = ExpenseCategory.query.all() if hasattr(ExpenseCategory, 'query') else []
     products = Product.query.all() if hasattr(Product, 'query') else []
@@ -87,6 +119,7 @@ def get_dashboard_context(active_tab='dashboard'):
         'bookings': bookings,
         'appointments': bookings,
         'services': services,
+        'staff': staff,
         'expenses': expenses,
         'categories': categories,
         'products': products,
@@ -127,7 +160,10 @@ def forgot_password():
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form.get('name', request.form.get('full_name', '')).strip()
+        name = request.form.get('name', request.form.get('first_name', '')).strip()
+        last_name = request.form.get('last_name', '').strip()
+        if last_name:
+            name = f"{name} {last_name}".strip()
         phone = request.form.get('phone', request.form.get('phone_number', '')).strip()
         email = request.form.get('email', '').strip()
 
@@ -199,6 +235,7 @@ def customer_portal():
         customer = Customer.query.get(session['customer_id'])
 
     services = get_services_list()
+    staff = get_staff_list()
     products = Product.query.filter_by(is_active=True).all() if hasattr(Product, 'is_active') else Product.query.all()
     
     user_bookings = []
@@ -217,6 +254,7 @@ def customer_portal():
         'booking.html',
         customer=customer,
         services=services,
+        staff=staff,
         products=products,
         time_slots=DEFAULT_TIME_SLOTS,
         bookings=user_bookings,
@@ -227,6 +265,7 @@ def customer_portal():
 def book_service():
     name = request.form.get('name', request.form.get('full_name', '')).strip()
     phone = request.form.get('phone', request.form.get('phone_number', '')).strip()
+    stylist_name = request.form.get('stylist_name', 'Ivonne Gonzalez (Master Stylist / Owner)')
     service_id = request.form.get('service_id')
     appointment_date = request.form.get('appointment_date', request.form.get('booking_date'))
     time_slot = request.form.get('time_slot', request.form.get('scheduled_time'))
@@ -264,6 +303,8 @@ def book_service():
     except Exception:
         appointment_dt = datetime.now()
 
+    appt_notes = f"Stylist: {stylist_name} | {notes}" if notes else f"Stylist: {stylist_name}"
+
     appt = BarberBooking(
         customer_id=customer.id,
         service_id=service.id if service else 1,
@@ -272,12 +313,12 @@ def book_service():
         appointment_time=appointment_dt if hasattr(BarberBooking, 'appointment_time') else None,
         status='Booked' if hasattr(BarberBooking, 'status') else None,
         payment_method=payment_method if hasattr(BarberBooking, 'payment_method') else None,
-        notes=notes if hasattr(BarberBooking, 'notes') else None
+        notes=appt_notes if hasattr(BarberBooking, 'notes') else None
     )
     db.session.add(appt)
     db.session.commit()
 
-    flash('Your appointment has been successfully scheduled!', 'success')
+    flash(f'Your appointment with {stylist_name} has been successfully scheduled!', 'success')
     return redirect(url_for('main.customer_portal'))
 
 # --- STYLIST COMMAND CENTER & POS ---
@@ -299,6 +340,26 @@ def pos():
         'dashboard.html' if os.path.exists('app/templates/dashboard.html') else 'booking.html',
         **ctx
     )
+
+@main_bp.route('/add_stylist', methods=['POST'])
+def add_stylist():
+    name = request.form.get('name', '').strip()
+    role = request.form.get('role', 'Stylist').strip()
+    specialties = request.form.getlist('specialties')
+
+    if name:
+        new_user = User(
+            username=name.lower().replace(' ', '_'),
+            email=f"{name.lower().replace(' ', '_')}@jackiecutz.com",
+            role=role.lower()
+        )
+        if hasattr(User, 'specialties'):
+            new_user.specialties = json.dumps(specialties)
+        new_user.set_password('Studio123!')
+        db.session.add(new_user)
+        db.session.commit()
+        flash(f'Stylist/Barber {name} registered with specialties: {", ".join(specialties)}', 'success')
+    return redirect(url_for('main.stylist_dashboard'))
 
 # --- INVENTORY & EXPENSES ---
 

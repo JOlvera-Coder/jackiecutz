@@ -36,31 +36,24 @@
 
     <!-- 4 CORE KPI METRIC CARDS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Gross Revenue -->
         <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.12)]">
             <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">GROSS REVENUE (YTD)</p>
             <p class="text-2xl sm:text-3xl font-black text-[#f7e3af] mt-2 drop-shadow-[0_0_8px_rgba(247,227,175,0.5)]">
                 ${{ "%.2f"|format(gross_revenue|default(0.0)) }}
             </p>
         </div>
-
-        <!-- Overhead -->
         <div class="bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
             <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">TOTAL STUDIO OVERHEAD</p>
             <p class="text-2xl sm:text-3xl font-black text-red-400 mt-2">
                 ${{ "%.2f"|format(total_overhead|default(0.0)) }}
             </p>
         </div>
-
-        <!-- Net Profit -->
         <div class="bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
             <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">NET TAXABLE PROFIT</p>
             <p class="text-2xl sm:text-3xl font-black text-emerald-400 mt-2">
                 ${{ "%.2f"|format(net_income|default(0.0)) }}
             </p>
         </div>
-
-        <!-- Active Queue -->
         <div class="bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
             <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">ACTIVE QUEUE / WALK-INS</p>
             <p class="text-2xl sm:text-3xl font-black text-white mt-2">
@@ -69,9 +62,93 @@
         </div>
     </div>
 
+    <!-- STYLIST/BARBER TEAM & SPECIALTY MANAGEMENT MODULE -->
+    <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
+            <div>
+                <h2 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)] flex items-center gap-2">
+                    ✂️ STYLIST & BARBER ROSTER WITH SPECIALTIES
+                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40">
+                        {{ staff|length|default(0) }} ACTIVE CHAIRS
+                    </span>
+                </h2>
+                <p class="text-xs text-zinc-400 mt-1">Assign stylist specialties so clients only book services that the selected team member performs.</p>
+            </div>
+        </div>
+
+        <!-- Add Stylist Form -->
+        <div class="bg-zinc-950 border border-dashed border-[#e6c280]/40 rounded-2xl p-4 sm:p-5">
+            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider block mb-3 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
+                + ADD STYLIST / BARBER & PERMITTED SERVICES
+            </span>
+            <form method="POST" action="{{ url_for('main.add_stylist') }}" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" name="name" required placeholder="Stylist / Barber Full Name" 
+                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
+                    <select name="role" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none">
+                        <option value="Stylist">Stylist</option>
+                        <option value="Barber">Barber</option>
+                        <option value="Master Stylist">Master Stylist</option>
+                    </select>
+                </div>
+
+                <!-- Specialty Checkboxes -->
+                <div>
+                    <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-2">Approved Specialties & Service Categories:</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Haircuts" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Haircuts</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Beard & Shave" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Beard & Shave</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="VIP Combos" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">VIP Combos</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Kids" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Kids</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Color" class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Color</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Waxing" class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Waxing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-wider text-xs rounded-2xl shadow-[0_0_15px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
+                    REGISTER STYLIST TO SYSTEM ✂️
+                </button>
+            </form>
+        </div>
+
+        <!-- Active Stylist Roster Display -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+            {% for person in staff %}
+            <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-black text-[#f7e3af]">{{ person.name }}</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300">{{ person.role }}</span>
+                </div>
+                <div class="flex flex-wrap gap-1 pt-1">
+                    {% for spec in person.specialties %}
+                        <span class="text-[9px] font-bold px-2 py-0.5 bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/30 rounded-lg">{{ spec }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
     <!-- 3 ANALYTICS CHARTS ROW -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <!-- Live Traffic Acquisition -->
         <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] flex flex-col justify-between">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-4">
                 <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_5px_rgba(247,227,175,0.4)]">
@@ -82,15 +159,8 @@
             <div class="h-56 flex items-center justify-center">
                 <canvas id="trafficChart"></canvas>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-zinc-400 mt-3 pt-3 border-t border-zinc-900">
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#caa055]"></span> Direct Booking</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#3b82f6]"></span> Walk-In Kiosk</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#ec4899]"></span> Instagram / Social</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#10b981]"></span> Client Referral</span>
-            </div>
         </div>
 
-        <!-- Geographic Density Map -->
         <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] flex flex-col justify-between">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-4">
                 <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_5px_rgba(247,227,175,0.4)]">
@@ -101,15 +171,8 @@
             <div class="h-56 flex items-center justify-center">
                 <canvas id="geoChart"></canvas>
             </div>
-            <div class="grid grid-cols-2 gap-2 text-[10px] font-bold text-zinc-400 mt-3 pt-3 border-t border-zinc-900">
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#caa055]"></span> 77073 (Airtex)</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#f97316]"></span> 77090 (Spring)</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#06b6d4]"></span> 77067 (North)</span>
-                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#84cc16]"></span> 77373 (Old Town)</span>
-            </div>
         </div>
 
-        <!-- Revenue vs Overhead -->
         <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] flex flex-col justify-between">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-4">
                 <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_5px_rgba(247,227,175,0.4)]">
@@ -119,11 +182,6 @@
             </div>
             <div class="h-56 flex items-center justify-center">
                 <canvas id="revChart"></canvas>
-            </div>
-            <div class="flex justify-around text-[10px] font-bold text-zinc-400 mt-3 pt-3 border-t border-zinc-900">
-                <span>Gross Revenue</span>
-                <span>Overhead Expenses</span>
-                <span>Net Profit</span>
             </div>
         </div>
     </div>
@@ -167,13 +225,6 @@
                 </div>
             </form>
         </div>
-
-        <!-- Supplier PO Section Header -->
-        <div class="pt-2">
-            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
-                📄 SUPPLIER PURCHASE ORDERS (POS)
-            </span>
-        </div>
     </div>
 
 </div>
@@ -182,7 +233,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Traffic Doughnut
     const trafficCtx = document.getElementById('trafficChart');
     if (trafficCtx) {
         new Chart(trafficCtx, {
@@ -195,15 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     borderWidth: 0
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     }
 
-    // 2. Geo Density Pie
     const geoCtx = document.getElementById('geoChart');
     if (geoCtx) {
         new Chart(geoCtx, {
@@ -216,15 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     borderWidth: 0
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     }
 
-    // 3. Revenue Bar
     const revCtx = document.getElementById('revChart');
     if (revCtx) {
         new Chart(revCtx, {
@@ -242,15 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#27272a' },
-                        ticks: { color: '#a1a1aa' }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#a1a1aa' }
-                    }
+                    y: { beginAtZero: true, grid: { color: '#27272a' }, ticks: { color: '#a1a1aa' } },
+                    x: { grid: { display: false }, ticks: { color: '#a1a1aa' } }
                 }
             }
         });
