@@ -1,6 +1,8 @@
+import io
+import csv
 from datetime import datetime, date
 import math
-from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, Response
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -28,7 +30,7 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
 
 
 # -------------------------------------------------------------
-# STATIC & INFORMATIONAL PAGES (Prevent Template BuildErrors)
+# STATIC & INFORMATIONAL PAGES
 # -------------------------------------------------------------
 @main_bp.route('/')
 def index():
@@ -188,7 +190,7 @@ def live_queue_display():
 
 
 # -------------------------------------------------------------
-# STYLIST COMMAND CENTER & CHECKOUT ACTIONS
+# STYLIST COMMAND CENTER, CSV EXPORT & CHECKOUT
 # -------------------------------------------------------------
 @main_bp.route('/stylist/dashboard')
 @login_required
@@ -229,6 +231,38 @@ def complete_checkout(appt_id):
     db.session.commit()
     flash(f"Service completed and marked paid for {appt.client_name}.", "success")
     return redirect(url_for('main.stylist_dashboard'))
+
+
+@main_bp.route('/stylist/export-tax-csv')
+@login_required
+def export_tax_csv():
+    """Export completed client checkout transactions for IRS / accounting."""
+    completed = Appointment.query.filter_by(status='completed').all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Transaction ID', 'Date', 'Time', 'Client Name', 'Phone', 'Service', 'Price', 'Payment Method', 'Status'])
+
+    for appt in completed:
+        svc_name = appt.service.name if appt.service else 'General Haircut'
+        price = f"${appt.service.price:.2f}" if (appt.service and appt.service.price) else "$35.00"
+        writer.writerow([
+            appt.id,
+            appt.date.strftime('%Y-%m-%d') if appt.date else '',
+            appt.time or '',
+            appt.client_name,
+            appt.phone or '',
+            svc_name,
+            price,
+            appt.payment_status or 'in_app',
+            appt.status
+        ])
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=jackiecutz_tax_records.csv"}
+    )
 
 
 # -------------------------------------------------------------
