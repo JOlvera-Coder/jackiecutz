@@ -17,7 +17,7 @@ GEOFENCE_RADIUS_MILES = 2.0
 
 def calculate_haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate distance in miles between two GPS coordinates."""
-    r = 3958.8  # Earth radius in miles
+    r = 3958.8
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
     a = (math.sin(dlat / 2) ** 2 +
@@ -28,13 +28,26 @@ def calculate_haversine_distance(lat1, lon1, lat2, lon2):
 
 
 # -------------------------------------------------------------
-# AUTHENTICATION & CORE USER ROUTES
+# STATIC & INFORMATIONAL PAGES (Prevent Template BuildErrors)
 # -------------------------------------------------------------
 @main_bp.route('/')
 def index():
     return redirect(url_for('main.login'))
 
 
+@main_bp.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+
+@main_bp.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+
+# -------------------------------------------------------------
+# AUTHENTICATION & CORE USER ROUTES
+# -------------------------------------------------------------
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -110,8 +123,14 @@ def client_dashboard():
     return render_template('booking.html', services=services, appointments=user_appts)
 
 
+@main_bp.route('/booking', methods=['GET', 'POST'])
+@login_required
+def booking():
+    return redirect(url_for('main.client_dashboard'))
+
+
 # -------------------------------------------------------------
-# WALK-IN KIOSK TERMINAL (With 6-Sec Confirmation & Cash/App Tag)
+# WALK-IN KIOSK TERMINAL
 # -------------------------------------------------------------
 @main_bp.route('/kiosk', methods=['GET', 'POST'])
 def walkin_kiosk():
@@ -140,7 +159,6 @@ def walkin_kiosk():
         db.session.add(new_appt)
         db.session.commit()
 
-        # Count position in line
         position = Appointment.query.filter(
             Appointment.status.in_(['waiting', 'checked_in']),
             Appointment.date == date.today()
@@ -155,9 +173,10 @@ def walkin_kiosk():
 
 
 # -------------------------------------------------------------
-# LIVE TV DISPLAY (Fullscreen Waitlist Display)
+# LIVE TV DISPLAY (Accessible at both /queue and /tv)
 # -------------------------------------------------------------
 @main_bp.route('/queue')
+@main_bp.route('/tv')
 def live_queue_display():
     today = date.today()
     active_clients = Appointment.query.filter(
