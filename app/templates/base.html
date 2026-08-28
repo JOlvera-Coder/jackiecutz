@@ -10,13 +10,15 @@
     
     <style>
         :root {
-            --gold-bright: #fff0b3;
-            --gold-primary: #e6c36a;
-            --gold-deep: #b88628;
-            --gold-shadow: #54390b;
+            /* True Illuminating Metallic Champagne Gold Spectrum */
+            --champagne-highlight: #ffffff;
+            --champagne-light: #fff6d6;
+            --champagne-cream: #faeac0;
+            --champagne-gold: #dfba6b;
+            --champagne-deep: #b5872a;
+            --champagne-bronze: #694a11;
+            --champagne-border: #d8b056;
             --bg-jet-black: #000000;
-            --card-jet-black: #080808;
-            --input-jet-black: #111111;
         }
 
         html, body {
@@ -28,7 +30,7 @@
             min-height: 100vh;
         }
 
-        /* Pure Studio Artwork Container (Seamless Jet Black, No Outlines) */
+        /* Pure Studio Artwork Container (Seamless Jet Black) */
         .studio-logo-banner {
             width: 100%;
             max-width: 480px;
@@ -46,15 +48,15 @@
             background: #000000 !important;
         }
 
-        /* Luminous Rich Champagne Gold Button */
+        /* Metallic Champagne Gold Button (Buttons & Triggers) */
         .gold-btn, .gold-metallic-bg {
-            background: linear-gradient(135deg, #fff3cc 0%, #e6c36a 28%, #d4af37 55%, #b88628 85%, #6b4e12 100%) !important;
-            color: #080808 !important;
+            background: linear-gradient(135deg, #ffffff 0%, #fff2cb 22%, #e5c16d 50%, #c39634 78%, #785213 100%) !important;
+            color: #0d0d0d !important;
             font-weight: 800 !important;
-            border: 1px solid #fff0b3 !important;
+            border: 1px solid #fff2cb !important;
             border-radius: 10px;
-            box-shadow: 0 4px 22px rgba(230, 195, 106, 0.45), 0 0 12px rgba(255, 243, 204, 0.35) inset !important;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 20px rgba(223, 186, 107, 0.45), 0 0 14px rgba(255, 242, 203, 0.4) inset !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
             cursor: pointer;
             transition: all 0.22s ease-in-out;
             letter-spacing: 1.5px;
@@ -62,31 +64,21 @@
         }
 
         .gold-btn:hover, .gold-metallic-bg:hover {
-            background: linear-gradient(135deg, #ffffff 0%, #fff0b3 25%, #e6c36a 60%, #b88628 100%) !important;
-            box-shadow: 0 6px 30px rgba(230, 195, 106, 0.75), 0 0 16px rgba(255, 255, 255, 0.6) inset !important;
+            background: linear-gradient(135deg, #ffffff 0%, #fff7dc 30%, #ebd08c 65%, #b5872a 100%) !important;
+            box-shadow: 0 6px 30px rgba(223, 186, 107, 0.75), 0 0 18px rgba(255, 255, 255, 0.7) inset !important;
             transform: translateY(-1px);
         }
 
-        .gold-input {
-            width: 100%;
-            padding: 12px 14px;
-            background: var(--input-jet-black);
-            border: 1px solid #201a12;
-            border-radius: 8px;
-            color: #fff0b3;
-            font-size: 0.95rem;
-            box-sizing: border-box;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .gold-input:focus {
-            outline: none;
-            border-color: #e6c36a;
-            box-shadow: 0 0 12px rgba(230, 195, 106, 0.4);
+        /* Matching Champagne Gold Input Fields */
+        .gold-input, input[type="text"], input[type="tel"], input[type="email"], input[type="date"], select {
+            background: #fffdf5 !important;
+            color: #111111 !important;
+            border: 1px solid #d8b056 !important;
+            font-weight: 600;
         }
 
         .gold-label {
-            color: #e6c36a;
+            color: #dfba6b !important;
             font-size: 0.78rem;
             font-weight: 800;
             letter-spacing: 1.5px;
@@ -95,46 +87,64 @@
             margin-bottom: 6px;
         }
 
-        /* Available Live Time Slots Button Styling */
-        .time-slot-btn, button[data-slot], [id^="slot-"], .slot-btn {
-            background: #14120c !important;
-            color: #fae498 !important;
-            border: 1px solid #c89e4b !important;
-            font-size: 0.78rem !important;
-            font-weight: 700 !important;
+        /* Available Live Time Slots (Matching Pill Tabs & Visible Typography) */
+        #slots-container button, 
+        #time-slots-container button, 
+        #slots-grid button,
+        .time-slot-btn, 
+        .slot-btn, 
+        button[data-slot], 
+        button[data-time],
+        [id^="slot-"] {
+            background: linear-gradient(135deg, #fffcf0 0%, #faeac0 50%, #ecd08c 100%) !important;
+            color: #1a1508 !important;
+            border: 1px solid #d8b056 !important;
+            font-size: 0.8rem !important;
+            font-weight: 800 !important;
             border-radius: 9999px !important;
-            padding: 8px 10px !important;
+            padding: 9px 12px !important;
             text-align: center !important;
+            box-shadow: 0 2px 8px rgba(216, 176, 86, 0.25) !important;
             transition: all 0.2s ease-in-out !important;
             cursor: pointer !important;
-            display: inline-flex !important;
+            display: flex !important;
             align-items: center !important;
             justify-content: center !important;
         }
 
-        .time-slot-btn:hover, button[data-slot]:hover, [id^="slot-"]:hover, .slot-btn:hover {
-            background: linear-gradient(135deg, #fff3cc 0%, #e6c36a 40%, #b88628 100%) !important;
+        /* Slot Hover State (Illuminated Glow) */
+        #slots-container button:hover, 
+        #time-slots-container button:hover, 
+        #slots-grid button:hover,
+        .time-slot-btn:hover, 
+        .slot-btn:hover, 
+        button[data-slot]:hover, 
+        button[data-time]:hover,
+        [id^="slot-"]:hover {
+            background: linear-gradient(135deg, #ffffff 0%, #fff7dc 40%, #e0b85c 100%) !important;
             color: #000000 !important;
-            border-color: #fff0b3 !important;
-            box-shadow: 0 0 14px rgba(230, 195, 106, 0.6) !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 16px rgba(223, 186, 107, 0.7) !important;
             transform: translateY(-1px);
         }
 
-        .time-slot-btn.selected, .time-slot-btn.active, button[data-slot].selected, [id^="slot-"].selected, .slot-btn.selected {
-            background: linear-gradient(135deg, #fff3cc 0%, #e6c36a 30%, #d4af37 60%, #9e7526 100%) !important;
+        /* Slot Active/Selected State (Deep Champagne Gold with High Glow) */
+        #slots-container button.selected, 
+        #time-slots-container button.selected, 
+        #slots-grid button.selected,
+        #slots-container button.active,
+        #time-slots-container button.active,
+        .time-slot-btn.selected, 
+        .time-slot-btn.active, 
+        .slot-btn.selected, 
+        button[data-slot].selected, 
+        button[data-time].selected,
+        [id^="slot-"].selected {
+            background: linear-gradient(135deg, #ffffff 0%, #e5c16d 45%, #b5872a 100%) !important;
             color: #000000 !important;
-            font-weight: 800 !important;
-            border-color: #fff0b3 !important;
-            box-shadow: 0 0 18px rgba(230, 195, 106, 0.85) !important;
-        }
-
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus {
-            -webkit-text-fill-color: #fff0b3 !important;
-            -webkit-box-shadow: 0 0 0px 1000px #111111 inset !important;
-            border: 1px solid #e6c36a !important;
-            caret-color: #fff0b3 !important;
+            font-weight: 900 !important;
+            border: 2px solid #ffffff !important;
+            box-shadow: 0 0 20px rgba(223, 186, 107, 0.95), 0 0 8px #ffffff inset !important;
         }
     </style>
 </head>
