@@ -1,324 +1,56 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<div class="min-h-screen bg-black text-white p-3 sm:p-6 pb-24 flex justify-center">
-    <div class="w-full max-w-xl space-y-6">
-
-        <!-- TOP BAR -->
-        <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
-            <div class="flex items-center space-x-3">
-                <button type="button" class="p-2 bg-zinc-950 border border-[#e6c280]/40 rounded-xl text-[#f7e3af] hover:border-[#f7e3af] transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-                <h1 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
-                    Welcome, {{ customer.name if customer else 'Client' }} ✨
-                </h1>
-            </div>
-            <a href="{{ url_for('main.logout') }}" class="text-xs text-zinc-400 hover:text-[#f7e3af] font-semibold transition">Sign Out</a>
-        </div>
-
-        <!-- LANGUAGE SWITCHER -->
-        <div class="flex justify-center">
-            <div class="bg-zinc-950 border border-[#e6c280]/30 rounded-2xl p-1 flex items-center space-x-1">
-                <span class="text-[11px] text-zinc-400 font-bold px-2">Language:</span>
-                <button type="button" id="btn-lang-en" onclick="setLanguage('en')" class="px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black shadow-[0_0_10px_rgba(230,194,128,0.3)] transition">
-                    English 🇺🇸
-                </button>
-                <button type="button" id="btn-lang-es" onclick="setLanguage('es')" class="px-3 py-1 text-xs font-bold rounded-xl text-zinc-400 hover:text-white transition">
-                    Español 🇲🇽
-                </button>
-            </div>
-        </div>
-
-        <!-- FLYER POSTER HERO -->
-        <div class="w-full rounded-3xl overflow-hidden border border-[#e6c280]/40 shadow-[0_0_25px_rgba(230,194,128,0.15)] bg-zinc-950">
-            <img id="flyer-img" src="{{ url_for('static', filename='img/flyer.jpg') }}" alt="Jackiecutz Hair Studio Menu" class="w-full object-cover">
-        </div>
-
-        <!-- WEEKLY HOURS & AVAILABILITY -->
-        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.12)]">
-            <div class="flex items-center justify-between mb-3 border-b border-zinc-900 pb-2">
-                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_5px_rgba(247,227,175,0.4)] flex items-center gap-1.5">
-                    🕒 WEEKLY HOURS & AVAILABILITY
-                </span>
-                <span class="text-[10px] text-zinc-500 font-mono">Houston, TX (CT)</span>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                <div class="bg-[#fffee0] p-2.5 rounded-2xl border border-zinc-800 flex flex-col justify-center">
-                    <p class="text-[11px] font-black uppercase text-black">Sun - Mon</p>
-                    <p class="text-xs font-bold text-red-600 mt-0.5">🔴 Closed</p>
-                </div>
-                <div class="bg-[#fffee0] p-2.5 rounded-2xl border border-zinc-800 flex flex-col justify-center">
-                    <p class="text-[11px] font-black uppercase text-black">Tuesday</p>
-                    <p class="text-xs font-bold text-black mt-0.5">10am - 6pm</p>
-                    <p class="text-[9px] text-zinc-600 font-semibold">(Appt Only)</p>
-                </div>
-                <div class="bg-[#fffee0] p-2.5 rounded-2xl border border-zinc-800 flex flex-col justify-center">
-                    <p class="text-[11px] font-black uppercase text-black">Wed - Thu</p>
-                    <p class="text-xs font-bold text-teal-800 mt-0.5">10am - 6pm</p>
-                </div>
-                <div class="bg-[#fffee0] p-2.5 rounded-2xl border border-zinc-800 flex flex-col justify-center">
-                    <p class="text-[11px] font-black uppercase text-black">Fri - Sat</p>
-                    <p class="text-xs font-bold text-teal-800 mt-0.5">10am - 7pm</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAIN BOOKING FORM CARD -->
-        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 sm:p-7 shadow-[0_0_25px_rgba(230,194,128,0.15)]">
-            <div class="text-center mb-6">
-                <h2 class="text-base sm:text-lg font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] drop-shadow-[0_0_8px_rgba(247,227,175,0.4)] tracking-wider">
-                    ✨ RESERVE YOUR SPOT ✨ 🔺
-                </h2>
-            </div>
-
-            <form method="POST" action="{{ url_for('main.book_service') }}" class="space-y-5" id="booking-form">
-                
-                <!-- STEP 1: STYLIST, SERVICE & DATE -->
-                <div class="bg-zinc-950/80 border border-zinc-800/80 rounded-2xl p-4 space-y-4">
-                    <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
-                        <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
-                            1. CHOOSE STYLIST, SERVICE & BOOKING DATE
-                        </span>
-                        <span class="text-[10px] text-zinc-500 uppercase font-mono">Primary Client</span>
-                    </div>
-
-                    <!-- Stylist / Barber Preference -->
-                    <div>
-                        <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1">Select Stylist / Barber</label>
-                        <select name="stylist_name" id="stylist_select" onchange="filterServicesByStylist()" class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#f7e3af]">
-                            {% for person in staff %}
-                                <option value="{{ person.name }}" data-specialties="{{ person.specialties|join(',') }}">
-                                    {{ person.name }} ({{ person.role }})
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- Filtered Service Selection -->
-                    <div>
-                        <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1">Service (Filtered to Stylist Specialty)</label>
-                        <select name="service_id" id="service_id" onchange="onServiceChanged()" class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#f7e3af]">
-                            {% for s in services %}
-                                <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category if s.category else 'Haircuts' }}">
-                                    {{ s.name }} ({{ s.category if s.category else 'Studio' }}) — ${{ "%.2f"|format(s.price) }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- Date Picker -->
-                    <div>
-                        <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1">Select Appointment Date</label>
-                        <input type="date" name="appointment_date" id="appointment_date" onchange="fetchLiveSlots()" required
-                               class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#f7e3af]">
-                    </div>
-
-                    <!-- Live Slots -->
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-[11px] font-black uppercase text-[#f7e3af] drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
-                                Available Live Time Slots
-                            </label>
-                            <span id="slot-status-badge" class="text-[11px] font-bold px-3 py-0.5 rounded-full bg-[#fffee0] text-black border border-zinc-800 font-mono">
-                                18 live slots open
-                            </span>
-                        </div>
-                        <input type="hidden" name="time_slot" id="selected_time_slot" required>
-                        <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-60 overflow-y-auto p-2 bg-black rounded-2xl border border-zinc-900">
-                        </div>
-                    </div>
-
-                    <!-- Contact Details -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        <div>
-                            <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Your Full Name</label>
-                            <input type="text" name="name" required placeholder="Full Name" value="{{ customer.name if customer else '' }}"
-                                   class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold uppercase text-zinc-400 mb-1">Phone Number</label>
-                            <input type="tel" name="phone" required placeholder="832-000-0000" value="{{ customer.phone if customer else '' }}"
-                                   class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- NOTES -->
-                <div>
-                    <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
-                        NOTES / STYLE PREFERENCES
-                    </label>
-                    <input type="text" name="notes" placeholder="e.g. Skin fade with scissors on top, beard lineup"
-                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
-                </div>
-
-                <!-- PAYMENT METHODS -->
-                <div class="space-y-3 pt-2">
-                    <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
-                        PAYMENT & CARD HOLD METHOD
-                    </label>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <label class="bg-[#fffee0] p-2 rounded-2xl border-2 border-[#e6c280] flex flex-col items-center justify-center text-center cursor-pointer">
-                            <input type="radio" name="payment_method" value="card_hold" checked class="hidden">
-                            <span class="text-xs font-black text-black">💳 Card Hold</span>
-                            <span class="text-[9px] font-bold text-zinc-600">Charged After Cut</span>
-                        </label>
-                        <label class="bg-[#fffee0] p-2 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
-                            <input type="radio" name="payment_method" value="zelle" class="hidden">
-                            <span class="text-xs font-black text-purple-700">⚡ Zelle</span>
-                            <span class="text-[9px] font-bold text-zinc-600">Pay at Salon</span>
-                        </label>
-                        <label class="bg-[#fffee0] p-2 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
-                            <input type="radio" name="payment_method" value="cashapp" class="hidden">
-                            <span class="text-xs font-black text-emerald-700">💵 Cash App</span>
-                            <span class="text-[9px] font-bold text-zinc-600">$Jackiecutz</span>
-                        </label>
-                        <label class="bg-[#fffee0] p-2 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
-                            <input type="radio" name="payment_method" value="cash" class="hidden">
-                            <span class="text-xs font-black text-amber-800">💈 In-Salon</span>
-                            <span class="text-[9px] font-bold text-zinc-600">Cash Preferred</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- ESTIMATED TOTAL & SUBMIT BUTTON -->
-                <div class="bg-[#fffee0] rounded-2xl p-3.5 flex items-center justify-between border border-zinc-800">
-                    <span class="text-xs font-black uppercase text-black">ESTIMATED TOTAL (PAY UPON SERVICE)</span>
-                    <span class="text-base font-black text-black" id="estimated-total-display">$35.00</span>
-                </div>
-
-                <div class="pt-2">
-                    <button type="submit" id="btn-submit-booking"
-                            class="w-full py-3.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
-                        CHOOSE A LIVE TIME SLOT ABOVE
-                    </button>
-                </div>
-            </form>
-        </div>
-
-    </div>
+<div id="geofence-banner" style="display:none; position: fixed; bottom: 20px; right: 20px; background: #000; color: #d4af37; border: 1px solid #d4af37; border-radius: 8px; padding: 14px 20px; z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+    <span id="geofence-text">📍 Proximity check active...</span>
 </div>
 
 <script>
-let allServiceOptions = [];
-
-function initServicesList() {
-    const sel = document.getElementById('service_id');
-    allServiceOptions = Array.from(sel.options).map(opt => ({
-        value: opt.value,
-        text: opt.text,
-        price: opt.getAttribute('data-price'),
-        category: opt.getAttribute('data-category')
-    }));
-}
-
-function filterServicesByStylist() {
-    const stylistSel = document.getElementById('stylist_select');
-    const serviceSel = document.getElementById('service_id');
-    if (!stylistSel || !serviceSel) return;
-
-    const opt = stylistSel.options[stylistSel.selectedIndex];
-    const rawSpecs = opt ? opt.getAttribute('data-specialties') : '';
-    const specs = rawSpecs ? rawSpecs.split(',') : [];
-
-    serviceSel.innerHTML = '';
-    const filtered = allServiceOptions.filter(s => specs.includes(s.category) || specs.length === 0);
-
-    (filtered.length > 0 ? filtered : allServiceOptions).forEach(s => {
-        const option = document.createElement('option');
-        option.value = s.value;
-        option.textContent = s.text;
-        option.setAttribute('data-price', s.price);
-        option.setAttribute('data-category', s.category);
-        serviceSel.appendChild(option);
-    });
-
-    onServiceChanged();
-}
-
-function setLanguage(lang) {
-    const flyer = document.getElementById('flyer-img');
-    const btnEn = document.getElementById('btn-lang-en');
-    const btnEs = document.getElementById('btn-lang-es');
-
-    if (lang === 'es') {
-        flyer.src = "{{ url_for('static', filename='img/flyer_es.jpg') }}";
-        btnEs.className = "px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black shadow-[0_0_10px_rgba(230,194,128,0.3)] transition";
-        btnEn.className = "px-3 py-1 text-xs font-bold rounded-xl text-zinc-400 hover:text-white transition";
-    } else {
-        flyer.src = "{{ url_for('static', filename='img/flyer.jpg') }}";
-        btnEn.className = "px-3 py-1 text-xs font-bold rounded-xl bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black shadow-[0_0_10px_rgba(230,194,128,0.3)] transition";
-        btnEs.className = "px-3 py-1 text-xs font-bold rounded-xl text-zinc-400 hover:text-white transition";
+(function initGeofenceTracker() {
+    if (!("geolocation" in navigator)) {
+        console.warn("Geolocation is not supported by this browser.");
+        return;
     }
-}
 
-function onServiceChanged() {
-    const sel = document.getElementById('service_id');
-    const opt = sel.options[sel.selectedIndex];
-    const price = opt ? opt.getAttribute('data-price') : '35.00';
-    document.getElementById('estimated-total-display').textContent = `$${parseFloat(price).toFixed(2)}`;
-}
+    const banner = document.getElementById("geofence-banner");
+    const bannerText = document.getElementById("geofence-text");
+    let hasAutoCheckedIn = false;
 
-async function fetchLiveSlots() {
-    const dateInput = document.getElementById('appointment_date');
-    const grid = document.getElementById('slots-grid');
-    const badge = document.getElementById('slot-status-badge');
-    const selectedTimeSlotInput = document.getElementById('selected_time_slot');
-    const submitBtn = document.getElementById('btn-submit-booking');
+    navigator.geolocation.watchPosition(
+        async function onPositionUpdate(position) {
+            if (hasAutoCheckedIn) return;
 
-    if (!dateInput.value) return;
-
-    grid.innerHTML = '<p class="col-span-full text-center text-xs text-[#f7e3af] py-4">Checking live availability...</p>';
-
-    try {
-        const res = await fetch(`/api/available-slots?date=${dateInput.value}`);
-        const data = await res.json();
-
-        grid.innerHTML = '';
-        selectedTimeSlotInput.value = '';
-        submitBtn.textContent = 'CHOOSE A LIVE TIME SLOT ABOVE';
-
-        if (data.closed || !data.slots || data.slots.length === 0) {
-            grid.innerHTML = '<p class="col-span-full text-center text-xs text-red-400 py-4 font-bold">🔴 Studio is closed for online bookings on this day.</p>';
-            badge.textContent = 'Closed';
-            return;
-        }
-
-        badge.textContent = `${data.count || data.slots.length} live slots open`;
-
-        data.slots.forEach(slot => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'py-2 px-2 text-center bg-black hover:bg-[#f7e3af] hover:text-black border border-zinc-800 hover:border-[#e6c280] rounded-xl text-xs font-bold text-zinc-300 transition duration-150';
-            btn.textContent = typeof slot === 'object' ? slot.time_str : slot;
-            
-            btn.onclick = () => {
-                document.querySelectorAll('#slots-grid button').forEach(b => {
-                    b.className = 'py-2 px-2 text-center bg-black hover:bg-[#f7e3af] hover:text-black border border-zinc-800 hover:border-[#e6c280] rounded-xl text-xs font-bold text-zinc-300 transition duration-150';
-                });
-                btn.className = 'py-2 px-2 text-center bg-[#f7e3af] text-black border border-[#e6c280] rounded-xl text-xs font-black shadow-[0_0_12px_rgba(247,227,175,0.4)]';
-                selectedTimeSlotInput.value = typeof slot === 'object' ? slot.time_str : slot;
-                submitBtn.textContent = `CONFIRM APPOINTMENT (${selectedTimeSlotInput.value}) ✂️`;
+            const payload = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                accuracy: position.coords.accuracy
             };
-            grid.appendChild(btn);
-        });
 
-    } catch (e) {
-        grid.innerHTML = '<p class="col-span-full text-center text-xs text-red-400 py-4">Error loading time slots.</p>';
-    }
-}
+            try {
+                const response = await fetch('/api/geofence-checkin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-document.addEventListener('DOMContentLoaded', () => {
-    initServicesList();
-    filterServicesByStylist();
-    const dateInput = document.getElementById('appointment_date');
-    if (dateInput && !dateInput.value) {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.value = today;
-        fetchLiveSlots();
-    }
-});
+                if (!response.ok) return;
+                const result = await response.json();
+
+                if (result.status === 'checked_in') {
+                    hasAutoCheckedIn = true;
+                    banner.style.display = 'block';
+                    bannerText.innerHTML = "✨ <strong>Jackie Cutz:</strong> You are within 10 feet! You have been auto-signed in.";
+                    setTimeout(() => { location.reload(); }, 3500);
+                }
+            } catch (err) {
+                console.error("Geofence ping failed:", err);
+            }
+        },
+        function onPositionError(error) {
+            console.warn("GPS Tracking warning:", error.message);
+        },
+        {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 5000
+        }
+    );
+})();
 </script>
-{% endblock %}
