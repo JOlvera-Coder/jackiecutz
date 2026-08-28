@@ -103,7 +103,7 @@
             margin-bottom: 6px;
         }
 
-        /* Live Time Slot Pills - Exact Match to #fffaea Input Tabs */
+        /* Live Time Slot Pills */
         #slots-container button, 
         #time-slots-container button, 
         #slots-grid button,
@@ -129,7 +129,6 @@
             justify-content: center !important;
         }
 
-        /* Slot Buttons Text/Spans */
         #slots-container button *, 
         #time-slots-container button *, 
         #slots-grid button *,
@@ -174,18 +173,34 @@
             font-weight: 800 !important;
         }
 
-        /* Payment & Card Method Tabs - Cream (#fffaea) Interior, Preserved Lettering */
-        div[id*="pay"] button,
+        /* Payment & Card Method Tabs - Complete Cream (#fffaea) Interior */
+        div.grid.grid-cols-2.sm\:grid-cols-4 > div,
+        div.grid.grid-cols-2.sm\:grid-cols-4 > button,
+        div.grid.grid-cols-4 > div,
+        div.grid.grid-cols-4 > button,
+        div.grid.grid-cols-2 > div:has(input[name*="pay"]),
+        div.grid.grid-cols-2 > button:has(input[name*="pay"]),
+        div[id*="pay-method"] button,
+        div[id*="pay-method"] > div,
         div[id*="payment"] button,
-        div[class*="grid-cols-4"] button,
-        div[class*="grid-cols-2"] button,
+        div[id*="payment"] > div,
         button[id^="pay-"],
         button[data-payment],
         button[data-pay],
         .payment-tab,
         .pay-option,
         button[onclick*="selectPayment"],
-        button[onclick*="setPayment"] {
+        button[onclick*="setPayment"],
+        label[for*="pay"],
+        div:has(> input[name="payment_method"]),
+        button:has(span:contains("Card Hold")),
+        button:has(span:contains("Zelle")),
+        button:has(span:contains("Cash App")),
+        button:has(span:contains("In-Salon")),
+        div:has(> span:contains("Card Hold")),
+        div:has(> span:contains("Zelle")),
+        div:has(> span:contains("Cash App")),
+        div:has(> span:contains("In-Salon")) {
             background-color: #fffaea !important;
             background: #fffaea !important;
             border: 1.5px solid #dfba6b !important;
@@ -195,7 +210,9 @@
         }
 
         /* Payment Method Active Selection Highlight */
-        div[id*="pay"] button.selected,
+        div.grid.grid-cols-2.sm\:grid-cols-4 > .selected,
+        div.grid.grid-cols-4 > .selected,
+        div[id*="pay-method"] button.selected,
         div[id*="payment"] button.selected,
         button[id^="pay-"].active,
         button[data-payment].active,
