@@ -48,7 +48,7 @@
             background: #000000 !important;
         }
 
-        /* Confirm & Reserve Spot Button: Bright Luminous Metallic Champagne Gold */
+        /* Confirm & Reserve Spot Button */
         .gold-btn, 
         .gold-metallic-bg,
         #btn-submit-booking,
@@ -182,7 +182,7 @@
             font-weight: 800 !important;
         }
 
-        /* Payment & Card Method Tabs: Uniform Rounded Shape & Solid Cream (#fffaea) Interior */
+        /* Payment & Card Method Tabs Container */
         label:has(input[name="payment_method"]),
         label:has(#txt-pay-card),
         label:has(#txt-pay-salon),
@@ -196,7 +196,7 @@
             background-color: #fffaea !important;
             background: #fffaea !important;
             border: 1.5px solid #dfba6b !important;
-            border-radius: 16px !important; /* Uniform rounded shape across all 4 tabs */
+            border-radius: 16px !important;
             box-shadow: 0 2px 6px rgba(216, 176, 86, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
             padding: 10px 8px !important;
@@ -205,9 +205,10 @@
             align-items: center !important;
             justify-content: center !important;
             text-align: center !important;
+            cursor: pointer !important;
         }
 
-        /* Payment Method Active/Checked State Glow */
+        /* Payment Tab Active State */
         label:has(input[name="payment_method"]:checked),
         label:has(input[name="payment_method"].selected),
         .payment-tab.selected,
@@ -216,7 +217,61 @@
             box-shadow: 0 0 16px rgba(223, 186, 107, 0.9), 0 0 6px #ffffff inset !important;
         }
 
-        /* Policy & Footer Notices: Restored to 0.75rem Size, 400 Regular Weight, High Contrast */
+        /* High-Contrast Legible Lettering for All 4 Payment Tabs on Cream Background */
+        /* 1. Card Hold */
+        #txt-pay-card,
+        label:has(#txt-pay-card) span:first-of-type,
+        span.text-white[id*="pay"] {
+            color: #111111 !important;
+            -webkit-text-fill-color: #111111 !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+        }
+
+        /* 2. Zelle (Rich Deep Purple) */
+        span.text-purple-400,
+        span[class*="text-purple"] {
+            color: #581c87 !important;
+            -webkit-text-fill-color: #581c87 !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+        }
+
+        /* 3. Cash App (Deep Rich Emerald) */
+        span.text-emerald-400,
+        span[class*="text-emerald"] {
+            color: #065f46 !important;
+            -webkit-text-fill-color: #065f46 !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+        }
+
+        /* 4. In-Salon (Deep Bronze Amber) */
+        #txt-pay-salon,
+        span.text-amber-300,
+        span[class*="text-amber-300"] {
+            color: #78350f !important;
+            -webkit-text-fill-color: #78350f !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+        }
+
+        /* Subtext Under All 4 Tabs (Dark Charcoal & High Legibility) */
+        label:has(input[name="payment_method"]) span.text-\[9px\],
+        label:has(input[name="payment_method"]) span[class*="text-zinc"],
+        label:has(input[name="payment_method"]) span:last-child,
+        #txt-pay-zelle-sub,
+        span[id*="pay-sub"],
+        span[id*="-sub"] {
+            color: #2b2b2b !important;
+            -webkit-text-fill-color: #2b2b2b !important;
+            font-weight: 700 !important;
+            font-size: 0.68rem !important;
+            opacity: 1 !important;
+            margin-top: 2px !important;
+        }
+
+        /* Policy & Grace Period Notices */
         #txt-card-hold-desc,
         #txt-policy-footer,
         div.card-hold-desc,
