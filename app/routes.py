@@ -146,6 +146,15 @@ def customer_portal():
     family_members = FamilyMember.query.filter_by(customer_id=customer.id).all() if customer else []
     return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS, bookings=user_bookings, family_members=family_members)
 
+@main_bp.route('/api/available-slots')
+def api_available_slots():
+    date_str = request.args.get('date', datetime.utcnow().strftime('%Y-%m-%d'))
+    return jsonify({
+        'status': 'success',
+        'date': date_str,
+        'slots': DEFAULT_TIME_SLOTS
+    })
+
 @main_bp.route('/update-profile', methods=['POST'])
 def update_profile():
     if 'customer_id' not in session:
@@ -156,7 +165,7 @@ def update_profile():
         customer.email = request.form.get('email', customer.email).strip()
         customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
         db.session.commit()
-        flash("Profile updated successfully!", "success")
+        flash("Profile details updated successfully!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/update-credentials', methods=['POST'])
