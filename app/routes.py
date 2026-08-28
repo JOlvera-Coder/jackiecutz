@@ -93,17 +93,35 @@ def login():
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
+        # Accept first_name/last_name or full name field
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        name = f"{first_name} {last_name}".strip() or request.form.get('name', '').strip()
+
+        username = request.form.get('username', '').strip()
         email = request.form.get('email', '').strip()
         phone = request.form.get('phone', '').strip()
-        password = request.form.get('password', '')
+        password = request.form.get('password', 'client123')
 
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered.', 'error')
-            return redirect(url_for('main.register'))
+        # Fallback generated email if optional in registration UI
+        if not email:
+            safe_handle = username or first_name.lower() or 'client'
+            clean_digits = ''.join(c for c in phone if c.isdigit())[-4:]
+            email = f"{safe_handle}_{clean_digits}@jackiecutz.com"
+
+        existing_user = User.query.filter(
+            or_(
+                User.email == email,
+                (User.phone == phone) if phone else False
+            )
+        ).first()
+
+        if existing_user:
+            login_user(existing_user)
+            return redirect(url_for('main.client_dashboard'))
 
         new_user = User(
-            name=name,
+            name=name or username or "Valued Client",
             email=email,
             phone=phone,
             password_hash=generate_password_hash(password),
@@ -112,7 +130,6 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
-        # Direct route to booking page upon registration
         return redirect(url_for('main.client_dashboard'))
 
     return render_template('register.html')
@@ -134,7 +151,7 @@ def logout():
 
 
 # -------------------------------------------------------------
-# CLIENT DASHBOARD, BOOKING & CUSTOMER PORTAL
+# CLIENT DASHBOARD, BOOKING & CONFIRMATION
 # -------------------------------------------------------------
 @main_bp.route('/dashboard')
 @login_required
@@ -144,20 +161,10 @@ def client_dashboard():
     return render_template('booking.html', services=services, appointments=user_appts)
 
 
-@main_bp.route('/portal')
-@main_bp.route('/customer-portal')
-def customer_portal():
-    return redirect(url_for('main.walkin_kiosk'))
-
-
-@main_bp.route('/client-portal')
-def client_portal():
-    return redirect(url_for('main.walkin_kiosk'))
-
-
+@main_bp.route('/book-service', methods=['POST'])
 @main_bp.route('/booking', methods=['GET', 'POST'])
 @login_required
-def booking():
+def book_service():
     if request.method == 'POST':
         service_id = request.form.get('service_id')
         appt_date_str = request.form.get('date')
@@ -183,8 +190,26 @@ def booking():
         )
         db.session.add(new_appt)
         db.session.commit()
-        flash("Appointment successfully booked! When you arrive, you will be automatically checked in.", "success")
+        return redirect(url_for('main.confirmation', booking_id=new_appt.id))
 
+    return redirect(url_for('main.client_dashboard'))
+
+
+@main_bp.route('/confirmation/<int:booking_id>')
+@login_required
+def confirmation(booking_id):
+    booking = Appointment.query.get_or_404(booking_id)
+    return render_template('confirmation.html', booking=booking)
+
+
+@main_bp.route('/portal')
+@main_bp.route('/customer-portal')
+def customer_portal():
+    return redirect(url_for('main.client_dashboard'))
+
+
+@main_bp.route('/client-portal')
+def client_portal():
     return redirect(url_for('main.client_dashboard'))
 
 
@@ -194,7 +219,7 @@ def auto_checkin(booking_id):
     appt.status = 'checked_in'
     db.session.commit()
     flash(f"Check-in confirmed for {appt.client_name}!", "success")
-    return redirect(url_for('main.walkin_kiosk'))
+    return redirect(url_for('main.confirmation', booking_id=appt.id))
 
 
 # -------------------------------------------------------------
@@ -364,13 +389,12 @@ def export_tax_csv():
 
 # -------------------------------------------------------------
 # GEOFENCE AUTOMATIC CHECK-IN API
-# Detects nearby clients and flips status to 'checked_in'
 # -------------------------------------------------------------
 @main_bp.route('/api/geofence-checkin', methods=['POST'])
 def geofence_checkin():
     data = request.get_json() or {}
-    user_lat = data.get('latitude')
-    user_lon = data.get('longitude')
+    user_lat = data.get('latitude') or data.get('lat')
+    user_lon = data.get('longitude') or data.get('lng')
     user_identifier = data.get('user_id')
 
     if user_lat is None or user_lon is None:
@@ -379,7 +403,6 @@ def geofence_checkin():
     distance = calculate_haversine_distance(float(user_lat), float(user_lon), SALON_LATITUDE, SALON_LONGITUDE)
 
     if distance <= GEOFENCE_RADIUS_MILES:
-        # Check by current_user session or provided user_id
         target_user_id = current_user.id if current_user.is_authenticated else user_identifier
 
         query = Appointment.query.filter(
@@ -396,6 +419,7 @@ def geofence_checkin():
             db.session.commit()
             return jsonify({
                 'status': 'checked_in',
+                'booking_id': appt.id,
                 'client_name': appt.client_name,
                 'distance': round(distance, 2),
                 'message': 'Welcome to Divine Salon! You have been automatically checked into the chair queue.'
