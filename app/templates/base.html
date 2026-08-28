@@ -48,14 +48,21 @@
             background: #000000 !important;
         }
 
-        /* Metallic Champagne Gold Button (Buttons & Triggers) */
-        .gold-btn, .gold-metallic-bg {
+        /* Shot #3: Bright Luminous Metallic Champagne Gold Button */
+        .gold-btn, 
+        .gold-metallic-bg,
+        #btn-submit-booking,
+        button[type="submit"]:has(#txt-btn-submit),
+        button:contains("CONFIRM & RESERVE SPOT"),
+        div:has(> #btn-submit-booking) button,
+        button.w-full.py-4 {
             background: linear-gradient(135deg, #ffffff 0%, #fff2cb 22%, #e5c16d 50%, #c39634 78%, #785213 100%) !important;
-            color: #0d0d0d !important;
-            font-weight: 800 !important;
-            border: 1px solid #fff2cb !important;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(223, 186, 107, 0.45), 0 0 14px rgba(255, 242, 203, 0.4) inset !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            font-weight: 900 !important;
+            border: 1.5px solid #ffffff !important;
+            border-radius: 12px !important;
+            box-shadow: 0 6px 28px rgba(223, 186, 107, 0.6), 0 0 16px rgba(255, 242, 203, 0.5) inset !important;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
             cursor: pointer;
             transition: all 0.22s ease-in-out;
@@ -63,13 +70,15 @@
             text-transform: uppercase;
         }
 
-        .gold-btn:hover, .gold-metallic-bg:hover {
+        .gold-btn:hover, 
+        .gold-metallic-bg:hover,
+        #btn-submit-booking:hover {
             background: linear-gradient(135deg, #ffffff 0%, #fff7dc 30%, #ebd08c 65%, #b5872a 100%) !important;
-            box-shadow: 0 6px 30px rgba(223, 186, 107, 0.75), 0 0 18px rgba(255, 255, 255, 0.7) inset !important;
-            transform: translateY(-1px);
+            box-shadow: 0 8px 36px rgba(223, 186, 107, 0.9), 0 0 20px rgba(255, 255, 255, 0.8) inset !important;
+            transform: translateY(-2px);
         }
 
-        /* Unified Illuminating Metallic Champagne Gold Borders across Customer App, Kiosk, and Command Center */
+        /* Unified Illuminating Metallic Champagne Gold Borders */
         .border-amber-500,
         .border-amber-500\/30,
         .border-amber-500\/40,
@@ -173,53 +182,53 @@
             font-weight: 800 !important;
         }
 
-        /* Payment & Card Method Tabs - Complete Cream (#fffaea) Interior */
-        div.grid.grid-cols-2.sm\:grid-cols-4 > div,
-        div.grid.grid-cols-2.sm\:grid-cols-4 > button,
-        div.grid.grid-cols-4 > div,
-        div.grid.grid-cols-4 > button,
-        div.grid.grid-cols-2 > div:has(input[name*="pay"]),
-        div.grid.grid-cols-2 > button:has(input[name*="pay"]),
-        div[id*="pay-method"] button,
-        div[id*="pay-method"] > div,
+        /* Shot #1: Payment & Card Method Tabs - Uniform Rounded Shape & Solid Cream (#fffaea) Interior */
+        div[id*="pay"] button,
         div[id*="payment"] button,
-        div[id*="payment"] > div,
-        button[id^="pay-"],
-        button[data-payment],
-        button[data-pay],
-        .payment-tab,
-        .pay-option,
+        div[class*="grid-cols-4"] > button,
+        div[class*="grid-cols-4"] > div,
+        div.grid.grid-cols-2.sm\:grid-cols-4 > button,
+        div.grid.grid-cols-2.sm\:grid-cols-4 > div,
         button[onclick*="selectPayment"],
         button[onclick*="setPayment"],
-        label[for*="pay"],
-        div:has(> input[name="payment_method"]),
-        button:has(span:contains("Card Hold")),
-        button:has(span:contains("Zelle")),
-        button:has(span:contains("Cash App")),
-        button:has(span:contains("In-Salon")),
-        div:has(> span:contains("Card Hold")),
-        div:has(> span:contains("Zelle")),
-        div:has(> span:contains("Cash App")),
-        div:has(> span:contains("In-Salon")) {
+        button[id*="pay-"],
+        button[data-payment],
+        .payment-tab,
+        .pay-option {
             background-color: #fffaea !important;
             background: #fffaea !important;
             border: 1.5px solid #dfba6b !important;
-            border-radius: 14px !important;
+            border-radius: 16px !important; /* Forces all 4 tabs to be completely uniform */
             box-shadow: 0 2px 6px rgba(216, 176, 86, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
         }
 
-        /* Payment Method Active Selection Highlight */
-        div.grid.grid-cols-2.sm\:grid-cols-4 > .selected,
-        div.grid.grid-cols-4 > .selected,
-        div[id*="pay-method"] button.selected,
+        /* Payment Tab Active/Selected Glow */
+        div[id*="pay"] button.selected,
         div[id*="payment"] button.selected,
-        button[id^="pay-"].active,
+        button[id*="pay-"].active,
         button[data-payment].active,
         .payment-tab.selected,
         .pay-option.selected {
             border: 2px solid #ffffff !important;
-            box-shadow: 0 0 16px rgba(223, 186, 107, 0.8), 0 0 6px #ffffff inset !important;
+            box-shadow: 0 0 16px rgba(223, 186, 107, 0.9), 0 0 6px #ffffff inset !important;
+        }
+
+        /* Shot #2: Legible High-Contrast Text for Policy & Footer Notices */
+        #txt-card-hold-desc,
+        #txt-policy-footer,
+        div.card-hold-desc,
+        p.text-zinc-500,
+        p.text-zinc-400,
+        p.text-xs.text-zinc-400,
+        p.text-xs.text-zinc-500,
+        p:contains("Your card is held"),
+        p:contains("Appointments held with") {
+            color: #f0ece1 !important;
+            font-size: 0.82rem !important;
+            font-weight: 600 !important;
+            line-height: 1.5 !important;
+            opacity: 1 !important;
         }
 
         /* "Estimated Total (Pay Upon Service)" Bar */
