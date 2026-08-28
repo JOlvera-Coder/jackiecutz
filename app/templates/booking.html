@@ -74,7 +74,7 @@
           {% for cat in categories %}
           <optgroup label="—— {{ cat|upper }} ——" class="bg-black text-amber-400 font-extrabold">
             {% for s in services if s.category == cat %}
-            <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" class="bg-[#fffaea] text-black font-bold" {% if loop.first and loop.parent.loop.first %}selected{% endif %}>
+            <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" class="bg-[#fffaea] text-black font-bold">
               {{ s.name }} — ${{ "%.2f"|format(s.price) }}
             </option>
             {% endfor %}
@@ -83,7 +83,7 @@
 
           {% if not categories %}
             {% for s in services %}
-            <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" class="bg-[#fffaea] text-black font-bold" {% if loop.first %}selected{% endif %}>
+            <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" class="bg-[#fffaea] text-black font-bold">
               {{ s.name }} — ${{ "%.2f"|format(s.price) }}
             </option>
             {% endfor %}
@@ -536,8 +536,10 @@ async function fetchLiveSlots() {
 
 function updateBookingCalculation(chosenSlotTime) {
   let total = 0;
-  const mainSvc = servicesMap[document.getElementById('service-select').value];
-  if (mainSvc) total += mainSvc.price;
+  const selectEl = document.getElementById('service-select');
+  if (selectEl && selectEl.value && servicesMap[selectEl.value]) {
+    total += servicesMap[selectEl.value].price;
+  }
 
   document.querySelectorAll('.guest-service-select').forEach(select => {
     const gSvc = servicesMap[select.value];
@@ -545,16 +547,19 @@ function updateBookingCalculation(chosenSlotTime) {
   });
 
   const formattedTotal = `$${total.toFixed(2)}`;
-  document.getElementById('booking-total-price').textContent = formattedTotal;
+  const totalEl = document.getElementById('booking-total-price');
+  if (totalEl) totalEl.textContent = formattedTotal;
   
   const slotTime = chosenSlotTime || document.getElementById('selected-time-slot').value;
   const submitBtn = document.getElementById('btn-submit-booking');
   const t = i18n[currentLang];
   
-  if (slotTime) {
-    submitBtn.textContent = `${t.btnSubmit} (${formattedTotal}) @ ${slotTime}`;
-  } else {
-    submitBtn.textContent = `${t.btnSubmit} (${formattedTotal})`;
+  if (submitBtn) {
+    if (slotTime) {
+      submitBtn.textContent = `${t.btnSubmit} (${formattedTotal}) @ ${slotTime}`;
+    } else {
+      submitBtn.textContent = `${t.btnSubmit} (${formattedTotal})`;
+    }
   }
 }
 
