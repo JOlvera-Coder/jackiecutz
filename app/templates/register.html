@@ -10,20 +10,24 @@
              class="w-full max-w-sm object-contain drop-shadow-2xl">
     </div>
 
-    <!-- Registration Card (Identical Width & Aesthetic as Login) -->
-    <div class="w-full max-w-md bg-black border border-amber-400/40 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-amber-500/10">
+    <!-- Registration Card -->
+    <div class="w-full max-w-md bg-black border border-[#e6c280]/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_25px_rgba(230,194,128,0.15)]">
 
         <!-- Title & Subtitle -->
         <div class="text-center mb-5">
-            <h2 class="text-lg font-black uppercase text-amber-400 tracking-wider">CLIENT REGISTRATION</h2>
-            <p class="text-xs text-zinc-400 mt-1">Create your studio profile for fast appointment booking.</p>
+            <h2 class="text-lg font-black uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] drop-shadow-[0_0_8px_rgba(247,227,175,0.4)]">
+                CLIENT REGISTRATION
+            </h2>
+            <p class="text-xs text-zinc-300 mt-1">
+                Create your studio profile for fast appointment booking.
+            </p>
         </div>
 
         <!-- Flash Alert Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="mb-4 p-3 rounded-xl text-xs font-bold text-center {% if category == 'danger' %}bg-red-500/20 text-red-400 border border-red-500/30{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% endif %}">
+                    <div class="mb-4 p-3 rounded-xl text-xs font-bold text-center {% if category == 'danger' %}bg-red-500/20 text-red-400 border border-red-500/30{% else %}bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -35,64 +39,64 @@
             
             <!-- Username -->
             <div>
-                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                     USERNAME (OPTIONAL HANDLE)
                 </label>
                 <input type="text" name="username" placeholder="e.g. IOlvera"
-                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                       class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af] placeholder-zinc-400">
             </div>
 
             <!-- Name Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                         FIRST NAME *
                     </label>
                     <input type="text" name="first_name" required placeholder="First Name"
-                           class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af] placeholder-zinc-400">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                         LAST NAME
                     </label>
                     <input type="text" name="last_name" placeholder="Last Name"
-                           class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af] placeholder-zinc-400">
                 </div>
             </div>
 
             <!-- Phone Number -->
             <div>
-                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                     PHONE NUMBER *
                 </label>
                 <input type="tel" name="phone" required placeholder="832-000-0000"
-                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                       class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af] placeholder-zinc-400">
             </div>
 
             <!-- Email Address -->
             <div>
-                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                     EMAIL ADDRESS
                 </label>
                 <input type="email" name="email" placeholder="name@example.com"
-                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                       class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af] placeholder-zinc-400">
             </div>
 
             <!-- Zip Code & Gender -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                         ZIP CODE *
                     </label>
                     <input type="text" name="zip_code" placeholder="77073" value="77073"
-                           class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af] placeholder-zinc-400">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                         GENDER
                     </label>
                     <select name="gender" 
-                            class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400">
+                            class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
@@ -103,14 +107,14 @@
 
             <!-- Birthday -->
             <div>
-                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                     BIRTHDAY (OPTIONAL)
                 </label>
                 <input type="date" name="birthday"
-                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400">
+                       class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
             </div>
 
-            <!-- Gold Metallic Button with Glow -->
+            <!-- Metallic Button with Glow -->
             <div class="pt-2">
                 <button type="submit" 
                         class="w-full py-3 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
@@ -123,15 +127,15 @@
         <div class="pt-5 mt-4 border-t border-zinc-900 text-center space-y-2">
             <p class="text-xs text-zinc-300">
                 Already have an account? 
-                <a href="{{ url_for('main.login') }}" class="font-bold text-white underline hover:text-amber-400 transition">
+                <a href="{{ url_for('main.login') }}" class="font-bold text-white underline hover:text-[#f7e3af] transition">
                     Log In
                 </a>
             </p>
             <p class="text-[11px] text-zinc-300 leading-tight">
                 By registering, you agree to our 
-                <a href="{{ url_for('main.terms') }}" class="underline hover:text-amber-400">Terms & Conditions</a> 
+                <a href="{{ url_for('main.terms') }}" class="underline hover:text-[#f7e3af]">Terms & Conditions</a> 
                 and 
-                <a href="{{ url_for('main.privacy') }}" class="underline hover:text-amber-400">Privacy Policy</a>.
+                <a href="{{ url_for('main.privacy') }}" class="underline hover:text-[#f7e3af]">Privacy Policy</a>.
             </p>
         </div>
 
