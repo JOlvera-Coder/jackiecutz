@@ -34,7 +34,7 @@ def login():
         remember = bool(request.form.get('remember_me'))
         digits = clean_phone(identifier)
 
-        # 1. Stylist / Admin Check
+        # 1. Stylist / Admin Check (Ivonne)
         user = User.query.filter(
             (User.username.ilike(identifier)) | 
             (User.email.ilike(identifier))
@@ -67,7 +67,6 @@ def login():
             session.clear()
             session['customer_id'] = customer.id
             session.permanent = remember
-            flash(f"Welcome back, {customer.name}!", "success")
             return redirect(url_for('main.customer_portal'))
 
         flash("Username, phone, or credentials not recognized. Please try again or register.", "danger")
@@ -139,22 +138,35 @@ def register():
 @main_bp.route('/booking')
 @main_bp.route('/customer/portal')
 def customer_portal():
-    customer = None
-    if 'customer_id' in session:
-        customer = Customer.query.get(session['customer_id'])
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    customer = Customer.query.get(session['customer_id'])
     services = BarberService.query.all()
-    user_bookings = BarberBooking.query.filter_by(customer_id=customer.id).all() if customer else []
+    user_bookings = BarberBooking.query.filter_by(customer_id=customer.id).order_by(BarberBooking.appointment_time.desc()).all() if customer else []
     return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS, bookings=user_bookings)
+
+@main_bp.route('/update-profile', methods=['POST'])
+def update_profile():
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    customer = Customer.query.get(session['customer_id'])
+    if customer:
+        customer.name = request.form.get('name', customer.name).strip()
+        customer.email = request.form.get('email', customer.email).strip()
+        customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
+        db.session.commit()
+        flash("Profile details updated successfully!", "success")
+    return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/book-service', methods=['POST'])
 def book_service():
-    customer = None
-    if 'customer_id' in session:
-        customer = Customer.query.get(session['customer_id'])
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    customer = Customer.query.get(session['customer_id'])
     
     service_id = request.form.get('service_id')
     service = BarberService.query.get(service_id) if service_id else None
-    service_name = service.name if service else request.form.get('service_name', 'Haircut')
+    service_name = service.name if service else request.form.get('service_name', 'Signature Haircut')
     price = service.price if service else 35.0
 
     booking = BarberBooking(
@@ -168,6 +180,17 @@ def book_service():
     db.session.commit()
 
     flash(f"Appointment booked successfully for {service_name}!", "success")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/cancel-booking/<int:booking_id>', methods=['POST'])
+def cancel_booking(booking_id):
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    booking = BarberBooking.query.get_or_404(booking_id)
+    if booking.customer_id == session['customer_id']:
+        booking.status = "Cancelled"
+        db.session.commit()
+        flash("Booking cancelled successfully.", "info")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
