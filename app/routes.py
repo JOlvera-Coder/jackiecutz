@@ -15,8 +15,17 @@ Appointment = BarberBooking
 
 main_bp = Blueprint('main', __name__)
 
-# Standard Studio Operating Hours Slots: 10:00 AM - 7:00 PM
-DEFAULT_TIME_SLOTS = [
+# --- ONLINE SCHEDULE RULES (Cutoff 30 mins prior to close) ---
+# Tue - Thu (Closes 6:00 PM): Last online slot 5:30 PM (16 slots)
+ONLINE_WEEKDAY_SLOTS = [
+    "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+    "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
+    "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
+    "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM"
+]
+
+# Fri - Sat (Closes 7:00 PM): Last online slot 6:30 PM (18 slots)
+ONLINE_WEEKEND_SLOTS = [
     "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
     "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
     "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
@@ -24,7 +33,9 @@ DEFAULT_TIME_SLOTS = [
     "06:00 PM", "06:30 PM"
 ]
 
-# Default Service Menu Fallback
+DEFAULT_TIME_SLOTS = ONLINE_WEEKEND_SLOTS
+
+# Service Fallback Menu
 FALLBACK_SERVICES = [
     {"id": 1, "name": "Studio Signature Haircut", "price": 35.0, "duration": 30, "category": "Haircuts"},
     {"id": 2, "name": "Skin Fade & Line Up", "price": 40.0, "duration": 35, "category": "Haircuts"},
@@ -118,7 +129,6 @@ def login():
         password = request.form.get('password', '').strip()
         remember = bool(request.form.get('remember'))
 
-        # Check Staff / Stylist User first
         user = User.query.filter(
             (User.username == identifier) | (User.email == identifier)
         ).first()
@@ -129,7 +139,6 @@ def login():
                 return redirect(url_for('main.stylist_dashboard'))
             return redirect(url_for('main.customer_portal'))
 
-        # Check Customer profile by Phone, Username, or Name
         customer = Customer.query.filter(
             (Customer.phone == identifier) | (Customer.username == identifier) | (Customer.name == identifier)
         ).first()
@@ -156,7 +165,7 @@ def logout():
         logout_user()
     return redirect(url_for('main.login'))
 
-# --- CUSTOMER PORTAL & APPOINTMENT ACTIONS ---
+# --- CUSTOMER PORTAL & ONLINE APPOINTMENT ACTIONS ---
 
 @main_bp.route('/customer/portal', endpoint='customer_portal')
 @main_bp.route('/portal', endpoint='client_portal')
@@ -194,11 +203,11 @@ def customer_portal():
 
 @main_bp.route('/book', methods=['POST'])
 def book_service():
-    name = request.form.get('name', '').strip()
-    phone = request.form.get('phone', '').strip()
+    name = request.form.get('name', request.form.get('full_name', '')).strip()
+    phone = request.form.get('phone', request.form.get('phone_number', '')).strip()
     service_id = request.form.get('service_id')
-    appointment_date = request.form.get('appointment_date')
-    time_slot = request.form.get('time_slot')
+    appointment_date = request.form.get('appointment_date', request.form.get('booking_date'))
+    time_slot = request.form.get('time_slot', request.form.get('scheduled_time'))
     notes = request.form.get('notes', '')
     payment_method = request.form.get('payment_method', 'card_hold')
 
@@ -220,7 +229,7 @@ def book_service():
             db.session.commit()
         session['customer_id'] = customer.id
 
-    service = BarberService.query.get(service_id) if (service_id and service_id.isdigit()) else None
+    service = BarberService.query.get(service_id) if (service_id and str(service_id).isdigit()) else None
     service_name = service.name if service else 'Studio Signature Haircut'
     service_price = service.price if service else 35.0
 
@@ -246,7 +255,7 @@ def book_service():
     flash('Your appointment has been successfully scheduled!', 'success')
     return redirect(url_for('main.customer_portal'))
 
-# --- STYLIST DASHBOARD & COMMAND CENTER ---
+# --- STYLIST COMMAND CENTER & POS ---
 
 @main_bp.route('/stylist/dashboard', endpoint='stylist_dashboard')
 @main_bp.route('/barber/dashboard', endpoint='barber_dashboard')
@@ -340,7 +349,7 @@ def export_tax_csv():
         headers={"Content-Disposition": "attachment;filename=jackiecutz_tax_report_2026.csv"}
     )
 
-# --- KIOSK & CHECK-IN ---
+# --- WALK-IN KIOSK (FULL DISCRETION: ALWAYS OPEN FOR WALK-IN CHECK-INS) ---
 
 @main_bp.route('/kiosk', methods=['GET', 'POST'], endpoint='walkin_kiosk')
 @main_bp.route('/walkin_kiosk', methods=['GET', 'POST'], endpoint='kiosk')
@@ -349,7 +358,30 @@ def walkin_kiosk():
         name = request.form.get('name', '').strip()
         phone = request.form.get('phone', '').strip()
         service_id = request.form.get('service_id')
-        flash('Checked in successfully!', 'success')
+
+        # Create or find walk-in client profile
+        customer = Customer.query.filter_by(phone=phone).first() if phone else None
+        if not customer and (name or phone):
+            customer = Customer(name=name or 'Walk-in Client', phone=phone or 'N/A')
+            db.session.add(customer)
+            db.session.commit()
+
+        # Add walk-in directly to the studio queue/bookings at current chair time
+        service = BarberService.query.get(service_id) if (service_id and str(service_id).isdigit()) else None
+        walkin_booking = BarberBooking(
+            customer_id=customer.id if customer else 1,
+            service_id=service.id if service else 1,
+            service_name=service.name if service else 'Studio Walk-In Cut',
+            price=service.price if service else 35.0,
+            appointment_time=datetime.now(),
+            status='Walk-In Queue',
+            payment_method='In-Person (Stylist Discretion)',
+            notes='Direct Walk-in / Kiosk Check-In'
+        )
+        db.session.add(walkin_booking)
+        db.session.commit()
+
+        flash('Walk-in checked in successfully!', 'success')
         return render_template('kiosk_success.html') if os.path.exists('app/templates/kiosk_success.html') else redirect(url_for('main.walkin_kiosk'))
 
     services = get_services_list()
@@ -360,37 +392,61 @@ def auto_checkin():
     flash('Client auto-checked in via Bluetooth/Geofence.', 'success')
     return redirect(url_for('main.customer_portal'))
 
-# --- DYNAMIC OPERATING HOURS TIME SLOTS API ---
+# --- REAL-TIME ONLINE BOOKING SLOTS (30 MIN PRE-CLOSE CUTOFF) ---
 
 @main_bp.route('/api/available-slots')
 def available_slots():
     date_str = request.args.get('date')
     if not date_str:
-        return jsonify({'slots': DEFAULT_TIME_SLOTS, 'is_closed': False})
+        return jsonify({
+            'slots': ONLINE_WEEKEND_SLOTS,
+            'time_slots': ONLINE_WEEKEND_SLOTS,
+            'closed': False,
+            'is_closed': False,
+            'count': len(ONLINE_WEEKEND_SLOTS)
+        })
 
     try:
         req_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-        # Sunday=6, Monday=0 (Closed)
+        # Sunday (6), Monday (0): Closed for online bookings
         if req_date.weekday() in [0, 6]:
-            return jsonify({'slots': [], 'is_closed': True})
+            return jsonify({
+                'slots': [],
+                'time_slots': [],
+                'closed': True,
+                'is_closed': True,
+                'count': 0
+            })
         
-        # Tuesday, Wednesday, Thursday: 10:00 AM - 6:00 PM
+        # Tuesday (1), Wednesday (2), Thursday (3): Closes 6:00 PM -> Online slots cut off at 5:30 PM
         if req_date.weekday() in [1, 2, 3]:
-            weekday_slots = [
-                "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
-                "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
-                "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
-                "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM"
-            ]
-            return jsonify({'slots': weekday_slots, 'is_closed': False})
+            return jsonify({
+                'slots': ONLINE_WEEKDAY_SLOTS,
+                'time_slots': ONLINE_WEEKDAY_SLOTS,
+                'closed': False,
+                'is_closed': False,
+                'count': len(ONLINE_WEEKDAY_SLOTS)
+            })
             
-        # Friday, Saturday: 10:00 AM - 7:00 PM
+        # Friday (4), Saturday (5): Closes 7:00 PM -> Online slots cut off at 6:30 PM
         if req_date.weekday() in [4, 5]:
-            return jsonify({'slots': DEFAULT_TIME_SLOTS, 'is_closed': False})
+            return jsonify({
+                'slots': ONLINE_WEEKEND_SLOTS,
+                'time_slots': ONLINE_WEEKEND_SLOTS,
+                'closed': False,
+                'is_closed': False,
+                'count': len(ONLINE_WEEKEND_SLOTS)
+            })
     except Exception:
         pass
 
-    return jsonify({'slots': DEFAULT_TIME_SLOTS, 'is_closed': False})
+    return jsonify({
+        'slots': ONLINE_WEEKEND_SLOTS,
+        'time_slots': ONLINE_WEEKEND_SLOTS,
+        'closed': False,
+        'is_closed': False,
+        'count': len(ONLINE_WEEKEND_SLOTS)
+    })
 
 @main_bp.route('/update_profile', methods=['POST'])
 def update_profile():
