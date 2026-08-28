@@ -13,7 +13,10 @@
             --gold-bright: #fff0b3;
             --gold-primary: #e6c36a;
             --gold-deep: #b88628;
+            --gold-shadow: #54390b;
             --bg-jet-black: #000000;
+            --card-jet-black: #080808;
+            --input-jet-black: #111111;
         }
 
         html, body {
@@ -25,6 +28,7 @@
             min-height: 100vh;
         }
 
+        /* Pure Studio Artwork Container (Seamless Jet Black, No Outlines) */
         .studio-logo-banner {
             width: 100%;
             max-width: 480px;
@@ -66,7 +70,7 @@
         .gold-input {
             width: 100%;
             padding: 12px 14px;
-            background: #111111;
+            background: var(--input-jet-black);
             border: 1px solid #201a12;
             border-radius: 8px;
             color: #fff0b3;
@@ -89,6 +93,39 @@
             text-transform: uppercase;
             display: block;
             margin-bottom: 6px;
+        }
+
+        /* Available Live Time Slots Button Styling */
+        .time-slot-btn, button[data-slot], [id^="slot-"], .slot-btn {
+            background: #14120c !important;
+            color: #fae498 !important;
+            border: 1px solid #c89e4b !important;
+            font-size: 0.78rem !important;
+            font-weight: 700 !important;
+            border-radius: 9999px !important;
+            padding: 8px 10px !important;
+            text-align: center !important;
+            transition: all 0.2s ease-in-out !important;
+            cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .time-slot-btn:hover, button[data-slot]:hover, [id^="slot-"]:hover, .slot-btn:hover {
+            background: linear-gradient(135deg, #fff3cc 0%, #e6c36a 40%, #b88628 100%) !important;
+            color: #000000 !important;
+            border-color: #fff0b3 !important;
+            box-shadow: 0 0 14px rgba(230, 195, 106, 0.6) !important;
+            transform: translateY(-1px);
+        }
+
+        .time-slot-btn.selected, .time-slot-btn.active, button[data-slot].selected, [id^="slot-"].selected, .slot-btn.selected {
+            background: linear-gradient(135deg, #fff3cc 0%, #e6c36a 30%, #d4af37 60%, #9e7526 100%) !important;
+            color: #000000 !important;
+            font-weight: 800 !important;
+            border-color: #fff0b3 !important;
+            box-shadow: 0 0 18px rgba(230, 195, 106, 0.85) !important;
         }
 
         input:-webkit-autofill,
