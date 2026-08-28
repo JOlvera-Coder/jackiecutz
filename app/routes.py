@@ -4,9 +4,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import (
-    User, Customer, Booking as Appointment, BarberService, 
-    BusinessSettings, Product, FamilyMember, WalkInQueue
+    User, Customer, FamilyMember, BarberService, 
+    BarberBooking, Product, ExpenseCategory, StudioExpense
 )
+
+# Alias for backwards compatibility across routes
+Appointment = BarberBooking
 
 main_bp = Blueprint('main', __name__)
 
@@ -40,11 +43,11 @@ def login():
 
         if user and user.check_password(password):
             login_user(user, remember=remember)
-            if user.role in ['stylist', 'admin', 'owner', 'barber']:
+            if hasattr(user, 'role') and user.role in ['stylist', 'admin', 'owner', 'barber']:
                 return redirect(url_for('main.stylist_dashboard'))
             return redirect(url_for('main.customer_portal'))
 
-        # Check Customer profile by Phone or Name
+        # Check Customer profile by Phone, Username, or Name
         customer = Customer.query.filter(
             (Customer.phone == identifier) | (Customer.username == identifier) | (Customer.name == identifier)
         ).first()
@@ -76,17 +79,23 @@ def logout():
 def customer_portal():
     customer = None
     if current_user.is_authenticated:
-        customer = Customer.query.filter_by(user_id=current_user.id).first()
+        customer = Customer.query.filter_by(user_id=current_user.id).first() if hasattr(Customer, 'user_id') else None
     elif 'customer_id' in session:
         customer = Customer.query.get(session['customer_id'])
 
     services = BarberService.query.filter_by(is_active=True).all() if hasattr(BarberService, 'is_active') else BarberService.query.all()
-    products = Product.query.filter_by(is_active=True).all() if hasattr(Product, 'is_active') else []
+    products = Product.query.filter_by(is_active=True).all() if hasattr(Product, 'is_active') else Product.query.all()
     
     user_bookings = []
     family_members = []
     if customer:
-        user_bookings = Appointment.query.filter_by(customer_id=customer.id).order_by(Appointment.appointment_time.desc()).limit(10).all()
+        if hasattr(BarberBooking, 'appointment_time'):
+            user_bookings = BarberBooking.query.filter_by(customer_id=customer.id).order_by(BarberBooking.appointment_time.desc()).limit(10).all()
+        elif hasattr(BarberBooking, 'date'):
+            user_bookings = BarberBooking.query.filter_by(customer_id=customer.id).order_by(BarberBooking.date.desc()).limit(10).all()
+        else:
+            user_bookings = BarberBooking.query.filter_by(customer_id=customer.id).limit(10).all()
+        
         family_members = FamilyMember.query.filter_by(customer_id=customer.id).all() if hasattr(FamilyMember, 'customer_id') else []
 
     return render_template(
@@ -114,7 +123,7 @@ def book_service():
         return redirect(url_for('main.customer_portal'))
 
     customer = None
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and hasattr(Customer, 'user_id'):
         customer = Customer.query.filter_by(user_id=current_user.id).first()
     elif 'customer_id' in session:
         customer = Customer.query.get(session['customer_id'])
@@ -137,15 +146,15 @@ def book_service():
     except Exception:
         appointment_dt = datetime.now()
 
-    appt = Appointment(
+    appt = BarberBooking(
         customer_id=customer.id,
         service_id=service.id if service else None,
-        service_name=service_name,
-        price=service_price,
-        appointment_time=appointment_dt,
-        status='Booked',
-        payment_method=payment_method,
-        notes=notes
+        service_name=service_name if hasattr(BarberBooking, 'service_name') else None,
+        price=service_price if hasattr(BarberBooking, 'price') else None,
+        appointment_time=appointment_dt if hasattr(BarberBooking, 'appointment_time') else None,
+        status='Booked' if hasattr(BarberBooking, 'status') else None,
+        payment_method=payment_method if hasattr(BarberBooking, 'payment_method') else None,
+        notes=notes if hasattr(BarberBooking, 'notes') else None
     )
     db.session.add(appt)
     db.session.commit()
@@ -155,14 +164,12 @@ def book_service():
 
 @main_bp.route('/stylist/dashboard')
 def stylist_dashboard():
-    appointments = Appointment.query.order_by(Appointment.appointment_time.asc()).all()
+    appointments = BarberBooking.query.all()
     services = BarberService.query.all()
-    walkins = WalkInQueue.query.filter_by(status='Waiting').all() if hasattr(WalkInQueue, 'status') else []
     return render_template(
         'stylist_dashboard.html' if os.path.exists('app/templates/stylist_dashboard.html') else 'booking.html',
         appointments=appointments,
-        services=services,
-        walkins=walkins
+        services=services
     )
 
 @main_bp.route('/kiosk')
