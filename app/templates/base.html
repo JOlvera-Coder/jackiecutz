@@ -48,33 +48,34 @@
             background: #000000 !important;
         }
 
-        /* Confirm & Reserve Spot Button: Bright Luminous Metallic Champagne Gold */
+        /* Confirm & Reserve Spot Button: Bright Metallic Champagne Gold */
+        #btn-submit-booking,
+        button#btn-submit-booking,
         .gold-btn, 
         .gold-metallic-bg,
-        #btn-submit-booking,
         button[type="submit"]:has(#txt-btn-submit),
-        button:contains("CONFIRM & RESERVE SPOT"),
-        div:has(> #btn-submit-booking) button,
-        button.w-full.py-4 {
-            background: linear-gradient(135deg, #ffffff 0%, #fff2cb 22%, #e5c16d 50%, #c39634 78%, #785213 100%) !important;
+        div:has(> #btn-submit-booking) button {
+            background: linear-gradient(135deg, #ffffff 0%, #fff2cb 25%, #e5c16d 52%, #c39634 80%, #785213 100%) !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             font-weight: 900 !important;
+            font-size: 0.88rem !important;
             border: 1.5px solid #ffffff !important;
             border-radius: 12px !important;
-            box-shadow: 0 6px 28px rgba(223, 186, 107, 0.6), 0 0 16px rgba(255, 242, 203, 0.5) inset !important;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-            transition: all 0.22s ease-in-out;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
+            box-shadow: 0 6px 28px rgba(223, 186, 107, 0.65), 0 0 16px rgba(255, 242, 203, 0.6) inset !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+            cursor: pointer !important;
+            transition: all 0.22s ease-in-out !important;
+            letter-spacing: 1.5px !important;
+            text-transform: uppercase !important;
+            opacity: 1 !important; /* Overrides the dull opacity-60 styling */
         }
 
+        #btn-submit-booking:hover,
         .gold-btn:hover, 
-        .gold-metallic-bg:hover,
-        #btn-submit-booking:hover {
+        .gold-metallic-bg:hover {
             background: linear-gradient(135deg, #ffffff 0%, #fff7dc 30%, #ebd08c 65%, #b5872a 100%) !important;
-            box-shadow: 0 8px 36px rgba(223, 186, 107, 0.9), 0 0 20px rgba(255, 255, 255, 0.8) inset !important;
+            box-shadow: 0 8px 36px rgba(223, 186, 107, 0.95), 0 0 20px rgba(255, 255, 255, 0.8) inset !important;
             transform: translateY(-2px);
         }
 
@@ -293,7 +294,6 @@
             visibility: visible !important;
         }
 
-        /* Bold Emphasis Inside Policy Notice */
         #txt-card-hold-desc strong,
         #txt-card-hold-desc b,
         p#txt-card-hold-desc strong,
