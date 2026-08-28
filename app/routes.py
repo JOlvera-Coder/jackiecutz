@@ -156,7 +156,28 @@ def update_profile():
         customer.email = request.form.get('email', customer.email).strip()
         customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
         db.session.commit()
-        flash("Profile updated successfully!", "success")
+        flash("Profile details updated successfully!", "success")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/update-credentials', methods=['POST'])
+def update_credentials():
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    customer = Customer.query.get(session['customer_id'])
+    if customer:
+        new_phone = clean_phone(request.form.get('phone', ''))
+        new_email = request.form.get('email', '').strip()
+        new_username = request.form.get('username', '').strip()
+
+        if new_phone and len(new_phone) >= 10:
+            customer.phone = new_phone
+        if new_email:
+            customer.email = new_email
+        if new_username:
+            customer.username = new_username
+
+        db.session.commit()
+        flash("Account credentials updated successfully!", "success")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/add-family-member', methods=['POST'])
