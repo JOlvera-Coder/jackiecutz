@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="10">
+    <title>Live TV Queue — Jackie Cutz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header img {
+            max-width: 480px;
+            width: 100%;
+            height: auto;
+        }
+
+        .tv-title {
+            color: #e5c158;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .tv-subtitle {
+            color: #8ec5fc;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .queue-container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .queue-card {
+            background: #0a0a0a;
+            border: 1.5px solid #d4af37;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        }
+
+        .section-header {
+            font-size: 1.25rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-chair {
+            color: #2ecc71;
+            border-bottom: 1.5px solid rgba(46, 204, 113, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .section-waiting {
+            color: #e5c158;
+            border-bottom: 1.5px solid rgba(229, 193, 88, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .list-item {
+            background: #141414;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .client-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .service-tag {
+            color: #8ec5fc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .position-badge {
+            background: linear-gradient(180deg, #e5c158 0%, #b8860b 100%);
+            color: #000000;
+            font-weight: 900;
+            font-size: 1.2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-state {
+            color: #8c9ba5;
+            font-size: 0.95rem;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackie Cutz">
+        <div class="tv-title">LIVE CHAIR & WAITLIST BOARD</div>
+        <div class="tv-subtitle">Auto-updating every 10 seconds</div>
+    </div>
+
+    <div class="queue-container">
+        <!-- In Chair Now -->
+        <div class="queue-card">
+            <div class="section-header section-chair">✂️ IN CHAIR NOW</div>
+            {% set in_chair = clients | selectattr("status", "equalto", "in_chair") | list if clients else [] %}
+            {% if in_chair %}
+                {% for c in in_chair %}
+                <div class="list-item" style="border-color: #2ecc71;">
+                    <div>
+                        <div class="client-name">{{ c.first_name }} {{ c.last_name[0] ~ '.' if c.last_name else '' }}</div>
+                        <div class="service-tag">{{ c.service.name if c.service else 'Standard Cut' }}</div>
+                    </div>
+                    <span style="color: #2ecc71; font-weight: 800; font-size: 0.9rem;">SERVICING</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">No client in chair currently</div>
+            {% endif %}
+        </div>
+
+        <!-- Waiting in Queue -->
+        <div class="queue-card">
+            <div class="section-header section-waiting">⏳ NEXT IN LINE</div>
+            {% set waiting = clients | selectattr("status", "equalto", "waiting") | list if clients else [] %}
+            {% if waiting %}
+                {% for c in waiting %}
+                <div class="list-item">
+                    <div>
+                        <div class="client-name">{{ c.first_name }} {{ c.last_name[0] ~ '.' if c.last_name else '' }}</div>
+                        <div class="service-tag">{{ c.service.name if c.service else 'Haircut Service' }}</div>
+                    </div>
+                    <div class="position-badge">#{{ loop.index }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">No waitlist — Walk-ins welcome!</div>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+</html>
