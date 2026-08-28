@@ -1,97 +1,140 @@
 {% extends 'base.html' %}
-{% block title %}Create Account | Jackiecutz Hair Studio{% endblock %}
 
 {% block content %}
-<div style="max-width: 520px; margin: 30px auto; padding: 0 16px; text-align: center;">
+<div class="min-h-screen flex flex-col items-center justify-center p-4 bg-black">
 
-  <!-- Studio Graphic Artwork Card -->
-  <div style="margin-bottom: 24px; border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,0.9); border: 1px solid #29241b;">
-    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio" style="width: 100%; height: auto; display: block;">
-  </div>
-
-  <!-- Registration Card -->
-  <div style="background: #0d0d0d; border: 1px solid #29241b; border-radius: 20px; padding: 28px 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: left;">
-    <h2 style="color: #fae498; text-align: center; font-size: 1.3rem; margin-top: 0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px;">
-      Client Registration
-    </h2>
-    <p style="color: #a0a0a0; text-align: center; font-size: 0.85rem; margin-bottom: 22px;">
-      Create your studio profile for fast appointment booking.
-    </p>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, msg in messages %}
-          <div style="padding: 12px; margin-bottom: 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-align: center;
-                      {% if category == 'danger' or category == 'error' %}background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid #dc3545;
-                      {% elif category == 'warning' %}background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid #ffc107;
-                      {% else %}background: rgba(40, 167, 69, 0.2); color: #51cf66; border: 1px solid #28a745;{% endif %}">
-            {{ msg }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-    <form method="POST" action="{{ url_for('main.register') }}" autocomplete="off">
-      <div style="margin-bottom: 16px;">
-        <label class="gold-label">Username (Optional Handle)</label>
-        <input type="text" name="username" class="gold-input" placeholder="e.g. IOlvera" value="{{ form_data.username if form_data else '' }}">
-      </div>
-
-      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-        <div style="flex: 1;">
-          <label class="gold-label">First Name *</label>
-          <input type="text" name="first_name" class="gold-input" placeholder="First Name" required value="{{ form_data.first_name if form_data else '' }}">
-        </div>
-        <div style="flex: 1;">
-          <label class="gold-label">Last Name</label>
-          <input type="text" name="last_name" class="gold-input" placeholder="Last Name" value="{{ form_data.last_name if form_data else '' }}">
-        </div>
-      </div>
-
-      <div style="margin-bottom: 16px;">
-        <label class="gold-label">Phone Number *</label>
-        <input type="tel" name="phone" class="gold-input" placeholder="832-000-0000" required value="{{ form_data.phone if form_data else '' }}">
-      </div>
-
-      <div style="margin-bottom: 16px;">
-        <label class="gold-label">Email Address</label>
-        <input type="email" name="email" class="gold-input" placeholder="name@example.com" value="{{ form_data.email if form_data else '' }}">
-      </div>
-
-      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-        <div style="flex: 1;">
-          <label class="gold-label">Zip Code *</label>
-          <input type="text" name="zip_code" class="gold-input" placeholder="77073" required value="{{ form_data.zip_code if form_data else '77073' }}">
-        </div>
-        <div style="flex: 1;">
-          <label class="gold-label">Gender</label>
-          <select name="gender" class="gold-input">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="margin-bottom: 22px;">
-        <label class="gold-label">Birthday (Optional)</label>
-        <input type="date" name="birthday" class="gold-input" value="{{ form_data.birthday if form_data else '' }}">
-      </div>
-
-      <button type="submit" class="gold-btn" style="width: 100%; padding: 16px;">
-        Create Account ✂️
-      </button>
-    </form>
-
-    <div style="margin-top: 20px; font-size: 0.85rem; color: #888; text-align: center;">
-      Already have an account? <a href="{{ url_for('main.login') }}" style="color: #fae498; text-decoration: none; font-weight: 700;">Sign In</a>
+    <!-- Jackiecutz Header Logo with Stars -->
+    <div class="w-full max-w-md flex justify-center mb-6">
+        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" 
+             alt="Jackiecutz Hair Studio - Ivonne Gonzalez" 
+             class="w-full max-w-sm object-contain drop-shadow-2xl">
     </div>
 
-    <div style="margin-top: 14px; font-size: 0.75rem; color: #666; text-align: center;">
-      By signing up, you agree to our 
-      <a href="{{ url_for('main.terms') }}" style="color: #c89e4b; text-decoration: underline;">Terms</a> and 
-      <a href="{{ url_for('main.privacy') }}" style="color: #c89e4b; text-decoration: underline;">Privacy Policy</a>.
+    <!-- Registration Card (Identical Width & Aesthetic as Login) -->
+    <div class="w-full max-w-md bg-black border border-amber-400/40 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-amber-500/10">
+
+        <!-- Title & Subtitle -->
+        <div class="text-center mb-5">
+            <h2 class="text-lg font-black uppercase text-amber-400 tracking-wider">CLIENT REGISTRATION</h2>
+            <p class="text-xs text-zinc-400 mt-1">Create your studio profile for fast appointment booking.</p>
+        </div>
+
+        <!-- Flash Alert Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-3 rounded-xl text-xs font-bold text-center {% if category == 'danger' %}bg-red-500/20 text-red-400 border border-red-500/30{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Registration Form -->
+        <form method="POST" action="{{ url_for('main.register') }}" class="space-y-4 text-left">
+            
+            <!-- Username -->
+            <div>
+                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    USERNAME (OPTIONAL HANDLE)
+                </label>
+                <input type="text" name="username" placeholder="e.g. IOlvera"
+                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+            </div>
+
+            <!-- Name Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                        FIRST NAME *
+                    </label>
+                    <input type="text" name="first_name" required placeholder="First Name"
+                           class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                        LAST NAME
+                    </label>
+                    <input type="text" name="last_name" placeholder="Last Name"
+                           class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div>
+                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    PHONE NUMBER *
+                </label>
+                <input type="tel" name="phone" required placeholder="832-000-0000"
+                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+            </div>
+
+            <!-- Email Address -->
+            <div>
+                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    EMAIL ADDRESS
+                </label>
+                <input type="email" name="email" placeholder="name@example.com"
+                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+            </div>
+
+            <!-- Zip Code & Gender -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                        ZIP CODE *
+                    </label>
+                    <input type="text" name="zip_code" placeholder="77073" value="77073"
+                           class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400 placeholder-zinc-400">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                        GENDER
+                    </label>
+                    <select name="gender" 
+                            class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Birthday -->
+            <div>
+                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                    BIRTHDAY (OPTIONAL)
+                </label>
+                <input type="date" name="birthday"
+                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400">
+            </div>
+
+            <!-- Gold Metallic Button with Glow -->
+            <div class="pt-2">
+                <button type="submit" 
+                        class="w-full py-3 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
+                    CREATE ACCOUNT ✂️
+                </button>
+            </div>
+        </form>
+
+        <!-- Footer Back to Login -->
+        <div class="pt-5 mt-4 border-t border-zinc-900 text-center space-y-2">
+            <p class="text-xs text-zinc-300">
+                Already have an account? 
+                <a href="{{ url_for('main.login') }}" class="font-bold text-white underline hover:text-amber-400 transition">
+                    Log In
+                </a>
+            </p>
+            <p class="text-[11px] text-zinc-300 leading-tight">
+                By registering, you agree to our 
+                <a href="{{ url_for('main.terms') }}" class="underline hover:text-amber-400">Terms & Conditions</a> 
+                and 
+                <a href="{{ url_for('main.privacy') }}" class="underline hover:text-amber-400">Privacy Policy</a>.
+            </p>
+        </div>
+
     </div>
-  </div>
 </div>
 {% endblock %}
