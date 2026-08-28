@@ -70,7 +70,7 @@
         }
 
         /* Matching Champagne Ivory Input Fields (#fffaea) */
-        .gold-input, input[type="text"], input[type="tel"], input[type="email"], input[type="date"], select {
+        .gold-input, input[type="text"], input[type="tel"], input[type="email"], input[type="date"], select, textarea {
             background: #fffaea !important;
             color: #000000 !important;
             border: 1px solid #d8b056 !important;
@@ -87,23 +87,20 @@
             margin-bottom: 6px;
         }
 
-        /* Force Pure Black High-Contrast Visible Text for Every Slot Button & Child Element */
-        #slots-container button,
-        #time-slots-container button,
+        /* Live Time Slot Pills - Exact Match to #fffaea Input Tabs */
+        #slots-container button, 
+        #time-slots-container button, 
         #slots-grid button,
-        .time-slot-btn,
-        .slot-btn,
-        button[data-slot],
+        .time-slot-btn, 
+        .slot-btn, 
+        button[data-slot], 
         button[data-time],
-        [id^="slot-"],
-        [class*="slot"] button,
-        div[class*="slot"] button {
+        [id^="slot-"] {
             background-color: #fffaea !important;
             background: #fffaea !important;
             color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
             border: 1px solid #d8b056 !important;
-            font-size: 0.8rem !important;
+            font-size: 0.78rem !important;
             font-weight: 800 !important;
             border-radius: 9999px !important;
             padding: 8px 10px !important;
@@ -114,63 +111,115 @@
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            line-height: 1 !important;
         }
 
-        /* Deep Target for Text Content Inside the Slot Pills */
-        #slots-container button *,
-        #time-slots-container button *,
+        /* Slot Buttons Text/Spans */
+        #slots-container button *, 
+        #time-slots-container button *, 
         #slots-grid button *,
-        .time-slot-btn *,
-        .slot-btn *,
-        button[data-slot] *,
+        .time-slot-btn *, 
+        .slot-btn *, 
+        button[data-slot] *, 
         button[data-time] *,
         [id^="slot-"] * {
             color: #000000 !important;
-            -webkit-text-fill-color: #000000 !important;
             font-weight: 800 !important;
-            font-size: 0.8rem !important;
-            line-height: 1 !important;
-            display: inline-block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+            font-size: 0.78rem !important;
         }
 
-        /* Slot Hover State */
-        #slots-container button:hover,
-        #time-slots-container button:hover,
-        #slots-grid button:hover,
-        .time-slot-btn:hover,
-        .slot-btn:hover,
-        button[data-slot]:hover,
-        button[data-time]:hover,
-        [id^="slot-"]:hover {
-            background: #ffffff !important;
+        /* 1. "+ Add Additional Person / Child" Tab Styling (#fffaea Cream) */
+        button[id*="add-person"],
+        button[id*="add-child"],
+        button[onclick*="addPerson"],
+        button[onclick*="addChild"],
+        #btn-add-person,
+        .btn-add-client,
+        form button:has(span:contains("Add Additional Person")),
+        div:has(> button:contains("Add Additional Person")) button {
+            background-color: #fffaea !important;
+            background: #fffaea !important;
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
-            border-color: #ffffff !important;
-            box-shadow: 0 0 16px rgba(223, 186, 107, 0.7) !important;
-            transform: translateY(-1px);
+            border: 1px solid #d8b056 !important;
+            font-weight: 800 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 8px rgba(216, 176, 86, 0.25) !important;
+            transition: all 0.2s ease-in-out !important;
         }
 
-        /* Slot Active/Selected State */
-        #slots-container button.selected,
-        #time-slots-container button.selected,
-        #slots-grid button.selected,
-        #slots-container button.active,
-        #time-slots-container button.active,
-        .time-slot-btn.selected,
-        .time-slot-btn.active,
-        .slot-btn.selected,
-        button[data-slot].selected,
-        button[data-time].selected,
-        [id^="slot-"].selected {
-            background: linear-gradient(135deg, #ffffff 0%, #e5c16d 45%, #b5872a 100%) !important;
+        /* Universal catch for "+ Add Additional Person / Child" */
+        button:is([id*="add"], [class*="add"]) {
+            background-color: #fffaea !important;
+            color: #000000 !important;
+            border-color: #d8b056 !important;
+            font-weight: 800 !important;
+        }
+
+        /* 2. Payment Method Tabs (Card Hold, Zelle, Cash App, In-Salon) */
+        div[id*="pay-method"] button,
+        div[class*="grid-cols-4"] button,
+        div[class*="grid-cols-2"] button[data-pay],
+        button[id^="pay-"],
+        button[data-payment],
+        .payment-tab,
+        .pay-option,
+        label:has(input[name="payment_method"]),
+        div:has(> input[name="payment_method"]) {
+            background-color: #fffaea !important;
+            background: #fffaea !important;
+            color: #000000 !important;
+            border: 1px solid #d8b056 !important;
+            font-weight: 800 !important;
+            border-radius: 14px !important;
+            box-shadow: 0 2px 6px rgba(216, 176, 86, 0.2) !important;
+            transition: all 0.2s ease-in-out !important;
+        }
+
+        /* Payment Tab Text Elements */
+        div[id*="pay-method"] button *,
+        div[class*="grid-cols-4"] button *,
+        button[id^="pay-"] *,
+        button[data-payment] *,
+        .payment-tab *,
+        .pay-option * {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            font-weight: 800 !important;
+        }
+
+        /* Payment Tab Selected/Active State (Highlighted Gold Ring) */
+        div[id*="pay-method"] button.selected,
+        button[id^="pay-"].active,
+        button[data-payment].active,
+        .payment-tab.selected,
+        .pay-option.selected {
+            background: linear-gradient(135deg, #ffffff 0%, #fff2cb 50%, #e5c16d 100%) !important;
+            border: 2px solid #ffffff !important;
+            box-shadow: 0 0 16px rgba(223, 186, 107, 0.7) !important;
+        }
+
+        /* 3. "Estimated Total (Pay Upon Service)" Bar */
+        div[id*="total-container"],
+        div[class*="total"],
+        div:has(> #booking-total-price),
+        div:has(> span:contains("ESTIMATED TOTAL")),
+        div:has(> p:contains("ESTIMATED TOTAL")) {
+            background-color: #fffaea !important;
+            background: #fffaea !important;
+            border: 1px solid #d8b056 !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 2px 8px rgba(216, 176, 86, 0.25) !important;
+        }
+
+        /* Estimated Total Bar Typography */
+        div[id*="total-container"] *,
+        div[class*="total"] *,
+        #booking-total-price,
+        span[id*="total"],
+        p[id*="total"] {
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             font-weight: 900 !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0 0 20px rgba(223, 186, 107, 0.95), 0 0 8px #ffffff inset !important;
         }
     </style>
 </head>
