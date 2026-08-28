@@ -6,7 +6,7 @@
     <title>{% block title %}Jackiecutz Hair Studio{% endblock %}</title>
     <!-- Tailwind CSS CDN for grid & component styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -87,7 +87,7 @@
             margin-bottom: 6px;
         }
 
-        /* Available Live Time Slots (Exact Match to #fffaea Date Input Tab) */
+        /* Live Time Slot Pills - Exact Match to #fffaea Input Tabs & Clear Text */
         #slots-container button, 
         #time-slots-container button, 
         #slots-grid button,
@@ -96,13 +96,14 @@
         button[data-slot], 
         button[data-time],
         [id^="slot-"] {
+            background-color: #fffaea !important;
             background: #fffaea !important;
             color: #000000 !important;
             border: 1px solid #d8b056 !important;
-            font-size: 0.82rem !important;
+            font-size: 0.78rem !important;
             font-weight: 800 !important;
             border-radius: 9999px !important;
-            padding: 8px 12px !important;
+            padding: 8px 10px !important;
             text-align: center !important;
             box-shadow: 0 2px 6px rgba(216, 176, 86, 0.2) !important;
             transition: all 0.2s ease-in-out !important;
@@ -112,7 +113,21 @@
             justify-content: center !important;
         }
 
-        /* Slot Hover State (Illuminated White Gold Glow) */
+        /* Enforce Dark Black Bold Text for Inner Text/Spans */
+        #slots-container button *, 
+        #time-slots-container button *, 
+        #slots-grid button *,
+        .time-slot-btn *, 
+        .slot-btn *, 
+        button[data-slot] *, 
+        button[data-time] *,
+        [id^="slot-"] * {
+            color: #000000 !important;
+            font-weight: 800 !important;
+            font-size: 0.78rem !important;
+        }
+
+        /* Slot Hover State */
         #slots-container button:hover, 
         #time-slots-container button:hover, 
         #slots-grid button:hover,
@@ -128,7 +143,7 @@
             transform: translateY(-1px);
         }
 
-        /* Slot Active/Selected State (Solid Metallic Gold with Clear Text) */
+        /* Slot Active/Selected State (Solid Metallic Champagne Gold) */
         #slots-container button.selected, 
         #time-slots-container button.selected, 
         #slots-grid button.selected,
