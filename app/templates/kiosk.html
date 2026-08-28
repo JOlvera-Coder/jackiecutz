@@ -7,7 +7,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -24,53 +24,65 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 35px 20px 60px 20px;
+            padding: 70px 20px 60px 20px;
         }
 
-        /* Branding Header */
+        /* Top Navigation / Toggle Bar */
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: #d4af37;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: #d4af37;
+            color: #000000;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(180deg, #e5c158 0%, #b8860b 100%);
+            color: #000000;
+            border-color: #e5c158;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Branding Header (Graphic Only) */
         .branding-header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
         .header-logo {
-            max-width: 290px;
+            max-width: 320px;
             width: 100%;
             height: auto;
-            margin-bottom: 8px;
             display: block;
-        }
-
-        .address-text {
-            color: #ff3333;
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .phone-text {
-            color: #d4af37;
-            font-size: 0.95rem;
-            font-weight: 800;
-            margin-top: 4px;
-            letter-spacing: 0.5px;
-        }
-
-        .signature-title {
-            font-family: 'Great Vibes', cursive;
-            font-size: 2.9rem;
-            color: #ffffff;
-            font-weight: 400;
-            margin-top: 6px;
-            letter-spacing: 1.5px;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
         }
 
         /* Gold Bordered Terminal Card */
@@ -212,15 +224,19 @@
 </head>
 <body>
 
-    <!-- Header Section -->
+    <!-- Workflow Toggle Bar -->
+    <nav class="top-navbar">
+        <a href="{{ url_for('main.walkin_kiosk') }}" class="nav-btn active">💈 Kiosk</a>
+        <a href="{{ url_for('main.stylist_dashboard') }}" class="nav-btn">✂️ Stylist</a>
+        <a href="{{ url_for('main.live_queue_display') }}" class="nav-btn" target="_blank">📺 Live TV</a>
+    </nav>
+
+    <!-- Header Section (Clean Graphic Emblem Only) -->
     <div class="branding-header">
         <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" class="header-logo" alt="Jackie Cutz">
-        <div class="address-text">📍 Divine Salon: 806-E Airtex Dr Suite 105, Houston, TX 77073.</div>
-        <div class="phone-text">📱 (832) 353-4577</div>
-        <div class="signature-title">Ivonne Gonzalez</div>
     </div>
 
-    <!-- Walk-In Check-In Terminal -->
+    <!-- Walk-In Check-In Terminal Card -->
     <div class="kiosk-card">
         <div class="terminal-title">WALK-IN CHECK-IN TERMINAL</div>
         <div class="terminal-subtitle">Please sign in to join today's active chair waitlist.</div>
