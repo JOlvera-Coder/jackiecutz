@@ -50,7 +50,6 @@ def privacy():
 
 # -------------------------------------------------------------
 # AUTHENTICATION & UNIVERSAL LOGIN
-# Matches Username, Name (e.g. 'Ian', 'Ivonne'), Phone, or Email
 # -------------------------------------------------------------
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -69,7 +68,6 @@ def login():
 
         clean_phone = ''.join(c for c in identifier if c.isdigit())
 
-        # Match username/name prefix, exact email, or phone number
         user = User.query.filter(
             or_(
                 func.lower(User.email) == identifier.lower(),
@@ -114,6 +112,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
+        # Direct route to booking page upon registration
         return redirect(url_for('main.client_dashboard'))
 
     return render_template('register.html')
@@ -159,6 +158,33 @@ def client_portal():
 @main_bp.route('/booking', methods=['GET', 'POST'])
 @login_required
 def booking():
+    if request.method == 'POST':
+        service_id = request.form.get('service_id')
+        appt_date_str = request.form.get('date')
+        appt_time = request.form.get('time', datetime.now().strftime("%I:%M %p"))
+
+        parsed_date = date.today()
+        if appt_date_str:
+            try:
+                parsed_date = datetime.strptime(appt_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                parsed_date = date.today()
+
+        new_appt = Appointment(
+            user_id=current_user.id,
+            client_name=current_user.name,
+            phone=current_user.phone,
+            email=current_user.email,
+            service_id=int(service_id) if service_id else None,
+            status='booked',
+            payment_status='in_app',
+            date=parsed_date,
+            time=appt_time
+        )
+        db.session.add(new_appt)
+        db.session.commit()
+        flash("Appointment successfully booked! When you arrive, you will be automatically checked in.", "success")
+
     return redirect(url_for('main.client_dashboard'))
 
 
@@ -192,7 +218,7 @@ def walkin_kiosk():
             client_name=full_name,
             phone=phone,
             email=email,
-            service_id=service_id if service_id else None,
+            service_id=int(service_id) if service_id else None,
             status='waiting',
             payment_status=payment_method,
             date=date.today(),
@@ -237,7 +263,7 @@ def live_queue_display():
 def stylist_dashboard():
     in_chair = Appointment.query.filter_by(status='in_chair').first()
     waiting_list = Appointment.query.filter(
-        Appointment.status.in_(['waiting', 'checked_in'])
+        Appointment.status.in_(['waiting', 'checked_in', 'booked'])
     ).order_by(Appointment.id.asc()).all()
     completed_today = Appointment.query.filter_by(status='completed').all()
 
@@ -253,13 +279,13 @@ def stylist_dashboard():
 @login_required
 def call_chair(appt_id):
     current_chair = Appointment.query.filter_by(status='in_chair').first()
-    if current_chair:
+    if current_chair and current_chair.id != appt_id:
         current_chair.status = 'completed'
 
     appt = Appointment.query.get_or_404(appt_id)
     appt.status = 'in_chair'
     db.session.commit()
-    flash(f"{appt.client_name} called to chair!", "success")
+    flash(f"{appt.client_name} is now in the chair!", "success")
     return redirect(url_for('main.stylist_dashboard'))
 
 
@@ -338,32 +364,41 @@ def export_tax_csv():
 
 # -------------------------------------------------------------
 # GEOFENCE AUTOMATIC CHECK-IN API
+# Detects nearby clients and flips status to 'checked_in'
 # -------------------------------------------------------------
 @main_bp.route('/api/geofence-checkin', methods=['POST'])
-@login_required
 def geofence_checkin():
     data = request.get_json() or {}
     user_lat = data.get('latitude')
     user_lon = data.get('longitude')
+    user_identifier = data.get('user_id')
 
     if user_lat is None or user_lon is None:
         return jsonify({'status': 'error', 'message': 'Coordinates missing.'}), 400
 
-    distance = calculate_haversine_distance(user_lat, user_lon, SALON_LATITUDE, SALON_LONGITUDE)
+    distance = calculate_haversine_distance(float(user_lat), float(user_lon), SALON_LATITUDE, SALON_LONGITUDE)
 
     if distance <= GEOFENCE_RADIUS_MILES:
-        appt = Appointment.query.filter_by(
-            user_id=current_user.id,
-            date=date.today(),
-            status='booked'
-        ).first()
+        # Check by current_user session or provided user_id
+        target_user_id = current_user.id if current_user.is_authenticated else user_identifier
+
+        query = Appointment.query.filter(
+            Appointment.date == date.today(),
+            Appointment.status == 'booked'
+        )
+        if target_user_id:
+            query = query.filter(Appointment.user_id == target_user_id)
+
+        appt = query.first()
 
         if appt:
             appt.status = 'checked_in'
             db.session.commit()
             return jsonify({
                 'status': 'checked_in',
-                'message': 'Welcome to Divine Salon! You are automatically checked into the chair queue.'
+                'client_name': appt.client_name,
+                'distance': round(distance, 2),
+                'message': 'Welcome to Divine Salon! You have been automatically checked into the chair queue.'
             })
 
     return jsonify({'status': 'out_of_range', 'distance': round(distance, 2)})
