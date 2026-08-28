@@ -1,582 +1,816 @@
 {% extends 'base.html' %}
-{% block title %}Client Portal | Jackiecutz Hair Studio{% endblock %}
-
+{% block title %}Jackiecutz Hair Studio | Ivonne Gonzalez{% endblock %}
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-6 pb-28 text-zinc-100">
+<div class="min-h-screen bg-black text-white flex flex-col items-center justify-center p-3 sm:p-6 selection:bg-amber-400 selection:text-black relative">
+    
+    <div class="max-w-xl w-full bg-black border border-amber-500/30 rounded-3xl p-4 sm:p-8 shadow-[0_0_60px_rgba(218,165,32,0.18)] text-center relative overflow-hidden">
+        
+        <!-- Top Navigation Bar -->
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-zinc-900">
+            <div class="flex items-center gap-2.5">
+                <button type="button" onclick="openDrawer()" class="p-1.5 rounded-xl bg-zinc-950 border border-amber-500/40 hover:border-amber-400 text-amber-400 hover:text-amber-300 transition flex flex-col justify-center items-center gap-1 w-9 h-9" title="Open Account Menu">
+                    <span class="w-4 h-0.5 bg-amber-400 rounded-full block"></span>
+                    <span class="w-4 h-0.5 bg-amber-400 rounded-full block"></span>
+                    <span class="w-4 h-0.5 bg-amber-400 rounded-full block"></span>
+                </button>
 
-  <!-- Studio Logo Banner -->
-  <div class="studio-logo-banner">
-    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio">
-  </div>
+                <span class="text-xs text-amber-400 font-bold" id="txt-welcome">Welcome, {{ session.get('user_name', 'Client') }} ✨</span>
+                {% if session.get('user_role') in ['owner', 'stylist'] %}
+                <a href="{{ url_for('main.stylist_dashboard') }}" class="text-[11px] bg-amber-500/10 border border-amber-500/40 text-amber-300 px-2.5 py-0.5 rounded-md hover:bg-amber-500/20 transition font-semibold" id="txt-admin-btn">
+                    Admin ⚙️
+                </a>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('main.logout') }}" class="text-xs text-zinc-500 hover:text-red-400 transition font-semibold" id="txt-signout">Sign Out</a>
+        </div>
 
-  <!-- Header & Language Switcher -->
-  <div class="flex items-center justify-between mb-4 px-1">
-    <div class="flex items-center space-x-2">
-      <span class="text-xs font-bold uppercase tracking-wider text-zinc-400" id="txt-welcome">Welcome,</span>
-      <span class="text-xs font-black text-amber-400 uppercase tracking-wider">{{ customer.name if customer else 'Valued Client' }}</span>
+        <!-- Language Switcher Bar with Real SVG Flags -->
+        <div class="flex justify-center items-center gap-2 mb-4">
+            <span class="text-xs font-bold text-zinc-400" id="txt-flyer-label">Language:</span>
+            <div class="inline-flex bg-zinc-950 p-1 rounded-xl border border-zinc-800">
+                
+                <button type="button" id="btn-en" onclick="setLang('en')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black transition cursor-pointer flex items-center gap-2">
+                    <span>English</span>
+                    <svg class="w-4 h-3 rounded-sm shadow-sm" viewBox="0 0 7410 3900">
+                        <rect width="7410" height="3900" fill="#b22234"/>
+                        <path d="M0,450H7410M0,1050H7410M0,1650H7410M0,2250H7410M0,2850H7410M0,3450H7410" stroke="#fff" stroke-width="300"/>
+                        <rect width="2964" height="2100" fill="#3c3b6e"/>
+                        <g fill="#fff">
+                            <g id="s18"><g id="s9"><g id="s5"><g id="s4"><path id="s" d="M247,90 317,307 135,173h224L177,307z"/><use href="#s" y="420"/><use href="#s" y="840"/><use href="#s" y="1260"/></g><use href="#s" y="1680"/></g><use href="#s4" x="247" y="210"/></g><use href="#s9" x="494"/></g><use href="#s18" x="988"/><use href="#s9" x="1976"/><use href="#s5" x="2470"/>
+                        </g>
+                    </svg>
+                </button>
+
+                <button type="button" id="btn-es" onclick="setLang('es')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer flex items-center gap-2">
+                    <span>Español</span>
+                    <svg class="w-4 h-3 rounded-sm shadow-sm" viewBox="0 0 640 480">
+                        <path fill="#006847" d="M0 0h213.3v480H0z"/>
+                        <path fill="#fff" d="M213.3 0h213.4v480H213.3z"/>
+                        <path fill="#ce1126" d="M426.7 0H640v480H426.7z"/>
+                        <circle cx="320" cy="240" r="30" fill="#8B5A2B"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. FULL FLYER GRAPHIC (Original clean image) -->
+        <div class="relative rounded-2xl overflow-hidden mb-5 bg-black border border-zinc-900 shadow-md">
+            <img id="flyer-img" src="{{ url_for('static', filename='img/flyer.jpg') }}" alt="Jackiecutz Hair Studio Flyer" class="w-full object-contain rounded-2xl block" onerror="this.src='/static/img/card_bg.jpg'">
+            
+            <!-- Hotspots -->
+            <a href="tel:8323534577" title="Call (832) 353-4577" class="absolute left-[3%] right-[40%] top-[27%] bottom-[63%] z-20 cursor-pointer rounded-lg hover:bg-amber-400/10 active:bg-amber-400/20 transition-all"></a>
+            <a href="https://www.google.com/maps/search/?api=1&query=806-E+Airtex+Dr+Suite+105+Houston+TX+77073" target="_blank" rel="noopener noreferrer" title="Open Divine Salon in Google Maps" class="absolute left-[3%] right-[38%] top-[37%] bottom-[53%] z-20 cursor-pointer rounded-lg hover:bg-amber-400/10 active:bg-amber-400/20 transition-all"></a>
+            <a href="https://www.tiktok.com/@jackiecutz" target="_blank" rel="noopener noreferrer" title="Jackiecutz on TikTok" class="absolute left-[2%] right-[68%] top-[82%] bottom-[2%] z-20 cursor-pointer rounded-xl hover:bg-pink-500/20 active:bg-pink-500/30 transition-all"></a>
+            <a href="https://www.facebook.com/jackiecutz" target="_blank" rel="noopener noreferrer" title="Jackiecutz on Facebook" class="absolute left-[65%] right-[2%] top-[84%] bottom-[2%] z-20 cursor-pointer rounded-xl hover:bg-blue-500/20 active:bg-blue-500/30 transition-all"></a>
+        </div>
+
+        <!-- 2. WEEKLY OPERATING HOURS (Yellowish Cards Theme) -->
+        <div class="bg-zinc-950 border border-zinc-800/90 rounded-2xl p-3.5 mb-5 text-left space-y-2.5">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5" id="txt-hours-header">
+                    <span>🕒 Weekly Hours & Availability</span>
+                </span>
+                <span class="text-[10px] text-zinc-500 font-mono" id="txt-timezone">Houston, TX (CT)</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
+                    <p class="font-extrabold text-zinc-800 text-xs" id="txt-day-sunmon">Sun - Mon</p>
+                    <p class="text-red-600 font-black text-[11px] mt-0.5" id="txt-status-closed">🔴 Closed</p>
+                </div>
+                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
+                    <p class="font-extrabold text-zinc-900 text-xs" id="txt-day-tue">Tuesday</p>
+                    <p class="text-zinc-900 font-bold text-[11px] mt-0.5" id="txt-status-tue">10am - 6pm <span class="text-amber-800 block text-[9px] font-black">(Appt Only)</span></p>
+                </div>
+                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
+                    <p class="font-extrabold text-zinc-900 text-xs" id="txt-day-wedthu">Wed - Thu</p>
+                    <p class="text-emerald-700 font-black text-[11px] mt-0.5" id="txt-status-wedthu">10am - 6pm</p>
+                </div>
+                <div class="bg-[#fffee0] border border-amber-300/80 p-2.5 rounded-xl text-center shadow-sm">
+                    <p class="font-extrabold text-zinc-900 text-xs" id="txt-day-frisat">Fri - Sat</p>
+                    <p class="text-emerald-700 font-black text-[11px] mt-0.5" id="txt-status-frisat">10am - 7pm</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. REAL-TIME BOOKING & LIVE SLOTS ENGINE -->
+        <div class="text-left">
+            <details class="group bg-black border border-amber-500/40 rounded-2xl p-4 sm:p-5 cursor-pointer" open>
+                <summary class="font-extrabold text-center text-amber-400 flex items-center justify-center gap-2 text-sm uppercase tracking-wider select-none">
+                    <span id="txt-booking-drawer-title">✨ RESERVE YOUR SPOT ✨</span>
+                    <span class="transition-transform group-open:rotate-180">▼</span>
+                </summary>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, msg in messages %}
+                      <div class="mt-3 p-2.5 rounded-xl text-xs {% if category == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+                        {{ msg }}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                <form id="booking-form" action="{{ url_for('main.book_service') }}" method="POST" class="mt-4 space-y-4 cursor-default">
+                    
+                    <input type="hidden" name="scheduled_time" id="primary_scheduled_time" required>
+
+                    <!-- Step 1: Select Service -->
+                    <div class="p-3.5 bg-zinc-950 border border-zinc-850 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-primary-card-title">1. Choose Service & Booking Date</span>
+                            <span class="text-[10px] text-zinc-500" id="txt-primary-self">Primary Client</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-service">Service</label>
+                            <select name="service_id" id="primary-service" required onchange="onServiceOrDateChange()" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                                {% for s in services %}
+                                <option value="{{ s.id }}" data-price="{{ s.price }}" data-cat-en="{{ s.category }}" data-name-en="{{ s.name }}">
+                                    {{ s.name }} ({{ s.category }}) — ${{ "%.2f"|format(s.price) }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-select-date">Select Appointment Date</label>
+                            <input type="date" id="primary-date-picker" required onchange="onServiceOrDateChange()" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                        </div>
+
+                        <!-- LIVE SLOTS CONTAINER -->
+                        <div class="pt-2 border-t border-zinc-900 space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <label class="block text-[10px] font-bold uppercase text-amber-400" id="lbl-live-slots">Available Live Time Slots</label>
+                                <span id="slot-status-badge" class="text-[10px] text-zinc-500 font-mono">Select date above</span>
+                            </div>
+                            <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-56 overflow-y-auto p-1.5 bg-black rounded-xl border border-zinc-900">
+                                <p class="col-span-full text-center text-xs text-zinc-500 py-4" id="txt-pick-date-msg">Please choose an appointment date to see live open chairs.</p>
+                            </div>
+                        </div>
+
+                        <!-- Primary Contact Info -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-zinc-900">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-name">Your Full Name</label>
+                                <input type="text" name="name" required value="{{ current_user.name if current_user else session.get('user_name', '') }}" placeholder="Full Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-phone">Phone Number</label>
+                                <input type="tel" name="phone" id="booking-phone" required value="{{ current_user.phone if current_user and current_user.phone else '' }}" placeholder="832-000-0000" maxlength="12" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Additional Guests Container -->
+                    <div id="additional-guests-container" class="space-y-3"></div>
+
+                    <!-- Add Person Button -->
+                    <button type="button" onclick="addGuestRow()" class="w-full py-2.5 bg-zinc-950 border border-amber-500/40 hover:border-amber-400 text-amber-300 hover:text-amber-200 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition shadow-sm">
+                        <span id="txt-add-person-btn">+ Add Additional Person / Child</span>
+                    </button>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-amber-400 mb-1" id="lbl-notes">Notes / Style Preferences</label>
+                        <input type="text" name="notes" placeholder="e.g. Skin fade with scissors on top, beard lineup" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                    </div>
+
+                    <!-- Payment Method Selector -->
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold uppercase text-amber-400 mb-2" id="lbl-pay-method">Payment & Card Hold Method</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+                            <label class="bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10 transition">
+                                <input type="radio" name="payment_method" value="card" checked onchange="togglePaymentGateway('card')" class="hidden">
+                                <span class="block text-xs font-bold text-white" id="txt-pay-card">💳 Card Hold</span>
+                                <span class="block text-[9px] text-zinc-500 mt-0.5" id="txt-pay-card-sub">Charged After Cut</span>
+                            </label>
+                            
+                            <label class="bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl cursor-pointer hover:border-purple-500 has-[:checked]:border-purple-400 has-[:checked]:bg-purple-500/10 transition">
+                                <input type="radio" name="payment_method" value="zelle" onchange="togglePaymentGateway('zelle')" class="hidden">
+                                <span class="block text-xs font-bold text-purple-400">⚡ Zelle</span>
+                                <span class="block text-[9px] text-zinc-500 mt-0.5" id="txt-pay-zelle-sub">Pay at Salon</span>
+                            </label>
+
+                            <label class="bg-zinc-950 border border-emerald-500 p-2.5 rounded-xl cursor-pointer hover:border-emerald-500 has-[:checked]:border-emerald-400 has-[:checked]:bg-emerald-500/10 transition">
+                                <input type="radio" name="payment_method" value="cash_app" onchange="togglePaymentGateway('cash_app')" class="hidden">
+                                <span class="block text-xs font-bold text-emerald-400">💵 Cash App</span>
+                                <span class="block text-[9px] text-zinc-500 mt-0.5">$Jackiecutz</span>
+                            </label>
+
+                            <label class="bg-zinc-950 border border-amber-400 has-[:checked]:border-amber-400 has-[:checked]:bg-amber-400/10 transition">
+                                <input type="radio" name="payment_method" value="cash" onchange="togglePaymentGateway('cash')" class="hidden">
+                                <span class="block text-xs font-bold text-amber-300" id="txt-pay-salon">💈 In-Salon</span>
+                                <span class="block text-[9px] text-zinc-500 mt-0.5" id="txt-pay-salon-sub">Cash Preferred</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Payment Sub-Gateways -->
+                    <div id="card-gateway" class="p-3.5 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-2.5">
+                        <div class="flex items-center justify-between text-xs text-zinc-400 font-bold border-b border-zinc-900 pb-2">
+                            <span id="txt-secure-card-title">Card Hold (Pay After Service)</span>
+                            <span class="text-amber-400 text-[10px]">🔒 256-Bit Encrypted</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-400 leading-relaxed" id="txt-card-hold-desc">
+                            Your card is held to secure your time slot. <strong>You will not be charged until your service is completed in the chair.</strong>
+                        </p>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-name">Name on Card</label>
+                            <input type="text" id="card_name" placeholder="Name as shown on card" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-number">Card Number</label>
+                            <input type="text" id="card_number" placeholder="4000 1234 5678 9010" maxlength="19" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-exp">Exp (MM/YY)</label>
+                                <input type="text" id="card_exp" placeholder="MM/YY" maxlength="5" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1">CVV</label>
+                                <input type="password" id="card_cvv" placeholder="•••" maxlength="4" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-card-zip">Zip Code</label>
+                                <input type="text" id="card_zip" placeholder="77073" maxlength="5" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="zelle-gateway" class="hidden p-3.5 bg-purple-950/20 border border-purple-500/30 rounded-2xl space-y-2 text-left">
+                        <span class="text-xs text-purple-300 font-bold block border-b border-purple-500/20 pb-1" id="txt-zelle-head">Zelle Payment Instructions</span>
+                        <p class="text-xs text-zinc-300 leading-relaxed" id="txt-zelle-desc">
+                            Pay upon arrival via Zelle to: <span class="text-amber-400 font-bold font-mono">832-353-4577</span> (Ivonne Gonzalez / Jackiecutz).
+                        </p>
+                    </div>
+
+                    <div id="cashapp-gateway" class="hidden p-3.5 bg-emerald-950/20 border border-emerald-500/30 rounded-2xl space-y-2 text-left">
+                        <span class="text-xs text-emerald-300 font-bold block border-b border-emerald-500/20 pb-1" id="txt-cashapp-head">Cash App Instructions</span>
+                        <p class="text-xs text-zinc-300 leading-relaxed" id="txt-cashapp-desc">
+                            Pay upon arrival to Cashtag: <span class="text-emerald-400 font-bold font-mono">$Jackiecutz</span>.
+                        </p>
+                    </div>
+
+                    <div id="cash-gateway" class="hidden p-3 bg-zinc-950 border border-amber-500/30 rounded-2xl text-left">
+                        <p class="text-xs text-zinc-300" id="txt-cash-desc">💵 Pay upon completion at Divine Salon (Suite 105). Cash is preferred.</p>
+                    </div>
+
+                    <!-- Estimated Total Card -->
+                    <div class="flex justify-between items-center bg-zinc-950 p-3.5 rounded-2xl border border-amber-500/40 shadow-sm">
+                        <span class="text-xs font-bold uppercase tracking-wider text-zinc-300" id="txt-total-label">Estimated Total (Pay Upon Service)</span>
+                        <span id="booking-total-price" class="text-base font-black text-amber-400">$25.00</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="btn-submit-booking" class="w-full bg-gradient-to-r from-amber-500 to-amber-300 hover:from-amber-400 hover:to-amber-200 text-black font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition shadow-lg opacity-60 cursor-not-allowed" disabled>
+                        CHOOSE A LIVE TIME SLOT ABOVE
+                    </button>
+
+                    <div class="pt-2 text-[10px] text-zinc-500 leading-relaxed text-center border-t border-zinc-900">
+                        <p id="txt-policy-footer">Appointments held with a 10-minute grace window. Cancellations require 2 hours advance notice.</p>
+                    </div>
+                </form>
+            </details>
+        </div>
+
     </div>
-    <div class="flex items-center space-x-2">
-      <button type="button" onclick="setLanguage('en')" id="lang-en-btn" class="px-2.5 py-1 text-[11px] font-black rounded-lg border border-amber-500/40 bg-zinc-900 text-amber-300 transition">EN</button>
-      <button type="button" onclick="setLanguage('es')" id="lang-es-btn" class="px-2.5 py-1 text-[11px] font-black rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-400 transition">ES</button>
-      <a href="{{ url_for('main.logout') }}" class="px-2.5 py-1 text-[11px] font-bold rounded-lg border border-red-500/30 bg-red-950/30 text-red-400 hover:bg-red-900/50 transition" id="txt-signout">Sign Out</a>
-    </div>
-  </div>
-
-  <!-- Weekly Studio Schedule Banner -->
-  <div class="mb-6 p-4 rounded-2xl bg-zinc-950 border border-amber-500/30 shadow-xl">
-    <div class="flex items-center justify-between mb-3 border-b border-zinc-900 pb-2">
-      <div class="flex items-center space-x-2">
-        <span class="text-amber-400 text-sm">🕒</span>
-        <h3 class="text-xs font-black uppercase tracking-wider text-amber-400" id="txt-hours-header">Weekly Hours & Availability</h3>
-      </div>
-      <span class="text-[10px] text-zinc-500 font-bold uppercase">Houston, TX (CT)</span>
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-      <div class="p-2.5 rounded-xl bg-black border border-zinc-900">
-        <span class="block text-[11px] font-bold text-zinc-400 uppercase" id="txt-day-sunmon">Sun - Mon</span>
-        <span class="block text-xs font-black text-red-400 mt-0.5" id="txt-status-closed">● Closed</span>
-      </div>
-      <div class="p-2.5 rounded-xl bg-black border border-zinc-900">
-        <span class="block text-[11px] font-bold text-zinc-300 uppercase" id="txt-day-tue">Tuesday</span>
-        <span class="block text-xs font-bold text-amber-300 mt-0.5">10am - 6pm</span>
-        <span class="block text-[9px] font-bold text-amber-500/90" id="txt-status-tue">(Appt Only)</span>
-      </div>
-      <div class="p-2.5 rounded-xl bg-black border border-zinc-900">
-        <span class="block text-[11px] font-bold text-zinc-300 uppercase" id="txt-day-wedthu">Wed - Thu</span>
-        <span class="block text-xs font-bold text-emerald-400 mt-0.5" id="txt-status-wedthu">10am - 6pm</span>
-      </div>
-      <div class="p-2.5 rounded-xl bg-black border border-zinc-900">
-        <span class="block text-[11px] font-bold text-zinc-300 uppercase" id="txt-day-frisat">Fri - Sat</span>
-        <span class="block text-xs font-bold text-emerald-400 mt-0.5" id="txt-status-frisat">10am - 7pm</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Primary Booking Form -->
-  <form id="booking-form" action="{{ url_for('main.book_service') }}" method="POST" class="space-y-4">
-    <div class="p-5 rounded-2xl bg-zinc-950 border border-amber-500/30 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-zinc-900 pb-2.5">
-        <h2 class="text-xs font-black uppercase tracking-wider text-amber-400" id="txt-booking-drawer-title">1. Choose Service & Booking Date</h2>
-        <span class="text-[10px] font-bold text-zinc-500 uppercase" id="txt-primary-card-title">Primary Client</span>
-      </div>
-
-      <!-- Service Selection -->
-      <div>
-        <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-service">Service</label>
-        <select name="service_id" id="service-select" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none" onchange="updateBookingCalculation()">
-          {% for s in services %}
-          <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" {% if loop.first %}selected{% endif %}>
-            {{ s.name }} ({{ s.category }}) — ${{ "%.2f"|format(s.price) }}
-          </option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <!-- Date Selector -->
-      <div>
-        <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-select-date">Select Appointment Date</label>
-        <input type="date" name="appointment_date" id="appointment-date" required class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none" onchange="fetchLiveSlots()">
-      </div>
-
-      <!-- Live Real-Time Time Slots -->
-      <div>
-        <div class="flex justify-between items-center mb-1.5">
-          <label class="block text-[10px] font-bold uppercase text-amber-400" id="lbl-live-slots">Available Live Time Slots</label>
-          <span id="open-slots-badge" class="px-2.5 py-0.5 text-[10px] font-bold bg-[#fffaea] text-black border border-amber-500/40 rounded-full">Querying live chairs...</span>
-        </div>
-        <div id="slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-56 overflow-y-auto p-1.5 bg-black rounded-xl border border-zinc-900">
-          <!-- Dynamic Pills Rendered by JS -->
-        </div>
-        <input type="hidden" name="time_slot" id="selected-time-slot" required>
-      </div>
-
-      <!-- Primary Contact Info: Seamlessly Hidden (Auto-Filled via session) -->
-      <input type="hidden" name="name" value="{{ customer.name if customer else '' }}">
-      <input type="hidden" name="phone" id="booking-phone" value="{{ customer.phone if customer else '' }}">
-      <span id="lbl-name" class="hidden"></span>
-      <span id="lbl-phone" class="hidden"></span>
-
-      <!-- Dynamic Additional Guests Container -->
-      <div id="additional-guests-container" class="space-y-3"></div>
-
-      <!-- Add Additional Guest / Child Trigger -->
-      <button type="button" id="btn-add-person" onclick="addAdditionalGuest()" class="w-full py-2.5 border border-zinc-800 rounded-full text-xs font-extrabold text-black bg-[#fffaea] hover:bg-white transition flex items-center justify-center space-x-1 shadow-sm">
-        <span id="txt-add-person-btn">+ Add Additional Person / Child</span>
-      </button>
-
-      <!-- Notes / Style Preferences -->
-      <div>
-        <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-notes">Notes / Style Preferences</label>
-        <textarea name="notes" rows="2" placeholder="e.g. Skin fade with scissors on top, beard lineup" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none"></textarea>
-      </div>
-
-      <!-- Payment & Card Hold Method Selection -->
-      <div class="pt-2 border-t border-zinc-900">
-        <label class="block text-[10px] font-bold uppercase text-amber-400 mb-2" id="lbl-pay-method">Payment & Card Hold Method</label>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <label class="payment-tab relative p-2.5 rounded-2xl bg-[#fffaea] border border-amber-500/40 text-center cursor-pointer transition">
-            <input type="radio" name="payment_method" value="card_hold" checked onchange="togglePaymentGateway('card_hold')" class="hidden">
-            <span class="block text-xs font-bold text-zinc-900" id="txt-pay-card">💳 Card Hold</span>
-            <span class="block text-[9px] text-zinc-700 font-bold mt-0.5">Charged After Cut</span>
-          </label>
-          <label class="payment-tab relative p-2.5 rounded-2xl bg-[#fffaea] border border-amber-500/40 text-center cursor-pointer transition">
-            <input type="radio" name="payment_method" value="zelle" onchange="togglePaymentGateway('zelle')" class="hidden">
-            <span class="block text-xs font-bold text-purple-900">⚡ Zelle</span>
-            <span class="block text-[9px] text-zinc-700 font-bold mt-0.5" id="txt-pay-zelle-sub">Pay at Salon</span>
-          </label>
-          <label class="payment-tab relative p-2.5 rounded-2xl bg-[#fffaea] border border-amber-500/40 text-center cursor-pointer transition">
-            <input type="radio" name="payment_method" value="cashapp" onchange="togglePaymentGateway('cashapp')" class="hidden">
-            <span class="block text-xs font-bold text-emerald-900">💵 Cash App</span>
-            <span class="block text-[9px] text-zinc-700 font-bold mt-0.5">$Jackiecutz</span>
-          </label>
-          <label class="payment-tab relative p-2.5 rounded-2xl bg-[#fffaea] border border-amber-500/40 text-center cursor-pointer transition">
-            <input type="radio" name="payment_method" value="salon" onchange="togglePaymentGateway('salon')" class="hidden">
-            <span class="block text-xs font-bold text-amber-900" id="txt-pay-salon">💈 In-Salon</span>
-            <span class="block text-[9px] text-zinc-700 font-bold mt-0.5">Cash Preferred</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Card Hold Security Form Container -->
-      <div id="card-gateway" class="p-3.5 rounded-2xl bg-black border border-zinc-900 space-y-2.5">
-        <div class="flex justify-between items-center border-b border-zinc-900 pb-1.5">
-          <span class="text-xs font-bold text-zinc-300" id="txt-secure-card-title">Card Hold (Pay After Service)</span>
-          <span class="text-[10px] font-bold text-amber-400">🔒 256-Bit Encrypted</span>
-        </div>
-        <p class="text-xs text-white leading-relaxed" id="txt-card-hold-desc">
-          Your card is held to secure your time slot. <strong>You will not be charged until your service is completed in the chair.</strong>
-        </p>
-        <div>
-          <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5" id="lbl-card-name">Name on Card</label>
-          <input type="text" name="card_name" placeholder="Name as shown on card" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5" id="lbl-card-number">Card Number</label>
-          <input type="text" name="card_number" placeholder="4000 1234 5678 9010" maxlength="19" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none">
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5" id="lbl-card-exp">EXP (MM/YY)</label>
-            <input type="text" name="card_exp" placeholder="MM/YY" maxlength="5" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5">CVV</label>
-            <input type="text" name="card_cvv" placeholder="•••" maxlength="4" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5" id="lbl-card-zip">Zip Code</label>
-            <input type="text" name="card_zip" placeholder="77073" value="{{ customer.zip_code if customer else '77073' }}" maxlength="5" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none">
-          </div>
-        </div>
-      </div>
-
-      <!-- Zelle Gateway Details -->
-      <div id="zelle-gateway" class="hidden p-3.5 bg-purple-950/20 border border-purple-500/30 rounded-2xl space-y-2 text-left">
-        <span class="text-xs text-purple-300 font-bold block border-b border-purple-500/20 pb-1" id="txt-zelle-head">Zelle Payment Instructions</span>
-        <p class="text-xs text-zinc-300 leading-relaxed" id="txt-zelle-desc">
-          Pay upon arrival via Zelle to: <span class="text-amber-400 font-bold font-mono">832-353-4577</span> (Ivonne Gonzalez / Jackiecutz).
-        </p>
-      </div>
-
-      <!-- Cash App Gateway Details -->
-      <div id="cashapp-gateway" class="hidden p-3.5 bg-emerald-950/20 border border-emerald-500/30 rounded-2xl space-y-2 text-left">
-        <span class="text-xs text-emerald-300 font-bold block border-b border-emerald-500/20 pb-1" id="txt-cashapp-head">Cash App Instructions</span>
-        <p class="text-xs text-zinc-300 leading-relaxed" id="txt-cashapp-desc">
-          Send payment to Cashtag: <span class="text-emerald-400 font-bold font-mono">$Jackiecutz</span>. Verification confirmed upon chair seating.
-        </p>
-      </div>
-
-      <!-- In-Salon Cash Details -->
-      <div id="salon-gateway" class="hidden p-3.5 bg-amber-950/20 border border-amber-500/30 rounded-2xl space-y-2 text-left">
-        <span class="text-xs text-amber-300 font-bold block border-b border-amber-500/20 pb-1" id="txt-pay-salon-head">In-Salon Payment</span>
-        <p class="text-xs text-zinc-300 leading-relaxed" id="txt-pay-salon-desc">
-          Pay directly inside Divine Salon Suite 105 via cash or in-person card tap after your service is completed.
-        </p>
-      </div>
-
-      <!-- Estimated Total Pill Bar -->
-      <div id="total-container" class="flex justify-between items-center p-3 rounded-full bg-[#fffaea] border border-amber-500/40">
-        <span class="text-xs font-black uppercase tracking-wider text-black" id="txt-total-label">Estimated Total (Pay Upon Service)</span>
-        <span class="text-base font-black text-black" id="booking-total-price">$35.00</span>
-      </div>
-
-      <!-- Submit Reservation Button -->
-      <div>
-        <button type="submit" id="btn-submit-booking" class="w-full py-3.5 gold-btn text-black font-black uppercase tracking-wider text-xs rounded-xl transition shadow-lg">
-          Confirm & Reserve Spot ($35.00)
-        </button>
-      </div>
-
-      <!-- Policy Disclaimer -->
-      <p class="text-xs text-white text-center pt-1" id="txt-policy-footer">
-        Appointments held with a 10-minute grace window. Cancellations require 2 hours advance notice.
-      </p>
-    </div>
-  </form>
-
-  <!-- Secondary User Drawer Tabs: Profile, Family & Security Management -->
-  <div class="mt-8 space-y-4">
-    <!-- Active Bookings List -->
-    <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-500/30">
-      <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3" id="txt-active-bookings-header">Your Appointment History</h3>
-      {% if bookings %}
-      <div class="space-y-2">
-        {% for b in bookings %}
-        <div class="flex items-center justify-between p-3 rounded-xl bg-black border border-zinc-900">
-          <div>
-            <span class="block text-xs font-bold text-zinc-100">{{ b.service_name }}</span>
-            <span class="block text-[10px] text-zinc-400">{{ b.appointment_time.strftime('%b %d, %Y at %I:%M %p') }}</span>
-          </div>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">{{ b.status }}</span>
-        </div>
-        {% endfor %}
-      </div>
-      {% else %}
-      <p class="text-xs text-zinc-500 text-center py-2" id="txt-no-bookings">No previous bookings found.</p>
-      {% endif %}
-    </div>
-
-    <!-- Client Profile Management Tab -->
-    <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-500/30">
-      <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3" id="txt-profile-header">Update Profile Details</h3>
-      <form action="{{ url_for('main.update_profile') }}" method="POST" class="space-y-2.5">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <div>
-            <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5">Full Name</label>
-            <input type="text" name="name" value="{{ customer.name if customer else '' }}" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5">Email</label>
-            <input type="email" name="email" value="{{ customer.email if customer and customer.email else '' }}" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:outline-none">
-          </div>
-        </div>
-        <button type="submit" class="w-full py-2 bg-[#fffaea] border border-amber-500/40 text-black font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-white transition">
-          Save Profile Changes
-        </button>
-      </form>
-    </div>
-
-    <!-- Family Members Hub -->
-    <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-500/30">
-      <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 mb-3" id="txt-family-header">Saved Family / Kids</h3>
-      {% if family_members %}
-      <div class="space-y-1.5 mb-3">
-        {% for fm in family_members %}
-        <div class="flex justify-between items-center p-2 rounded-lg bg-black border border-zinc-900">
-          <span class="text-xs text-zinc-200 font-bold">{{ fm.name }} ({{ fm.relationship }})</span>
-          <form action="{{ url_for('main.delete_family_member', member_id=fm.id) }}" method="POST" onsubmit="return confirm('Remove family member?');">
-            <button type="submit" class="text-[10px] text-red-400 hover:underline">Delete</button>
-          </form>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-      <form action="{{ url_for('main.add_family_member') }}" method="POST" class="space-y-2">
-        <div class="grid grid-cols-2 gap-2">
-          <input type="text" name="name" placeholder="Member Name" required class="bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:outline-none">
-          <input type="text" name="relationship" placeholder="Child / Spouse" value="Child" class="bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:outline-none">
-        </div>
-        <button type="submit" class="w-full py-2 bg-[#fffaea] border border-amber-500/40 text-black font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-white transition">
-          + Add To Family Hub
-        </button>
-      </form>
-    </div>
-
-    <!-- Security & Account Settings -->
-    <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-500/30 space-y-3">
-      <h3 class="text-xs font-black uppercase tracking-wider text-amber-400" id="txt-security-header">Account Credentials & Privacy</h3>
-      <form action="{{ url_for('main.update_credentials') }}" method="POST" class="space-y-2">
-        <div class="grid grid-cols-2 gap-2">
-          <input type="tel" name="phone" placeholder="Phone Number" value="{{ customer.phone if customer else '' }}" class="bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:outline-none">
-          <input type="text" name="username" placeholder="Username" value="{{ customer.username if customer and customer.username else '' }}" class="bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:outline-none">
-        </div>
-        <button type="submit" class="w-full py-2 bg-[#fffaea] border border-amber-500/40 text-black font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-white transition">
-          Update Credentials
-        </button>
-      </form>
-      <form action="{{ url_for('main.delete_account') }}" method="POST" onsubmit="return confirm('Permanently delete your account and profile data?');">
-        <button type="submit" class="w-full py-2 bg-red-950/20 border border-red-500/30 text-red-400 font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-red-900/40 transition">
-          Delete My Account
-        </button>
-      </form>
-    </div>
-  </div>
 </div>
+
+<!-- Slide-Out Drawer Component -->
+<div id="drawer-backdrop" onclick="closeDrawer()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+<div id="app-drawer" class="fixed top-0 left-0 bottom-0 w-full max-w-sm bg-black border-r border-amber-500/40 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-5 overflow-y-auto space-y-5 text-left selection:bg-amber-400 selection:text-black">
+    <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
+        <span class="text-amber-400 font-black text-sm uppercase tracking-wider" id="txt-drawer-header">Account Menu</span>
+        <button type="button" onclick="closeDrawer()" class="text-zinc-400 hover:text-white text-lg font-bold p-1">✕</button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800 text-[11px] font-bold text-center">
+        <button type="button" onclick="switchDrawerTab('profile')" id="tab-btn-profile" class="py-1.5 rounded-lg bg-amber-400 text-black transition">Profile</button>
+        <button type="button" onclick="switchDrawerTab('family')" id="tab-btn-family" class="py-1.5 rounded-lg text-zinc-400 hover:text-white transition">Family</button>
+        <button type="button" onclick="switchDrawerTab('security')" id="tab-btn-security" class="py-1.5 rounded-lg text-zinc-400 hover:text-white transition">Security</button>
+    </div>
+
+    <div id="drawer-tab-profile" class="space-y-3.5">
+        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-profile-title">Personal Profile</h3>
+        <form method="POST" action="{{ url_for('main.update_profile') }}" class="space-y-3">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-name">Full Name</label>
+                <input type="text" name="name" required value="{{ current_user.name if current_user else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-phone">Phone Number</label>
+                <input type="tel" name="phone" value="{{ current_user.phone if current_user and current_user.phone else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-email">Email Address</label>
+                <input type="email" name="email" value="{{ current_user.email if current_user and current_user.email else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-bday">Birthday (MM/DD/YYYY)</label>
+                    <input type="text" name="birthday" value="{{ current_user.birthday if current_user and current_user.birthday else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-d-zip">Zip Code</label>
+                    <input type="text" name="zip_code" value="{{ current_user.zip_code if current_user and current_user.zip_code else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-amber-400 hover:bg-amber-300 text-black font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Save Profile Changes</button>
+        </form>
+    </div>
+
+    <div id="drawer-tab-family" class="space-y-4 hidden">
+        <div>
+            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-family-title">Saved Family Profiles</h3>
+            <p class="text-[11px] text-zinc-400 mt-0.5" id="txt-family-sub">Save children or family members for quick appointment scheduling.</p>
+        </div>
+        <div class="space-y-2">
+            {% for m in family_members %}
+            <div class="flex items-center justify-between bg-zinc-950 border border-zinc-800 p-2.5 rounded-xl">
+                <div>
+                    <p class="text-xs font-bold text-white">{{ m.name }}</p>
+                    <p class="text-[10px] text-zinc-400">{{ m.relationship }} {% if m.birthday %}• Born: {{ m.birthday }}{% endif %}</p>
+                </div>
+                <form method="POST" action="{{ url_for('main.delete_family_member') }}">
+                    <input type="hidden" name="member_index" value="{{ loop.index0 }}">
+                    <button type="submit" class="text-red-400 hover:text-red-300 text-xs font-bold p-1">✕</button>
+                </form>
+            </div>
+            {% else %}
+            <p class="text-[11px] text-zinc-500 italic" id="txt-family-empty">No family members saved yet.</p>
+            {% endfor %}
+        </div>
+        <form method="POST" action="{{ url_for('main.add_family_member') }}" class="p-3 bg-zinc-950 border border-amber-500/30 rounded-2xl space-y-2.5">
+            <span class="text-[11px] font-bold text-amber-300 uppercase tracking-wider block" id="txt-add-fam-head">+ Add Family Member</span>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-fam-name">Name</label>
+                <input type="text" name="family_name" required placeholder="e.g. Mateo Gonzalez" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-fam-rel">Relation</label>
+                    <select name="relationship" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-2 py-1.5 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                        <option value="Child">Child</option>
+                        <option value="Spouse">Spouse</option>
+                        <option value="Parent">Parent</option>
+                        <option value="Sibling">Sibling</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-fam-bday">Birthday</label>
+                    <input type="text" name="family_birthday" placeholder="MM/DD/YYYY" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                </div>
+            </div>
+            <button type="submit" class="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-300 text-black font-bold rounded-xl text-xs uppercase tracking-wider transition">Add To Family List</button>
+        </form>
+    </div>
+
+    <div id="drawer-tab-security" class="space-y-5 hidden">
+        <div>
+            <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="txt-sec-title">Login Credentials</h3>
+            <p class="text-[11px] text-zinc-400 mt-0.5" id="txt-sec-sub">Update your sign-in username or password.</p>
+        </div>
+        <form method="POST" action="{{ url_for('main.update_credentials') }}" class="space-y-3">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-sec-user">Username</label>
+                <input type="text" name="username" value="{{ current_user.username if current_user else '' }}" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-sec-newpass">New Password</label>
+                <input type="password" name="new_password" placeholder="Leave blank to keep current" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-zinc-400 mb-1" id="lbl-sec-confpass">Confirm New Password</label>
+                <input type="password" name="confirm_password" placeholder="••••••••" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <button type="submit" class="w-full bg-amber-400 hover:bg-amber-300 text-black font-bold py-2 rounded-xl text-xs uppercase tracking-wider transition">Update Credentials</button>
+        </form>
+
+        <div class="pt-4 border-t border-red-500/30 space-y-2">
+            <h4 class="text-xs font-bold text-red-400 uppercase tracking-wider" id="txt-danger-title">Delete Account</h4>
+            <p class="text-[10px] text-zinc-400 leading-relaxed" id="txt-danger-desc">Permanently delete your profile and booking records.</p>
+            <form method="POST" action="{{ url_for('main.delete_account') }}" onsubmit="return confirm('Are you sure you want to permanently delete your account?');">
+                <button type="submit" class="w-full py-2 bg-red-500/10 border border-red-500/40 hover:bg-red-500/20 text-red-400 font-bold rounded-xl text-xs uppercase tracking-wider transition" id="btn-danger-del">Permanently Delete Account</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Template for Dynamic Additional Guest Rows -->
+<template id="guest-row-template">
+    <div class="guest-row p-3.5 bg-zinc-950 border border-amber-500/30 rounded-2xl space-y-2.5 relative">
+        <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider guest-card-title">Additional Person / Guest</span>
+            <button type="button" onclick="removeGuestRow(this)" class="text-xs text-red-400 hover:text-red-300 font-bold guest-remove-btn">✕ Remove</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1 guest-lbl-name">Guest Full Name</label>
+                <input type="text" name="guest_name[]" required placeholder="Guest Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1 guest-lbl-service">Guest Service</label>
+                <select name="guest_service_id[]" required onchange="calculateTotal()" class="guest-service-select w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+                    {% for s in services %}
+                    <option value="{{ s.id }}" data-price="{{ s.price }}" data-cat-en="{{ s.category }}" data-name-en="{{ s.name }}">
+                        {{ s.name }} ({{ s.category }}) — ${{ "%.2f"|format(s.price) }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div>
+            <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1 guest-lbl-time">Guest Time Slot</label>
+            <input type="datetime-local" name="guest_scheduled_time[]" required class="guest-time-input w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-medium focus:border-amber-400 focus:outline-none">
+        </div>
+    </div>
+</template>
 
 <script>
 let currentLang = 'en';
-let additionalGuestCount = 0;
 
-const servicesMap = {
-  {% for s in services %}
-  "{{ s.id }}": { name: "{{ s.name }}", price: {{ s.price }}, category: "{{ s.category }}" },
-  {% endfor %}
+const serviceTranslations = {
+    "Men & Boys Specialty Cut": { es: "Corte Especial para Hombres y Niños", cat_es: "Corte Especial" },
+    "Women & Girls Haircut": { es: "Corte para Damas y Niñas", cat_es: "Corte de Cabello" },
+    "Color & Highlights": { es: "Tinte y Rayitos", cat_es: "Color" },
+    "Hairstyles / Updos": { es: "Peinados / Recogidos", cat_es: "Estilo" },
+    "Professional Makeup": { es: "Maquillaje Profesional", cat_es: "Belleza y Maquillaje" },
+    "Waxing Services (Eyebrows/Lip)": { es: "Depilación con Cera (Cejas/Labios)", cat_es: "Depilación" },
+    "Intensive Deep Conditioning Treatment": { es: "Tratamiento Profundo Intensivo", cat_es: "Tratamiento" }
 };
 
 const i18n = {
-  en: {
-    welcome: "Welcome,",
-    signout: "Sign Out",
-    hoursHeader: "Weekly Hours & Availability",
-    daySunMon: "Sun - Mon",
-    statusClosed: "● Closed",
-    dayTue: "Tuesday",
-    statusTue: "(Appt Only)",
-    dayWedThu: "Wed - Thu",
-    statusWedThu: "10am - 6pm",
-    dayFriSat: "Fri - Sat",
-    statusFriSat: "10am - 7pm",
-    drawerTitle: "1. Choose Service & Booking Date",
-    primaryCardTitle: "Primary Client",
-    lblService: "Service",
-    lblSelectDate: "Select Appointment Date",
-    lblLiveSlots: "Available Live Time Slots",
-    openSlotsSuffix: "live slots open",
-    lblNotes: "Notes / Style Preferences",
-    payMethod: "Payment & Card Hold Method",
-    payCard: "💳 Card Hold",
-    payZelleSub: "Pay at Salon",
-    paySalon: "💈 In-Salon",
-    secureCard: "Card Hold (Pay After Service)",
-    cardHoldDesc: "Your card is held to secure your time slot. <strong>You will not be charged until your service is completed in the chair.</strong>",
-    cardName: "Name on Card",
-    cardNumber: "Card Number",
-    cardExp: "EXP (MM/YY)",
-    cardZip: "Zip Code",
-    zelleHead: "Zelle Payment Instructions",
-    zelleDesc: "Pay upon arrival via Zelle to: 832-353-4577 (Ivonne Gonzalez / Jackiecutz).",
-    cashappHead: "Cash App Instructions",
-    cashappDesc: "Send payment to Cashtag: $Jackiecutz. Verification confirmed upon chair seating.",
-    totalLabel: "Estimated Total (Pay Upon Service)",
-    policyFooter: "Appointments held with a 10-minute grace window. Cancellations require 2 hours advance notice.",
-    addPersonBtn: "+ Add Additional Person / Child",
-    btnSubmit: "Confirm & Reserve Spot"
-  },
-  es: {
-    welcome: "Bienvenido,",
-    signout: "Cerrar Sesión",
-    hoursHeader: "Horario Semanal y Disponibilidad",
-    daySunMon: "Dom - Lun",
-    statusClosed: "● Cerrado",
-    dayTue: "Martes",
-    statusTue: "(Solo Citas)",
-    dayWedThu: "Mié - Jue",
-    statusWedThu: "10am - 6pm",
-    dayFriSat: "Vie - Sáb",
-    statusFriSat: "10am - 7pm",
-    drawerTitle: "1. Elija Servicio y Fecha",
-    primaryCardTitle: "Cliente Principal",
-    lblService: "Servicio",
-    lblSelectDate: "Seleccione Fecha de Cita",
-    lblLiveSlots: "Horarios Disponibles en Vivo",
-    openSlotsSuffix: "horarios libres disponibles",
-    lblNotes: "Notas / Preferencias de Estilo",
-    payMethod: "Método de Pago y Reserva",
-    payCard: "💳 Tarjeta en Espera",
-    payZelleSub: "Pagar en el Salón",
-    paySalon: "💈 En el Salón",
-    secureCard: "Reserva con Tarjeta (Pague Después)",
-    cardHoldDesc: "Su tarjeta se guarda para asegurar su horario. <strong>No se le cobrará hasta completar su servicio en la silla.</strong>",
-    cardName: "Nombre en la Tarjeta",
-    cardNumber: "Número de Tarjeta",
-    cardExp: "EXP (MM/AA)",
-    cardZip: "Código Postal",
-    zelleHead: "Instrucciones de Pago con Zelle",
-    zelleDesc: "Pague al llegar por Zelle a: 832-353-4577 (Ivonne Gonzalez / Jackiecutz).",
-    cashappHead: "Instrucciones de Cash App",
-    cashappDesc: "Envíe el pago al Cashtag: $Jackiecutz. Confirmación al tomar asiento.",
-    totalLabel: "Total Estimado (Pagar al Recibir Servicio)",
-    policyFooter: "Tolerancia de 10 minutos de gracia. Cancelaciones requieren 2 horas de aviso.",
-    addPersonBtn: "+ Agregar Persona Adicional / Niño",
-    btnSubmit: "Confirmar y Reservar Cita"
-  }
+    en: {
+        welcome: "Welcome, {{ session.get('user_name', 'Client') }} ✨",
+        adminBtn: "Admin ⚙️",
+        signOut: "Sign Out",
+        flyerLabel: "Language:",
+        hoursHeader: "🕒 Weekly Hours & Availability",
+        daySunMon: "Sun - Mon",
+        statusClosed: "🔴 Closed",
+        dayTue: "Tuesday",
+        statusTue: "10am - 6pm (Appt Only)",
+        dayWedThu: "Wed - Thu",
+        statusWedThu: "10am - 6pm",
+        dayFriSat: "Fri - Sat",
+        statusFriSat: "10am - 7pm",
+        drawerTitle: "✨ RESERVE YOUR SPOT ✨",
+        primaryCardTitle: "1. Choose Service & Booking Date",
+        primarySelf: "Primary Client",
+        lblService: "Service",
+        lblSelectDate: "Select Appointment Date",
+        lblLiveSlots: "Available Live Time Slots",
+        fullName: "Your Full Name",
+        phone: "Phone Number",
+        addPersonBtn: "+ Add Additional Person / Child",
+        notes: "Notes / Style Preferences",
+        payMethod: "Payment & Card Hold Method",
+        payCard: "💳 Card Hold",
+        payCardSub: "Charged After Cut",
+        payZelleSub: "Pay at Salon",
+        paySalon: "💈 In-Salon",
+        paySalonSub: "Cash Preferred",
+        secureCard: "Card Hold (Pay After Service)",
+        cardHoldDesc: "Your card is held to secure your time slot. You will not be charged until your service is completed in the chair.",
+        cardName: "Name on Card",
+        cardNumber: "Card Number",
+        cardExp: "Exp (MM/YY)",
+        cardZip: "Zip Code",
+        zelleHead: "Zelle Payment Instructions",
+        zelleDesc: "Pay upon arrival via Zelle to: 832-353-4577 (Ivonne Gonzalez / Jackiecutz).",
+        cashappHead: "Cash App Instructions",
+        cashappDesc: "Pay upon arrival to Cashtag: $Jackiecutz.",
+        cashDesc: "💵 Pay upon completion at Divine Salon (Suite 105). Cash is preferred.",
+        totalLabel: "Estimated Total (Pay Upon Service)",
+        btnSubmit: "Confirm & Reserve Spot",
+        btnChooseSlotPrompt: "CHOOSE A LIVE TIME SLOT ABOVE",
+        policyFooter: "Appointments held with a 10-minute grace window. Cancellations require 2 hours advance notice.",
+        drawerHeader: "Account Menu",
+        tabProfile: "Profile",
+        tabFamily: "Family",
+        tabSecurity: "Security",
+        openSlotsSuffix: "live slots open"
+    },
+    es: {
+        welcome: "Bienvenido(a), {{ session.get('user_name', 'Cliente') }} ✨",
+        adminBtn: "Admin ⚙️",
+        signOut: "Cerrar Sesión",
+        flyerLabel: "Idioma:",
+        hoursHeader: "🕒 Horario de Servicio Semanal",
+        daySunMon: "Dom - Lun",
+        statusClosed: "🔴 Cerrado",
+        dayTue: "Martes",
+        statusTue: "10am - 6pm (Con Cita)",
+        dayWedThu: "Mié - Jue",
+        statusWedThu: "10am - 6pm",
+        dayFriSat: "Vie - Sáb",
+        statusFriSat: "10am - 7pm",
+        drawerTitle: "✨ RESERVA TU CITA ✨",
+        primaryCardTitle: "1. Seleccione Servicio y Fecha de Cita",
+        primarySelf: "Cliente Principal",
+        lblService: "Servicio",
+        lblSelectDate: "Seleccionar Fecha de Cita",
+        lblLiveSlots: "Horarios Disponibles en Vivo",
+        fullName: "Nombre Completo",
+        phone: "Número de Teléfono",
+        addPersonBtn: "+ Agregar Persona / Niño(a) Adicional",
+        notes: "Notas / Preferencias de Estilo",
+        payMethod: "Método de Pago y Retención",
+        payCard: "💳 Retención de Tarjeta",
+        payCardSub: "Se Cobra al Terminar",
+        payZelleSub: "Pagar en el Salón",
+        paySalon: "💈 En el Salón",
+        paySalonSub: "Efectivo Preferible",
+        secureCard: "Retención de Tarjeta (Pago tras el Servicio)",
+        cardHoldDesc: "Su tarjeta se retiene para asegurar su horario. No se le cobrará nada hasta que se complete su servicio en la silla.",
+        cardName: "Nombre en la Tarjeta",
+        cardNumber: "Número de Tarjeta",
+        cardExp: "Vence (MM/AA)",
+        cardZip: "Código Postal",
+        zelleHead: "Instrucciones de Pago con Zelle",
+        zelleDesc: "Pague al llegar por Zelle a: 832-353-4577 (Ivonne Gonzalez / Jackiecutz).",
+        cashappHead: "Instrucciones de Cash App",
+        cashappDesc: "Pague al llegar a: $Jackiecutz.",
+        cashDesc: "💵 Pago al terminar en Divine Salon (Suite 105). Es preferible el pago en efectivo.",
+        totalLabel: "Total Estimado (Se Paga tras el Servicio)",
+        btnSubmit: "Confirmar y Reservar Cita",
+        btnChooseSlotPrompt: "SELECCIONE UN HORARIO DISPONIBLE ARRIBA",
+        policyFooter: "Tolerancia de 10 minutos para citas. Cancelaciones requieren mínimo 2 horas de anticipación.",
+        drawerHeader: "Menú de Cuenta",
+        tabProfile: "Perfil",
+        tabFamily: "Familia",
+        tabSecurity: "Seguridad",
+        openSlotsSuffix: "horarios libres disponibles"
+    }
 };
 
-function setLanguage(lang) {
-  currentLang = lang;
-  const t = i18n[lang];
-  document.getElementById('lang-en-btn').className = lang === 'en' ? 'px-2.5 py-1 text-[11px] font-black rounded-lg border border-amber-500/40 bg-zinc-900 text-amber-300 transition' : 'px-2.5 py-1 text-[11px] font-black rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-400 transition';
-  document.getElementById('lang-es-btn').className = lang === 'es' ? 'px-2.5 py-1 text-[11px] font-black rounded-lg border border-amber-500/40 bg-zinc-900 text-amber-300 transition' : 'px-2.5 py-1 text-[11px] font-black rounded-lg border border-zinc-800 bg-zinc-950 text-zinc-400 transition';
-  
-  document.getElementById('txt-welcome').textContent = t.welcome;
-  document.getElementById('txt-signout').textContent = t.signout;
-  document.getElementById('txt-hours-header').textContent = t.hoursHeader;
-  document.getElementById('txt-day-sunmon').textContent = t.daySunMon;
-  document.getElementById('txt-status-closed').textContent = t.statusClosed;
-  document.getElementById('txt-day-tue').textContent = t.dayTue;
-  document.getElementById('txt-status-tue').textContent = t.statusTue;
-  document.getElementById('txt-day-wedthu').textContent = t.dayWedThu;
-  document.getElementById('txt-status-wedthu').textContent = t.statusWedThu;
-  document.getElementById('txt-day-frisat').textContent = t.dayFriSat;
-  document.getElementById('txt-status-frisat').textContent = t.statusFriSat;
-  document.getElementById('txt-booking-drawer-title').textContent = t.drawerTitle;
-  document.getElementById('txt-primary-card-title').textContent = t.primaryCardTitle;
-  document.getElementById('lbl-service').textContent = t.lblService;
-  document.getElementById('lbl-select-date').textContent = t.lblSelectDate;
-  document.getElementById('lbl-live-slots').textContent = t.lblLiveSlots;
-  document.getElementById('lbl-notes').textContent = t.lblNotes;
-  document.getElementById('lbl-pay-method').textContent = t.payMethod;
-  document.getElementById('txt-pay-card').textContent = t.payCard;
-  document.getElementById('txt-pay-zelle-sub').textContent = t.payZelleSub;
-  document.getElementById('txt-pay-salon').textContent = t.paySalon;
-  document.getElementById('txt-secure-card-title').textContent = t.secureCard;
-  document.getElementById('txt-card-hold-desc').innerHTML = t.cardHoldDesc;
-  document.getElementById('lbl-card-name').textContent = t.cardName;
-  document.getElementById('lbl-card-number').textContent = t.cardNumber;
-  document.getElementById('lbl-card-exp').textContent = t.cardExp;
-  document.getElementById('lbl-card-zip').textContent = t.cardZip;
-  document.getElementById('txt-zelle-head').textContent = t.zelleHead;
-  document.getElementById('txt-zelle-desc').textContent = t.zelleDesc;
-  document.getElementById('txt-cashapp-head').textContent = t.cashappHead;
-  document.getElementById('txt-cashapp-desc').textContent = t.cashappDesc;
-  document.getElementById('txt-total-label').textContent = t.totalLabel;
-  document.getElementById('txt-policy-footer').textContent = t.policyFooter;
-  document.getElementById('txt-add-person-btn').textContent = t.addPersonBtn;
-  updateBookingCalculation();
-}
+function setLang(lang) {
+    currentLang = lang;
+    const img = document.getElementById('flyer-img');
+    const btnEn = document.getElementById('btn-en');
+    const btnEs = document.getElementById('btn-es');
+    const t = i18n[lang];
 
-async function fetchLiveSlots() {
-  const dateVal = document.getElementById('appointment-date').value;
-  const serviceId = document.getElementById('service-select').value;
-  const grid = document.getElementById('slots-grid');
-  const badge = document.getElementById('open-slots-badge');
-  
-  if (!dateVal) {
-    grid.innerHTML = `<p class="col-span-full text-center text-xs text-zinc-500 py-4">${currentLang === 'es' ? 'Por favor elija una fecha.' : 'Please choose an appointment date.'}</p>`;
-    badge.textContent = currentLang === 'es' ? 'Seleccione fecha' : 'Select date above';
-    return;
-  }
-
-  badge.textContent = currentLang === 'es' ? 'Consultando horarios...' : 'Querying live chairs...';
-  grid.innerHTML = `<p class="col-span-full text-center text-xs text-amber-400 py-4 animate-pulse">${currentLang === 'es' ? 'Verificando disponibilidad...' : 'Checking live availability...'}</p>`;
-
-  try {
-    const res = await fetch(`/api/available-slots?service_id=${serviceId}&date=${dateVal}`);
-    const data = await res.json();
-    
-    if (data.is_closed) {
-      grid.innerHTML = `<p class="col-span-full text-center text-xs text-red-400 py-4 font-bold">${currentLang === 'es' ? 'El salón está cerrado en esta fecha.' : 'Salon is closed on this day. Please select Tue-Sat.'}</p>`;
-      badge.textContent = currentLang === 'es' ? 'Cerrado' : 'Closed';
-      return;
+    if (lang === 'es') {
+        img.src = '/static/img/flyer_es.jpg';
+        btnEs.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black transition cursor-pointer flex items-center gap-2';
+        btnEn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer flex items-center gap-2';
+    } else {
+        img.src = '/static/img/flyer.jpg';
+        btnEn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black transition cursor-pointer flex items-center gap-2';
+        btnEs.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition cursor-pointer flex items-center gap-2';
     }
 
-    if (!data.slots || data.slots.length === 0) {
-      grid.innerHTML = `<p class="col-span-full text-center text-xs text-zinc-400 py-4 font-semibold">${currentLang === 'es' ? 'No hay horarios disponibles.' : 'No open chairs for this date.'}</p>`;
-      badge.textContent = currentLang === 'es' ? '0 Disponibles' : '0 Available';
-      return;
-    }
+    document.getElementById('txt-welcome').textContent = t.welcome;
+    if (document.getElementById('txt-admin-btn')) document.getElementById('txt-admin-btn').textContent = t.adminBtn;
+    document.getElementById('txt-signout').textContent = t.signOut;
+    document.getElementById('txt-flyer-label').textContent = t.flyerLabel;
+    document.getElementById('txt-hours-header').textContent = t.hoursHeader;
+    document.getElementById('txt-day-sunmon').textContent = t.daySunMon;
+    document.getElementById('txt-status-closed').textContent = t.statusClosed;
+    document.getElementById('txt-day-tue').textContent = t.dayTue;
+    document.getElementById('txt-status-tue').textContent = t.statusTue;
+    document.getElementById('txt-day-wedthu').textContent = t.dayWedThu;
+    document.getElementById('txt-status-wedthu').textContent = t.statusWedThu;
+    document.getElementById('txt-day-frisat').textContent = t.dayFriSat;
+    document.getElementById('txt-status-frisat').textContent = t.statusFriSat;
+    document.getElementById('txt-booking-drawer-title').textContent = t.drawerTitle;
+    document.getElementById('txt-primary-card-title').textContent = t.primaryCardTitle;
+    document.getElementById('lbl-service').textContent = t.lblService;
+    document.getElementById('lbl-select-date').textContent = t.lblSelectDate;
+    document.getElementById('lbl-live-slots').textContent = t.lblLiveSlots;
+    document.getElementById('txt-primary-self').textContent = t.primarySelf;
+    document.getElementById('lbl-name').textContent = t.fullName;
+    document.getElementById('lbl-phone').textContent = t.phone;
+    document.getElementById('txt-add-person-btn').textContent = t.addPersonBtn;
+    document.getElementById('lbl-notes').textContent = t.notes;
+    document.getElementById('lbl-pay-method').textContent = t.payMethod;
+    document.getElementById('txt-pay-card').textContent = t.payCard;
+    document.getElementById('txt-pay-card-sub').textContent = t.payCardSub;
+    document.getElementById('txt-pay-zelle-sub').textContent = t.payZelleSub;
+    document.getElementById('txt-pay-salon').textContent = t.paySalon;
+    document.getElementById('txt-pay-salon-sub').textContent = t.paySalonSub;
+    document.getElementById('txt-secure-card-title').textContent = t.secureCard;
+    document.getElementById('txt-card-hold-desc').textContent = t.cardHoldDesc;
+    document.getElementById('lbl-card-name').textContent = t.cardName;
+    document.getElementById('lbl-card-number').textContent = t.cardNumber;
+    document.getElementById('lbl-card-exp').textContent = t.cardExp;
+    document.getElementById('lbl-card-zip').textContent = t.cardZip;
+    document.getElementById('txt-zelle-head').textContent = t.zelleHead;
+    document.getElementById('txt-zelle-desc').textContent = t.zelleDesc;
+    document.getElementById('txt-cashapp-head').textContent = t.cashappHead;
+    document.getElementById('txt-cashapp-desc').textContent = t.cashappDesc;
+    document.getElementById('txt-cash-desc').textContent = t.cashDesc;
+    document.getElementById('txt-total-label').textContent = t.totalLabel;
+    document.getElementById('txt-policy-footer').textContent = t.policyFooter;
 
-    badge.textContent = `${data.slots.length} ${i18n[currentLang].openSlotsSuffix}`;
-    grid.innerHTML = '';
-    
-    data.slots.forEach(slot => {
-      const timeText = slot.time_str || slot.time || slot;
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'time-slot-btn py-2 text-xs font-black rounded-full border text-black bg-[#fffaea] border-[#dfba6b] hover:bg-white transition flex items-center justify-center';
-      btn.textContent = timeText;
-      btn.onclick = () => {
-        document.querySelectorAll('.time-slot-btn').forEach(b => {
-          b.classList.remove('selected', 'active');
-          b.style.background = '#fffaea';
-          b.style.color = '#000000';
-          b.style.borderColor = '#dfba6b';
-        });
-        btn.classList.add('selected', 'active');
-        btn.style.background = 'linear-gradient(135deg, #ffffff 0%, #e5c16d 50%, #b5872a 100%)';
-        btn.style.color = '#000000';
-        btn.style.borderColor = '#ffffff';
-        document.getElementById('selected-time-slot').value = timeText;
-        updateBookingCalculation(timeText);
-      };
-      grid.appendChild(btn);
+    document.getElementById('txt-drawer-header').textContent = t.drawerHeader;
+    document.getElementById('tab-btn-profile').textContent = t.tabProfile;
+    document.getElementById('tab-btn-family').textContent = t.tabFamily;
+    document.getElementById('tab-btn-security').textContent = t.tabSecurity;
+
+    document.querySelectorAll('#primary-service option, .guest-service-select option').forEach(opt => {
+        const nameEn = opt.getAttribute('data-name-en');
+        const catEn = opt.getAttribute('data-cat-en');
+        const price = parseFloat(opt.getAttribute('data-price')).toFixed(2);
+        
+        if (lang === 'es' && serviceTranslations[nameEn]) {
+            const tr = serviceTranslations[nameEn];
+            opt.textContent = `${tr.es} (${tr.cat_es}) — $${price}`;
+        } else {
+            opt.textContent = `${nameEn} (${catEn}) — $${price}`;
+        }
     });
 
-  } catch (err) {
-    grid.innerHTML = `<p class="col-span-full text-center text-xs text-red-400 py-4">Error loading live schedule.</p>`;
-  }
+    const slotVal = document.getElementById('primary_scheduled_time').value;
+    if (!slotVal) {
+        document.getElementById('btn-submit-booking').textContent = t.btnChooseSlotPrompt;
+    }
+
+    onServiceOrDateChange();
 }
 
-function updateBookingCalculation(chosenSlotTime) {
-  let total = 0;
-  const mainSvc = servicesMap[document.getElementById('service-select').value];
-  if (mainSvc) total += mainSvc.price;
+async function onServiceOrDateChange() {
+    calculateTotal();
+    const serviceId = document.getElementById('primary-service').value;
+    const dateVal = document.getElementById('primary-date-picker').value;
+    const grid = document.getElementById('slots-grid');
+    const badge = document.getElementById('slot-status-badge');
+    const t = i18n[currentLang];
 
-  document.querySelectorAll('.guest-service-select').forEach(select => {
-    const gSvc = servicesMap[select.value];
-    if (gSvc) total += gSvc.price;
-  });
+    if (!dateVal) {
+        grid.innerHTML = `<p class="col-span-full text-center text-xs text-zinc-500 py-4">${currentLang === 'es' ? 'Por favor elija una fecha para ver sillas disponibles.' : 'Please choose an appointment date to see live open chairs.'}</p>`;
+        badge.textContent = currentLang === 'es' ? 'Seleccione fecha' : 'Select date above';
+        return;
+    }
 
-  const formattedTotal = `$${total.toFixed(2)}`;
-  document.getElementById('booking-total-price').textContent = formattedTotal;
-  
-  const slotTime = chosenSlotTime || document.getElementById('selected-time-slot').value;
-  const submitBtn = document.getElementById('btn-submit-booking');
-  const t = i18n[currentLang];
-  
-  if (slotTime) {
-    submitBtn.textContent = `${t.btnSubmit} (${formattedTotal}) @ ${slotTime}`;
-  } else {
-    submitBtn.textContent = `${t.btnSubmit} (${formattedTotal})`;
-  }
+    badge.textContent = currentLang === 'es' ? 'Buscando horarios...' : 'Querying live chairs...';
+    grid.innerHTML = `<p class="col-span-full text-center text-xs text-amber-400 py-4 animate-pulse">⏳ ${currentLang === 'es' ? 'Verificando disponibilidad en vivo...' : 'Checking live availability...'}</p>`;
+
+    try {
+        const res = await fetch(`/api/available-slots?service_id=${serviceId}&date=${dateVal}`);
+        const data = await res.json();
+
+        if (data.closed) {
+            grid.innerHTML = `<p class="col-span-full text-center text-xs text-red-400 py-4 font-bold">🔴 ${currentLang === 'es' ? 'El salón está cerrado los domingos y lunes.' : 'Salon is closed on Sundays and Mondays. Please select Tue - Sat.'}</p>`;
+            badge.textContent = currentLang === 'es' ? 'Cerrado' : 'Closed';
+            disableSubmit();
+            return;
+        }
+
+        if (!data.slots || data.slots.length === 0) {
+            grid.innerHTML = `<p class="col-span-full text-center text-xs text-zinc-400 py-4 font-semibold">${data.message || (currentLang === 'es' ? 'No hay horarios disponibles para esta fecha. Intente con otra.' : 'No slots open on this date. Please pick another day.')}</p>`;
+            badge.textContent = currentLang === 'es' ? '0 Disponibles' : '0 Available';
+            disableSubmit();
+            return;
+        }
+
+        badge.textContent = `${data.slots.length} ${t.openSlotsSuffix}`;
+        grid.innerHTML = '';
+
+        data.slots.forEach(slot => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'slot-btn py-2 px-2 text-center bg-black hover:bg-amber-400 hover:text-black border border-zinc-800 hover:border-amber-400 rounded-xl text-xs font-bold text-zinc-300 transition duration-150';
+            btn.textContent = slot.time_str;
+            btn.onclick = () => selectSlot(slot.iso_val, slot.time_str, btn);
+            grid.appendChild(btn);
+        });
+
+    } catch (err) {
+        grid.innerHTML = `<p class="col-span-full text-center text-xs text-red-400 py-4">Error loading slots.</p>`;
+    }
+}
+
+function selectSlot(isoVal, timeStr, btnElement) {
+    document.getElementById('primary_scheduled_time').value = isoVal;
+    document.querySelectorAll('.slot-btn').forEach(b => {
+        b.className = 'slot-btn py-2 px-2 text-center bg-black hover:bg-amber-400 hover:text-black border border-zinc-800 hover:border-amber-400 rounded-xl text-xs font-bold text-zinc-300 transition duration-150';
+    });
+    btnElement.className = 'slot-btn py-2 px-2 text-center bg-amber-400 text-black border border-amber-300 rounded-xl text-xs font-black shadow-lg';
+
+    document.querySelectorAll('.guest-time-input').forEach(inp => {
+        if (!inp.value) inp.value = isoVal;
+    });
+
+    const submitBtn = document.getElementById('btn-submit-booking');
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+    const total = document.getElementById('booking-total-price').textContent;
+    const t = i18n[currentLang];
+    submitBtn.textContent = `${t.btnSubmit} (${total}) — ${timeStr}`;
+}
+
+function disableSubmit() {
+    const submitBtn = document.getElementById('btn-submit-booking');
+    submitBtn.disabled = true;
+    submitBtn.classList.add('opacity-60', 'cursor-not-allowed');
+    const t = i18n[currentLang];
+    submitBtn.textContent = t.btnChooseSlotPrompt;
+    document.getElementById('primary_scheduled_time').value = '';
+}
+
+function openDrawer() {
+    document.getElementById('drawer-backdrop').classList.remove('hidden');
+    document.getElementById('app-drawer').classList.remove('-translate-x-full');
+}
+function closeDrawer() {
+    document.getElementById('drawer-backdrop').classList.add('hidden');
+    document.getElementById('app-drawer').classList.add('-translate-x-full');
+}
+function switchDrawerTab(tab) {
+    ['profile', 'family', 'security'].forEach(t => {
+        document.getElementById(`drawer-tab-${t}`).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tab) {
+            btn.className = 'py-1.5 rounded-lg bg-amber-400 text-black transition';
+        } else {
+            btn.className = 'py-1.5 rounded-lg text-zinc-400 hover:text-white transition';
+        }
+    });
+}
+
+function addGuestRow() {
+    const container = document.getElementById('additional-guests-container');
+    const template = document.getElementById('guest-row-template');
+    const clone = template.content.cloneNode(true);
+    
+    const primaryTimeVal = document.getElementById('primary_scheduled_time').value;
+    if (primaryTimeVal) {
+        const timeInput = clone.querySelector('.guest-time-input');
+        if (timeInput) timeInput.value = primaryTimeVal;
+    }
+
+    container.appendChild(clone);
+    setLang(currentLang);
+    calculateTotal();
+}
+
+function removeGuestRow(btn) {
+    btn.closest('.guest-row').remove();
+    calculateTotal();
+}
+
+function calculateTotal() {
+    let total = 0;
+    const primarySelect = document.getElementById('primary-service');
+    if (primarySelect && primarySelect.selectedOptions[0]) {
+        total += parseFloat(primarySelect.selectedOptions[0].getAttribute('data-price') || 0);
+    }
+    document.querySelectorAll('.guest-service-select').forEach(sel => {
+        if (sel.selectedOptions[0]) {
+            total += parseFloat(sel.selectedOptions[0].getAttribute('data-price') || 0);
+        }
+    });
+    const formatted = '$' + total.toFixed(2);
+    document.getElementById('booking-total-price').textContent = formatted;
+    
+    const slotVal = document.getElementById('primary_scheduled_time').value;
+    if (slotVal) {
+        const t = i18n[currentLang];
+        document.getElementById('btn-submit-booking').textContent = `${t.btnSubmit} (${formatted})`;
+    }
 }
 
 function togglePaymentGateway(method) {
-  document.getElementById('card-gateway').classList.toggle('hidden', method !== 'card_hold');
-  document.getElementById('zelle-gateway').classList.toggle('hidden', method !== 'zelle');
-  document.getElementById('cashapp-gateway').classList.toggle('hidden', method !== 'cashapp');
-  document.getElementById('salon-gateway').classList.toggle('hidden', method !== 'salon');
+    document.getElementById('card-gateway').classList.toggle('hidden', method !== 'card');
+    document.getElementById('zelle-gateway').classList.toggle('hidden', method !== 'zelle');
+    document.getElementById('cashapp-gateway').classList.toggle('hidden', method !== 'cash_app');
+    document.getElementById('cash-gateway').classList.toggle('hidden', method !== 'cash');
+
+    const isCard = (method === 'card');
+    document.getElementById('card_name').required = isCard;
+    document.getElementById('card_number').required = isCard;
+    document.getElementById('card_exp').required = isCard;
+    document.getElementById('card_cvv').required = isCard;
+    document.getElementById('card_zip').required = isCard;
 }
 
-function addAdditionalGuest() {
-  additionalGuestCount++;
-  const container = document.getElementById('additional-guests-container');
-  const guestCard = document.createElement('div');
-  guestCard.className = 'p-3.5 rounded-xl bg-black border border-zinc-900 space-y-2 relative';
-  guestCard.id = `guest-card-${additionalGuestCount}`;
-  
-  guestCard.innerHTML = `
-    <div class="flex justify-between items-center border-b border-zinc-900 pb-1">
-      <span class="text-[11px] font-bold text-amber-400 uppercase">+ Additional Guest #${additionalGuestCount}</span>
-      <button type="button" onclick="removeGuest(${additionalGuestCount})" class="text-xs text-red-400 font-bold hover:underline">✕ Remove</button>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-      <div>
-        <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5">Guest Full Name</label>
-        <input type="text" name="guest_name_${additionalGuestCount}" placeholder="Name of child or person" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none">
-      </div>
-      <div>
-        <label class="block text-[9px] font-bold uppercase text-zinc-400 mb-0.5">Guest Service</label>
-        <select name="guest_service_${additionalGuestCount}" class="guest-service-select w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3 py-1.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none" onchange="updateBookingCalculation()">
-          {% for s in services %}
-          <option value="{{ s.id }}">{{ s.name }} — ${{ "%.2f"|format(s.price) }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-  `;
-  container.appendChild(guestCard);
-  updateBookingCalculation();
-}
-
-function removeGuest(id) {
-  const card = document.getElementById(`guest-card-${id}`);
-  if (card) {
-    card.remove();
-    updateBookingCalculation();
-  }
-}
-
-// Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-  const dateInput = document.getElementById('appointment-date');
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  dateInput.value = `${year}-${month}-${day}`;
-  fetchLiveSlots();
-  updateBookingCalculation();
+document.getElementById('booking-phone').addEventListener('input', function (e) {
+    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+    e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
 });
+
+document.getElementById('card_number').addEventListener('input', function (e) {
+    let v = e.target.value.replace(/\D/g, '').substring(0, 16);
+    let parts = v.match(/(\d{1,4})/g) || [];
+    e.target.value = parts.join(' ');
+});
+
+document.getElementById('card_exp').addEventListener('input', function (e) {
+    let v = e.target.value.replace(/\D/g, '').substring(0, 4);
+    if (v.length >= 3) {
+        e.target.value = v.substring(0, 2) + '/' + v.substring(2);
+    } else {
+        e.target.value = v;
+    }
+});
+
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('primary-date-picker').min = today;
+document.getElementById('primary-date-picker').value = today;
+onServiceOrDateChange();
 </script>
 {% endblock %}
