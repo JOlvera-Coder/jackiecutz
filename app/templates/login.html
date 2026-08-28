@@ -3,7 +3,7 @@
 {% block content %}
 <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-black">
 
-    <!-- Jackiecutz Header Logo with Stars (Larger Scale) -->
+    <!-- Jackiecutz Header Logo with Stars -->
     <div class="w-full max-w-md flex justify-center mb-6">
         <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" 
              alt="Jackiecutz Hair Studio - Ivonne Gonzalez" 
@@ -11,13 +11,13 @@
     </div>
 
     <!-- Login Card -->
-    <div class="w-full max-w-sm bg-black border border-amber-400/40 rounded-3xl p-6 sm:p-7 shadow-2xl shadow-amber-500/10">
+    <div class="w-full max-w-sm bg-black border border-[#e6c280]/40 rounded-3xl p-6 sm:p-7 shadow-[0_0_25px_rgba(230,194,128,0.15)]">
 
         <!-- Flash Alert Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="mb-4 p-3 rounded-xl text-xs font-bold text-center {% if category == 'danger' %}bg-red-500/20 text-red-400 border border-red-500/30{% else %}bg-amber-500/20 text-amber-300 border border-amber-500/30{% endif %}">
+                    <div class="mb-4 p-3 rounded-xl text-xs font-bold text-center {% if category == 'danger' %}bg-red-500/20 text-red-400 border border-red-500/30{% else %}bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40{% endif %}">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -27,33 +27,33 @@
         <!-- Form -->
         <form method="POST" action="{{ url_for('main.login') }}" class="space-y-4 text-left">
             <div>
-                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.35)]">
                     USERNAME, NAME, OR PHONE
                 </label>
                 <input type="text" name="username" required 
-                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400">
+                       class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
             </div>
 
             <div>
-                <label class="block text-[11px] font-black uppercase text-amber-400 tracking-wider mb-1">
+                <label class="block text-[11px] font-black uppercase text-[#f7e3af] tracking-wider mb-1 drop-shadow-[0_0_4px_rgba(247,227,175,0.35)]">
                     PASSWORD (STYLISTS / REGISTERED)
                 </label>
                 <input type="password" name="password" 
-                       class="w-full bg-[#fffee0] border border-amber-400/20 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-amber-400">
+                       class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-2.5 text-sm text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
             </div>
 
             <!-- Remember Me & Forgot Password -->
             <div class="flex items-center justify-between pt-1">
                 <label class="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" name="remember" class="rounded bg-zinc-900 border-zinc-700 text-amber-400 focus:ring-amber-400 h-4 w-4">
+                    <input type="checkbox" name="remember" class="rounded bg-zinc-900 border-zinc-700 text-[#f7e3af] focus:ring-[#f7e3af] h-4 w-4">
                     <span class="text-xs text-zinc-300">Remember Me</span>
                 </label>
-                <a href="{{ url_for('main.forgot_password') }}" class="text-xs font-bold text-amber-400 hover:text-amber-300 transition">
+                <a href="{{ url_for('main.forgot_password') }}" class="text-xs font-bold text-[#f7e3af] hover:text-white transition drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
                     Forgot Password?
                 </a>
             </div>
 
-            <!-- Gold Metallic Log In Button with Glow -->
+            <!-- Metallic Champagne Gold Button with Glow -->
             <div class="pt-2">
                 <button type="submit" 
                         class="w-full py-3 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
@@ -66,15 +66,15 @@
         <div class="pt-5 mt-4 border-t border-zinc-900 text-center space-y-2">
             <p class="text-xs text-zinc-300">
                 Need an account? 
-                <a href="{{ url_for('main.register') }}" class="font-bold text-white underline hover:text-amber-400 transition">
+                <a href="{{ url_for('main.register') }}" class="font-bold text-white underline hover:text-[#f7e3af] transition">
                     Register
                 </a>
             </p>
             <p class="text-[11px] text-zinc-300 leading-tight">
                 By logging in, you agree to our 
-                <a href="{{ url_for('main.terms') }}" class="underline hover:text-amber-400">Terms & Conditions</a> 
+                <a href="{{ url_for('main.terms') }}" class="underline hover:text-[#f7e3af]">Terms & Conditions</a> 
                 and 
-                <a href="{{ url_for('main.privacy') }}" class="underline hover:text-amber-400">Privacy Policy</a>.
+                <a href="{{ url_for('main.privacy') }}" class="underline hover:text-[#f7e3af]">Privacy Policy</a>.
             </p>
         </div>
 
