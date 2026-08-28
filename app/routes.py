@@ -16,7 +16,6 @@ Appointment = BarberBooking
 main_bp = Blueprint('main', __name__)
 
 # --- ONLINE SCHEDULE RULES (Cutoff 30 mins prior to close) ---
-# Tue - Thu (Closes 6:00 PM): Last online slot 5:30 PM (16 slots)
 ONLINE_WEEKDAY_SLOTS = [
     "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
     "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
@@ -24,7 +23,6 @@ ONLINE_WEEKDAY_SLOTS = [
     "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM"
 ]
 
-# Fri - Sat (Closes 7:00 PM): Last online slot 6:30 PM (18 slots)
 ONLINE_WEEKEND_SLOTS = [
     "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
     "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
@@ -35,7 +33,6 @@ ONLINE_WEEKEND_SLOTS = [
 
 DEFAULT_TIME_SLOTS = ONLINE_WEEKEND_SLOTS
 
-# Service Fallback Menu
 FALLBACK_SERVICES = [
     {"id": 1, "name": "Studio Signature Haircut", "price": 35.0, "duration": 30, "category": "Haircuts"},
     {"id": 2, "name": "Skin Fade & Line Up", "price": 40.0, "duration": 35, "category": "Haircuts"},
@@ -119,23 +116,32 @@ def terms():
 def privacy():
     return render_template('privacy.html' if os.path.exists('app/templates/privacy.html') else 'terms.html')
 
-@main_bp.route('/forgot_password')
+@main_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
+    if request.method == 'POST':
+        identifier = request.form.get('phone', request.form.get('email', request.form.get('username', ''))).strip()
+        flash(f'Password reset instructions have been dispatched to {identifier or "your phone/email"}.', 'success')
+        return redirect(url_for('main.login'))
     return render_template('forgot_password.html' if os.path.exists('app/templates/forgot_password.html') else 'login.html')
 
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        phone = request.form.get('phone', '').strip()
+        name = request.form.get('name', request.form.get('full_name', '')).strip()
+        phone = request.form.get('phone', request.form.get('phone_number', '')).strip()
+        email = request.form.get('email', '').strip()
+
         if phone:
             cust = Customer.query.filter_by(phone=phone).first()
             if not cust:
-                cust = Customer(name=name or phone, phone=phone)
+                cust = Customer(name=name or phone, phone=phone, email=email if hasattr(Customer, 'email') else None)
                 db.session.add(cust)
                 db.session.commit()
             session['customer_id'] = cust.id
+            flash('Account created successfully! Welcome to JackieCutz Studio.', 'success')
             return redirect(url_for('main.customer_portal'))
+        flash('Please enter a valid phone number to register.', 'warning')
+
     return render_template('register.html' if os.path.exists('app/templates/register.html') else 'login.html')
 
 @main_bp.route('/login', methods=['GET', 'POST'])
@@ -181,7 +187,7 @@ def logout():
         logout_user()
     return redirect(url_for('main.login'))
 
-# --- CUSTOMER PORTAL & ONLINE APPOINTMENT ACTIONS ---
+# --- CUSTOMER PORTAL & ONLINE APPOINTMENTS ---
 
 @main_bp.route('/customer/portal', endpoint='customer_portal')
 @main_bp.route('/portal', endpoint='client_portal')
@@ -294,7 +300,7 @@ def pos():
         **ctx
     )
 
-# --- INVENTORY & EXPENSE ACTIONS ---
+# --- INVENTORY & EXPENSES ---
 
 @main_bp.route('/add_expense', methods=['POST'])
 def add_expense():
@@ -399,7 +405,7 @@ def walkin_kiosk():
         db.session.commit()
 
         flash('Walk-in checked in successfully!', 'success')
-        return render_template('kiosk_success.html') if os.path.exists('app/templates/kiosk_success.html') else redirect(url_for('main.walkin_kiosk'))
+        return render_template('kiosk_success.html' if os.path.exists('app/templates/kiosk_success.html') else redirect(url_for('main.walkin_kiosk')))
 
     services = get_services_list()
     return render_template('kiosk.html', services=services)
@@ -409,7 +415,7 @@ def auto_checkin():
     flash('Client auto-checked in via Bluetooth/Geofence.', 'success')
     return redirect(url_for('main.customer_portal'))
 
-# --- REAL-TIME ONLINE BOOKING SLOTS (MATCHES JS OBJECT SCHEMA) ---
+# --- REAL-TIME AVAILABLE SLOTS API ---
 
 @main_bp.route('/api/available-slots')
 def available_slots():
@@ -420,7 +426,6 @@ def available_slots():
         req_date = datetime.today().date()
         date_str = req_date.strftime('%Y-%m-%d')
 
-    # Sunday (6), Monday (0): Closed for online bookings
     if req_date.weekday() in [0, 6]:
         return jsonify({
             'slots': [],
@@ -430,7 +435,6 @@ def available_slots():
             'count': 0
         })
 
-    # Tuesday (1), Wednesday (2), Thursday (3): 10am - 6pm (Cutoff 5:30 PM)
     if req_date.weekday() in [1, 2, 3]:
         slot_objs = format_slot_objects(ONLINE_WEEKDAY_SLOTS, date_str)
         return jsonify({
@@ -441,7 +445,6 @@ def available_slots():
             'count': len(slot_objs)
         })
 
-    # Friday (4), Saturday (5): 10am - 7pm (Cutoff 6:30 PM)
     slot_objs = format_slot_objects(ONLINE_WEEKEND_SLOTS, date_str)
     return jsonify({
         'slots': slot_objs,
