@@ -30,6 +30,16 @@ class Customer(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     bookings = db.relationship('BarberBooking', backref='customer', lazy='dynamic')
+    family_members = db.relationship('FamilyMember', backref='customer', lazy='dynamic')
+
+class FamilyMember(db.Model):
+    __tablename__ = 'family_members'
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    relationship = db.Column(db.String(50), default="Child")
+    notes = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class BarberService(db.Model):
     __tablename__ = 'barber_services'

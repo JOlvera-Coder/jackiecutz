@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify, Response
 from app import db
-from app.models import User, Customer, BarberBooking, BarberService, Product, StudioExpense, ExpenseCategory
+from app.models import User, Customer, FamilyMember, BarberBooking, BarberService, Product, StudioExpense, ExpenseCategory
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime, date, timedelta
 import csv
@@ -143,7 +143,8 @@ def customer_portal():
     customer = Customer.query.get(session['customer_id'])
     services = BarberService.query.all()
     user_bookings = BarberBooking.query.filter_by(customer_id=customer.id).order_by(BarberBooking.appointment_time.desc()).all() if customer else []
-    return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS, bookings=user_bookings)
+    family_members = FamilyMember.query.filter_by(customer_id=customer.id).all() if customer else []
+    return render_template('booking.html', customer=customer, services=services, time_slots=DEFAULT_TIME_SLOTS, bookings=user_bookings, family_members=family_members)
 
 @main_bp.route('/update-profile', methods=['POST'])
 def update_profile():
@@ -155,7 +156,38 @@ def update_profile():
         customer.email = request.form.get('email', customer.email).strip()
         customer.zip_code = request.form.get('zip_code', customer.zip_code).strip()
         db.session.commit()
-        flash("Profile details updated successfully!", "success")
+        flash("Profile updated successfully!", "success")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/add-family-member', methods=['POST'])
+def add_family_member():
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    name = request.form.get('name', '').strip()
+    relationship = request.form.get('relationship', 'Child').strip()
+    notes = request.form.get('notes', '').strip()
+    
+    if name:
+        member = FamilyMember(
+            customer_id=session['customer_id'],
+            name=name,
+            relationship=relationship,
+            notes=notes
+        )
+        db.session.add(member)
+        db.session.commit()
+        flash(f"Added {name} to your family profile!", "success")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/delete-family-member/<int:member_id>', methods=['POST'])
+def delete_family_member(member_id):
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    member = FamilyMember.query.get_or_404(member_id)
+    if member.customer_id == session['customer_id']:
+        db.session.delete(member)
+        db.session.commit()
+        flash("Family member removed.", "info")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/book-service', methods=['POST'])
@@ -191,6 +223,17 @@ def cancel_booking(booking_id):
         booking.status = "Cancelled"
         db.session.commit()
         flash("Booking cancelled successfully.", "info")
+    return redirect(url_for('main.customer_portal'))
+
+@main_bp.route('/reschedule-booking/<int:booking_id>', methods=['POST'])
+def reschedule_booking(booking_id):
+    if 'customer_id' not in session:
+        return redirect(url_for('main.login'))
+    booking = BarberBooking.query.get_or_404(booking_id)
+    if booking.customer_id == session['customer_id']:
+        booking.status = "Rescheduled"
+        db.session.commit()
+        flash("Appointment rescheduled.", "info")
     return redirect(url_for('main.customer_portal'))
 
 @main_bp.route('/walkin-kiosk', methods=['GET', 'POST'])
