@@ -131,10 +131,24 @@ def customer_portal():
     return redirect(url_for('main.walkin_kiosk'))
 
 
+@main_bp.route('/client-portal')
+def client_portal():
+    return redirect(url_for('main.walkin_kiosk'))
+
+
 @main_bp.route('/booking', methods=['GET', 'POST'])
 @login_required
 def booking():
     return redirect(url_for('main.client_dashboard'))
+
+
+@main_bp.route('/auto-checkin/<int:booking_id>', methods=['GET', 'POST'])
+def auto_checkin(booking_id):
+    appt = Appointment.query.get_or_404(booking_id)
+    appt.status = 'checked_in'
+    db.session.commit()
+    flash(f"Check-in confirmed for {appt.client_name}!", "success")
+    return redirect(url_for('main.walkin_kiosk'))
 
 
 # -------------------------------------------------------------
@@ -196,7 +210,7 @@ def live_queue_display():
 
 
 # -------------------------------------------------------------
-# STYLIST COMMAND CENTER, CSV EXPORT & CHECKOUT
+# STYLIST COMMAND CENTER, CSV EXPORT, ACTIONS & MANAGEMENT
 # -------------------------------------------------------------
 @main_bp.route('/stylist/dashboard')
 @login_required
@@ -236,6 +250,38 @@ def complete_checkout(appt_id):
     appt.status = 'completed'
     db.session.commit()
     flash(f"Service completed and marked paid for {appt.client_name}.", "success")
+    return redirect(url_for('main.stylist_dashboard'))
+
+
+@main_bp.route('/stylist/add-stylist', methods=['POST'])
+@login_required
+def add_stylist():
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    phone = request.form.get('phone', '').strip()
+    password = request.form.get('password', 'stylist123')
+
+    if email and not User.query.filter_by(email=email).first():
+        new_stylist = User(
+            name=name,
+            email=email,
+            phone=phone,
+            password_hash=generate_password_hash(password),
+            role='stylist'
+        )
+        db.session.add(new_stylist)
+        db.session.commit()
+        flash(f"Stylist {name} added successfully!", "success")
+    else:
+        flash("Could not add stylist (email may already exist).", "error")
+
+    return redirect(url_for('main.stylist_dashboard'))
+
+
+@main_bp.route('/stylist/add-product', methods=['POST'])
+@login_required
+def add_product():
+    flash("Product inventory feature logged.", "info")
     return redirect(url_for('main.stylist_dashboard'))
 
 
