@@ -1,27 +1,112 @@
 {% extends 'base.html' %}
+{% block title %}Appointment Confirmed | Jackiecutz Hair Studio{% endblock %}
+
 {% block content %}
-<div class="min-h-screen py-12 px-4 flex justify-center items-center">
-    <div class="max-w-md w-full bg-zinc-950 border border-amber-500/30 rounded-3xl p-8 text-center shadow-2xl">
-        <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold border border-emerald-500/20">
-            ✓
-        </div>
-        <h1 class="text-2xl font-bold text-white mb-2">You are on the Schedule!</h1>
-        <p class="text-zinc-400 text-sm mb-6">We sent an SMS reminder to <span class="text-white font-mono">{{ booking.customer.phone }}</span>.</p>
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-left space-y-2 mb-6">
-            <div class="flex justify-between">
-                <span class="text-zinc-400 text-sm">Client:</span>
-                <span class="text-white font-medium text-sm">{{ booking.customer.name }}</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-zinc-400 text-sm">Service:</span>
-                <span class="text-amber-400 font-medium text-sm">{{ booking.service.name }}</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-zinc-400 text-sm">Time:</span>
-                <span class="text-white font-medium text-sm">{{ booking.scheduled_time.strftime('%b %d at %I:%M %p') }}</span>
-            </div>
-        </div>
-        <a href="{{ url_for('main.client_portal') }}" class="text-xs text-amber-400 hover:underline">← Book another cut</a>
+<div style="max-width: 500px; margin: 24px auto 40px auto; padding: 0 16px; text-align: center; background: #000000;">
+
+  <!-- Studio Logo Banner -->
+  <div class="studio-logo-banner">
+    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio">
+  </div>
+
+  <!-- Confirmation Card -->
+  <div style="background: #080808; border: 1px solid #201a12; border-radius: 20px; padding: 28px 22px; box-shadow: 0 12px 35px rgba(0,0,0,0.95); text-align: left;">
+    
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #ffffff 0%, #faeac0 50%, #dfba6b 100%); color: #000; font-size: 1.8rem; font-weight: 900; box-shadow: 0 0 20px rgba(223, 186, 107, 0.6); margin-bottom: 12px;">
+        ✓
+      </div>
+      <h2 style="color: #fff0b3; font-size: 1.3rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;">
+        You Are On The Schedule!
+      </h2>
+      <p style="color: #888; font-size: 0.82rem; margin: 0;">
+        Confirmation # <span style="color: #dfba6b; font-weight: 800;">JC-{{ "%05d"|format(booking.id) }}</span>
+      </p>
     </div>
+
+    <!-- Booking Details Pill -->
+    <div style="background: #fffaea; color: #000000; border-radius: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(216, 176, 86, 0.2);">
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0d0b0; padding-bottom: 8px; margin-bottom: 8px;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: #555;">CLIENT NAME:</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ customer.name if customer else (booking.customer.name if booking.customer else 'Valued Client') }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0d0b0; padding-bottom: 8px; margin-bottom: 8px;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: #555;">PHONE NUMBER:</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ customer.phone if customer else (booking.customer.phone if booking.customer else '') }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0d0b0; padding-bottom: 8px; margin-bottom: 8px;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: #555;">SERVICE:</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.service_name }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="font-size: 0.78rem; font-weight: 700; color: #555;">APPOINTMENT TIME:</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.appointment_time.strftime('%b %d, %Y at %I:%M %p') }}</span>
+      </div>
+    </div>
+
+    <!-- Geolocation Auto Check-In Radar -->
+    <div style="background: #111111; border: 1px solid #29241b; border-radius: 14px; padding: 16px; margin-bottom: 22px; text-align: center;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
+        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #51cf66; box-shadow: 0 0 10px #51cf66;" id="geo-indicator"></span>
+        <span style="color: #fff0b3; font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Smart Auto Check-In Active</span>
+      </div>
+      <p style="color: #999; font-size: 0.78rem; margin: 0 0 10px 0;" id="geo-status">
+        Detecting GPS position... When you arrive at Divine Salon Suite 105, you will be automatically checked into Ivonne's active chair queue.
+      </p>
+      <button type="button" onclick="manualCheckIn()" id="manual-btn" style="background: #fffaea; color: #000; border: 1px solid #d8b056; font-size: 0.75rem; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer;">
+        📍 I Have Arrived (Manual Check-In)
+      </button>
+    </div>
+
+    <a href="{{ url_for('main.customer_portal') }}" class="gold-btn" style="display: block; text-align: center; text-decoration: none; padding: 14px; font-size: 0.85rem;">
+      Return to Studio Hub ✂️
+    </a>
+  </div>
 </div>
+
+<script>
+// Divine Salon Suite 105: 806-E Airtex Dr, Houston, TX 77073
+const SALON_LAT = 29.9861;
+const SALON_LON = -95.4056;
+const PROXIMITY_METERS = 75; // Auto check-in trigger within ~250 feet
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3;
+    const φ1 = lat1 * Math.PI/180;
+    const φ2 = lat2 * Math.PI/180;
+    const Δφ = (lat2-lat1) * Math.PI/180;
+    const Δλ = (lon2-lon1) * Math.PI/180;
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function triggerCheckIn(method) {
+    fetch("{{ url_for('main.auto_checkin', booking_id=booking.id) }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+    }).then(res => res.json()).then(data => {
+        if (data.status === 'success') {
+            document.getElementById('geo-status').innerHTML = `<b style="color: #51cf66;">✓ Auto-Checked In!</b> You are now placed in Ivonne's active queue.`;
+            document.getElementById('manual-btn').style.display = 'none';
+        }
+    });
+}
+
+function manualCheckIn() {
+    triggerCheckIn('manual');
+}
+
+if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(pos => {
+        const dist = calculateDistance(pos.coords.latitude, pos.coords.longitude, SALON_LAT, SALON_LON);
+        if (dist <= PROXIMITY_METERS) {
+            triggerCheckIn('geo');
+        } else {
+            document.getElementById('geo-status').textContent = `GPS active. You are ~${Math.round(dist)}m from the salon. Auto check-in will trigger upon arrival.`;
+        }
+    }, err => {
+        document.getElementById('geo-status').textContent = "Location access inactive. Use the manual check-in button when you arrive.";
+    }, { enableHighAccuracy: true });
+}
+</script>
 {% endblock %}
