@@ -28,19 +28,19 @@
     <div style="background: #fffaea; color: #000000; border-radius: 14px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(216, 176, 86, 0.2);">
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0d0b0; padding-bottom: 8px; margin-bottom: 8px;">
         <span style="font-size: 0.78rem; font-weight: 700; color: #555;">CLIENT NAME:</span>
-        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ customer.name if customer else (booking.customer.name if booking.customer else 'Valued Client') }}</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.client_name }}</span>
       </div>
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0d0b0; padding-bottom: 8px; margin-bottom: 8px;">
         <span style="font-size: 0.78rem; font-weight: 700; color: #555;">PHONE NUMBER:</span>
-        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ customer.phone if customer else (booking.customer.phone if booking.customer else '') }}</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.phone or 'Not Provided' }}</span>
       </div>
       <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e0d0b0; padding-bottom: 8px; margin-bottom: 8px;">
         <span style="font-size: 0.78rem; font-weight: 700; color: #555;">SERVICE:</span>
-        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.service_name }}</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.service.name if booking.service else 'Jackiecutz Hair Studio Service' }}</span>
       </div>
       <div style="display: flex; justify-content: space-between;">
         <span style="font-size: 0.78rem; font-weight: 700; color: #555;">APPOINTMENT TIME:</span>
-        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.appointment_time.strftime('%b %d, %Y at %I:%M %p') }}</span>
+        <span style="font-size: 0.85rem; font-weight: 800; color: #000;">{{ booking.date.strftime('%b %d, %Y') if booking.date else 'Today' }} at {{ booking.time or 'Scheduled' }}</span>
       </div>
     </div>
 
