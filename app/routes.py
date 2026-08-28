@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
 from app.models import (
-    User, Customer, Appointment, BarberService, 
+    User, Customer, Booking as Appointment, BarberService, 
     BusinessSettings, Product, FamilyMember, WalkInQueue
 )
 
