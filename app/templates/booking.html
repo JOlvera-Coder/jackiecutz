@@ -60,41 +60,22 @@
         <span class="text-[10px] font-bold text-zinc-500 uppercase" id="txt-primary-card-title">Primary Client</span>
       </div>
 
-      <!-- Service Selection with Clean Categorized Optgroups -->
+      <!-- Service Selection -->
       <div>
         <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-service">Service</label>
-        <select name="service_id" id="service-select" class="w-full bg-[#fffaea] border border-[#dfba6b] rounded-xl px-3.5 py-2.5 text-xs text-black font-bold focus:outline-none" onchange="updateBookingCalculation(); fetchLiveSlots();">
-          {% set categories = [] %}
+        <select name="service_id" id="service-select" class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none" onchange="updateBookingCalculation()">
           {% for s in services %}
-            {% if s.category and s.category not in categories %}
-              {% set _ = categories.append(s.category) %}
-            {% endif %}
+          <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" {% if loop.first %}selected{% endif %}>
+            {{ s.name }} ({{ s.category }}) — ${{ "%.2f"|format(s.price) }}
+          </option>
           {% endfor %}
-
-          {% for cat in categories %}
-          <optgroup label="—— {{ cat|upper }} ——" class="bg-black text-amber-400 font-extrabold">
-            {% for s in services if s.category == cat %}
-            <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" class="bg-[#fffaea] text-black font-bold">
-              {{ s.name }} — ${{ "%.2f"|format(s.price) }}
-            </option>
-            {% endfor %}
-          </optgroup>
-          {% endfor %}
-
-          {% if not categories %}
-            {% for s in services %}
-            <option value="{{ s.id }}" data-price="{{ s.price }}" data-category="{{ s.category }}" data-name="{{ s.name }}" class="bg-[#fffaea] text-black font-bold">
-              {{ s.name }} — ${{ "%.2f"|format(s.price) }}
-            </option>
-            {% endfor %}
-          {% endif %}
         </select>
       </div>
 
       <!-- Date Selector -->
       <div>
         <label class="block text-[10px] font-bold uppercase text-zinc-400 mb-1" id="lbl-select-date">Select Appointment Date</label>
-        <input type="date" name="appointment_date" id="appointment-date" required class="w-full bg-[#fffaea] border border-[#dfba6b] rounded-xl px-3.5 py-2.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none" onchange="fetchLiveSlots()">
+        <input type="date" name="appointment_date" id="appointment-date" required class="w-full bg-[#fffaea] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-black font-bold focus:border-amber-400 focus:outline-none" onchange="fetchLiveSlots()">
       </div>
 
       <!-- Live Real-Time Time Slots -->
@@ -109,9 +90,9 @@
         <input type="hidden" name="time_slot" id="selected-time-slot" required>
       </div>
 
-      <!-- Primary Contact Info (Stored cleanly in background for submission) -->
-      <input type="hidden" name="name" value="{{ customer.name if customer else (current_user.name if current_user else '') }}">
-      <input type="hidden" name="phone" id="booking-phone" value="{{ customer.phone if customer else (current_user.phone if current_user else '') }}">
+      <!-- Primary Contact Info: Seamlessly Hidden (Auto-Filled via session) -->
+      <input type="hidden" name="name" value="{{ customer.name if customer else '' }}">
+      <input type="hidden" name="phone" id="booking-phone" value="{{ customer.phone if customer else '' }}">
       <span id="lbl-name" class="hidden"></span>
       <span id="lbl-phone" class="hidden"></span>
 
@@ -122,24 +103,6 @@
       <button type="button" id="btn-add-person" onclick="addAdditionalGuest()" class="w-full py-2.5 border border-zinc-800 rounded-full text-xs font-extrabold text-black bg-[#fffaea] hover:bg-white transition flex items-center justify-center space-x-1 shadow-sm">
         <span id="txt-add-person-btn">+ Add Additional Person / Child</span>
       </button>
-
-      <!-- Optional Retail Products Drawer (Shown only if inventory published) -->
-      {% if products and products|length > 0 %}
-      <div class="pt-2 border-t border-zinc-900">
-        <label class="block text-[10px] font-bold uppercase text-amber-400 mb-2">Add Hair Care & Styling Products</label>
-        <div class="grid grid-cols-2 gap-2">
-          {% for p in products %}
-          <label class="p-2.5 rounded-xl bg-black border border-zinc-900 flex items-center justify-between cursor-pointer">
-            <div>
-              <span class="block text-xs font-bold text-zinc-200">{{ p.name }}</span>
-              <span class="block text-[10px] text-amber-400 font-bold">${{ "%.2f"|format(p.price) }}</span>
-            </div>
-            <input type="checkbox" name="product_ids" value="{{ p.id }}" class="rounded text-amber-500 focus:ring-0">
-          </label>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
 
       <!-- Notes / Style Preferences -->
       <div>
@@ -234,13 +197,13 @@
       <!-- Estimated Total Pill Bar -->
       <div id="total-container" class="flex justify-between items-center p-3 rounded-full bg-[#fffaea] border border-amber-500/40">
         <span class="text-xs font-black uppercase tracking-wider text-black" id="txt-total-label">Estimated Total (Pay Upon Service)</span>
-        <span class="text-base font-black text-black" id="booking-total-price">$25.00</span>
+        <span class="text-base font-black text-black" id="booking-total-price">$35.00</span>
       </div>
 
       <!-- Submit Reservation Button -->
       <div>
         <button type="submit" id="btn-submit-booking" class="w-full py-3.5 gold-btn text-black font-black uppercase tracking-wider text-xs rounded-xl transition shadow-lg">
-          Confirm & Reserve Spot ($25.00)
+          Confirm & Reserve Spot ($35.00)
         </button>
       </div>
 
@@ -251,7 +214,7 @@
     </div>
   </form>
 
-  <!-- User Drawer Tabs: History, Profile, Family, Credentials -->
+  <!-- Secondary User Drawer Tabs: Profile, Family & Security Management -->
   <div class="mt-8 space-y-4">
     <!-- Active Bookings List -->
     <div class="p-4 rounded-2xl bg-zinc-950 border border-amber-500/30">
@@ -536,10 +499,8 @@ async function fetchLiveSlots() {
 
 function updateBookingCalculation(chosenSlotTime) {
   let total = 0;
-  const selectEl = document.getElementById('service-select');
-  if (selectEl && selectEl.value && servicesMap[selectEl.value]) {
-    total += servicesMap[selectEl.value].price;
-  }
+  const mainSvc = servicesMap[document.getElementById('service-select').value];
+  if (mainSvc) total += mainSvc.price;
 
   document.querySelectorAll('.guest-service-select').forEach(select => {
     const gSvc = servicesMap[select.value];
@@ -547,19 +508,16 @@ function updateBookingCalculation(chosenSlotTime) {
   });
 
   const formattedTotal = `$${total.toFixed(2)}`;
-  const totalEl = document.getElementById('booking-total-price');
-  if (totalEl) totalEl.textContent = formattedTotal;
+  document.getElementById('booking-total-price').textContent = formattedTotal;
   
   const slotTime = chosenSlotTime || document.getElementById('selected-time-slot').value;
   const submitBtn = document.getElementById('btn-submit-booking');
   const t = i18n[currentLang];
   
-  if (submitBtn) {
-    if (slotTime) {
-      submitBtn.textContent = `${t.btnSubmit} (${formattedTotal}) @ ${slotTime}`;
-    } else {
-      submitBtn.textContent = `${t.btnSubmit} (${formattedTotal})`;
-    }
+  if (slotTime) {
+    submitBtn.textContent = `${t.btnSubmit} (${formattedTotal}) @ ${slotTime}`;
+  } else {
+    submitBtn.textContent = `${t.btnSubmit} (${formattedTotal})`;
   }
 }
 
@@ -609,7 +567,7 @@ function removeGuest(id) {
   }
 }
 
-// Initialize on page load
+// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById('appointment-date');
   const now = new Date();
