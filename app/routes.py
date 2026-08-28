@@ -15,6 +15,7 @@ Appointment = BarberBooking
 
 main_bp = Blueprint('main', __name__)
 
+# Standard Studio Operating Hours Slots: 10:00 AM - 7:00 PM
 DEFAULT_TIME_SLOTS = [
     "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
     "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
@@ -23,9 +24,27 @@ DEFAULT_TIME_SLOTS = [
     "06:00 PM", "06:30 PM"
 ]
 
+# Default Service Menu Fallback
+FALLBACK_SERVICES = [
+    {"id": 1, "name": "Studio Signature Haircut", "price": 35.0, "duration": 30, "category": "Haircuts"},
+    {"id": 2, "name": "Skin Fade & Line Up", "price": 40.0, "duration": 35, "category": "Haircuts"},
+    {"id": 3, "name": "Beard Sculpt & Razor Edge", "price": 25.0, "duration": 20, "category": "Beard & Shave"},
+    {"id": 4, "name": "Full Service VIP (Cut + Beard + Hot Towel)", "price": 60.0, "duration": 50, "category": "Combos"},
+    {"id": 5, "name": "Kids / Junior Haircut (12 & under)", "price": 25.0, "duration": 25, "category": "Kids"}
+]
+
+def get_services_list():
+    try:
+        db_services = BarberService.query.all()
+        if db_services and len(db_services) > 0:
+            return db_services
+    except Exception:
+        pass
+    return FALLBACK_SERVICES
+
 def get_dashboard_context(active_tab='dashboard'):
-    bookings = BarberBooking.query.all()
-    services = BarberService.query.all()
+    bookings = BarberBooking.query.all() if hasattr(BarberBooking, 'query') else []
+    services = get_services_list()
     expenses = StudioExpense.query.all() if hasattr(StudioExpense, 'query') else []
     categories = ExpenseCategory.query.all() if hasattr(ExpenseCategory, 'query') else []
     products = Product.query.all() if hasattr(Product, 'query') else []
@@ -148,7 +167,7 @@ def customer_portal():
     elif 'customer_id' in session:
         customer = Customer.query.get(session['customer_id'])
 
-    services = BarberService.query.filter_by(is_active=True).all() if hasattr(BarberService, 'is_active') else BarberService.query.all()
+    services = get_services_list()
     products = Product.query.filter_by(is_active=True).all() if hasattr(Product, 'is_active') else Product.query.all()
     
     user_bookings = []
@@ -201,9 +220,9 @@ def book_service():
             db.session.commit()
         session['customer_id'] = customer.id
 
-    service = BarberService.query.get(service_id)
-    service_name = service.name if service else 'Studio Haircut'
-    service_price = service.price if service else 25.0
+    service = BarberService.query.get(service_id) if (service_id and service_id.isdigit()) else None
+    service_name = service.name if service else 'Studio Signature Haircut'
+    service_price = service.price if service else 35.0
 
     try:
         combined_dt_str = f"{appointment_date} {time_slot}"
@@ -213,7 +232,7 @@ def book_service():
 
     appt = BarberBooking(
         customer_id=customer.id,
-        service_id=service.id if service else None,
+        service_id=service.id if service else 1,
         service_name=service_name if hasattr(BarberBooking, 'service_name') else None,
         price=service_price if hasattr(BarberBooking, 'price') else None,
         appointment_time=appointment_dt if hasattr(BarberBooking, 'appointment_time') else None,
@@ -333,7 +352,7 @@ def walkin_kiosk():
         flash('Checked in successfully!', 'success')
         return render_template('kiosk_success.html') if os.path.exists('app/templates/kiosk_success.html') else redirect(url_for('main.walkin_kiosk'))
 
-    services = BarberService.query.all()
+    services = get_services_list()
     return render_template('kiosk.html', services=services)
 
 @main_bp.route('/auto_checkin', methods=['POST'])
@@ -341,7 +360,7 @@ def auto_checkin():
     flash('Client auto-checked in via Bluetooth/Geofence.', 'success')
     return redirect(url_for('main.customer_portal'))
 
-# --- USER SETTINGS & API ---
+# --- DYNAMIC OPERATING HOURS TIME SLOTS API ---
 
 @main_bp.route('/api/available-slots')
 def available_slots():
@@ -351,8 +370,23 @@ def available_slots():
 
     try:
         req_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        # Sunday=6, Monday=0 (Closed)
         if req_date.weekday() in [0, 6]:
             return jsonify({'slots': [], 'is_closed': True})
+        
+        # Tuesday, Wednesday, Thursday: 10:00 AM - 6:00 PM
+        if req_date.weekday() in [1, 2, 3]:
+            weekday_slots = [
+                "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+                "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM",
+                "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM",
+                "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM"
+            ]
+            return jsonify({'slots': weekday_slots, 'is_closed': False})
+            
+        # Friday, Saturday: 10:00 AM - 7:00 PM
+        if req_date.weekday() in [4, 5]:
+            return jsonify({'slots': DEFAULT_TIME_SLOTS, 'is_closed': False})
     except Exception:
         pass
 
