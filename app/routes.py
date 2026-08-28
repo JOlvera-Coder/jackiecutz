@@ -1,57 +1,60 @@
-from datetime import datetime
-from flask import render_template, request, redirect, url_for, flash, jsonify
-from flask_login import login_required
+import math
+from flask import request, jsonify
+from flask_login import current_user, login_required
 from app import db
-from app.models import Appointment, Service
+from app.models import Appointment
 
-@main_bp.route('/kiosk', methods=['GET', 'POST'])
-def walkin_kiosk():
-    success_client = None
-    if request.method == 'POST':
-        first_name = request.form.get('first_name', '').strip()
-        last_name = request.form.get('last_name', '').strip()
-        phone = request.form.get('phone', '').strip()
-        email = request.form.get('email', '').strip()
-        zip_code = request.form.get('zip_code', '').strip()
-        service_id = request.form.get('service_id')
-        payment_method = request.form.get('payment_method', 'in_app')
+# Jackie Cutz Salon Coordinates (Update lat/lng to exact salon address if needed)
+SALON_LAT = 29.7604
+SALON_LNG = -95.3698
+GEOFENCE_RADIUS_METERS = 3.05  # Exactly 10 feet (3.05 meters)
 
-        client_name = f"{first_name} {last_name}".strip()
+def calculate_haversine_distance(lat1, lon1, lat2, lon2):
+    R = 6371000  # Earth radius in meters
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
 
-        # Calculate current queue count
-        queue_count = Appointment.query.filter(
-            Appointment.status.in_(['waiting', 'checked_in', 'in_chair'])
-        ).count()
+    a = (math.sin(delta_phi / 2.0) ** 2 +
+         math.cos(phi1) * math.cos(phi2) *
+         math.sin(delta_lambda / 2.0) ** 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
 
-        new_walkin = Appointment(
-            client_name=client_name,
-            phone=phone,
-            email=email,
-            service_id=int(service_id) if service_id and service_id.isdigit() else None,
-            status='waiting',
-            payment_status=payment_method, # 'cash' or 'in_app'
-            date=datetime.utcnow().date(),
-            time=datetime.utcnow().strftime("%I:%M %p")
-        )
-
-        db.session.add(new_walkin)
-        db.session.commit()
-
-        success_client = {
-            'name': client_name,
-            'position': queue_count + 1
-        }
-
-    services = Service.query.all() if 'Service' in globals() else []
-    return render_template('kiosk.html', services=services, success_client=success_client)
-
-
-# Ivonne Checkout & Complete Service Action
-@main_bp.route('/stylist/complete-checkout/<int:appt_id>', methods=['POST'])
+@main_bp.route('/api/geofence-checkin', methods=['POST'])
 @login_required
-def complete_checkout(appt_id):
-    appt = Appointment.query.get_or_404(appt_id)
-    appt.status = 'completed'
-    db.session.commit()
-    flash(f"Service completed for {appt.client_name}!", "success")
-    return redirect(url_for('main.stylist_dashboard'))
+def geofence_checkin():
+    data = request.get_json() or {}
+    user_lat = data.get('lat')
+    user_lng = data.get('lng')
+
+    if user_lat is None or user_lng is None:
+        return jsonify({'status': 'error', 'message': 'Missing coordinates'}), 400
+
+    distance = calculate_haversine_distance(float(user_lat), float(user_lng), SALON_LAT, SALON_LNG)
+
+    if distance <= GEOFENCE_RADIUS_METERS:
+        # Find today's active booked appointment for this logged-in client
+        appt = Appointment.query.filter_by(
+            user_id=current_user.id,
+            status='booked'
+        ).first()
+
+        if appt:
+            appt.status = 'checked_in'
+            db.session.commit()
+            return jsonify({
+                'status': 'checked_in',
+                'message': 'Auto-detected within 10 feet! You are checked in.',
+                'distance_feet': round(distance * 3.28084, 1)
+            }), 200
+
+        return jsonify({
+            'status': 'already_checked_in_or_no_appt',
+            'distance_feet': round(distance * 3.28084, 1)
+        }), 200
+
+    return jsonify({
+        'status': 'outside_geofence',
+        'distance_feet': round(distance * 3.28084, 1)
+    }), 200
