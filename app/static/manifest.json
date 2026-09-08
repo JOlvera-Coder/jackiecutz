@@ -3,6 +3,7 @@
   "name": "Jackiecutz Hair Studio",
   "short_name": "Jackiecutz",
   "description": "Book appointments and manage services at Jackiecutz Hair Studio.",
+  "categories": ["beauty", "lifestyle", "style"],
   "start_url": "/login",
   "display": "standalone",
   "background_color": "#000000",
