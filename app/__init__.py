@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
@@ -24,6 +24,14 @@ def create_app():
 
     from app.routes import main_bp
     flask_app.register_blueprint(main_bp)
+
+    @flask_app.route('/.well-known/assetlinks.json')
+    def asset_links():
+        return send_from_directory(
+            os.path.join(flask_app.root_path, 'static', '.well-known'),
+            'assetlinks.json',
+            mimetype='application/json'
+        )
 
     with flask_app.app_context():
         db.create_all()
