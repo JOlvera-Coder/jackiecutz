@@ -5,6 +5,7 @@
   "description": "Book appointments and manage services at Jackiecutz Hair Studio.",
   "categories": ["beauty", "lifestyle", "style"],
   "prefer_related_applications": false,
+  "related_applications": [],
   "start_url": "/login",
   "display": "standalone",
   "background_color": "#000000",
