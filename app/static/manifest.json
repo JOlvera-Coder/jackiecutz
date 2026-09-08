@@ -10,6 +10,10 @@
   "prefer_related_applications": false,
   "start_url": "/login",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "background_color": "#000000",
   "theme_color": "#dfba6b",
   "orientation": "portrait",
@@ -25,6 +29,15 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Appointment",
+      "short_name": "Book",
+      "description": "Quickly book a haircut appointment",
+      "url": "/login",
+      "icons": [{ "src": "/static/img/icon-192.png", "sizes": "192x192" }]
     }
   ],
   "screenshots": [
