@@ -21,5 +21,14 @@
       "type": "image/png",
       "purpose": "any"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/img/card_bg.jpg",
+      "sizes": "1050x600",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Jackiecutz Hair Studio Login"
+    }
   ]
 }
