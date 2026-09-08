@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.onrender.jackiecutz_app.twa",
+        "sha256_cert_fingerprints": ["93:75:02:96:1E:D9:86:ED:0F:DC:6C:28:B0:1D:2B:4A:A3:0C:DA:AC:BE:EE:95:16:15:BA:C3:B0:C3:F4:DA:A9"]
+      }
+    }]
