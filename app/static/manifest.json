@@ -37,7 +37,7 @@
     },
     {
       "src": "/static/img/icon-512.png",
-      "sizes": "540x720",
+      "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Jackiecutz Hair Studio Mobile"
