@@ -10,10 +10,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/static/img/card_bg.jpg",
-      "sizes": "192x192 512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "src": "https://dummyimage.com/192x192/dfba6b/000000.png&text=Jackiecutz",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://dummyimage.com/512x512/dfba6b/000000.png&text=Jackiecutz",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
