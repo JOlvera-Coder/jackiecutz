@@ -335,5 +335,10 @@
 </head>
 <body style="background-color: #000000 !important;">
     {% block content %}{% endblock %}
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}");
+  }
+</script>
 </body>
 </html>

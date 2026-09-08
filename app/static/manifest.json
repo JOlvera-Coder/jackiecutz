@@ -1,6 +1,7 @@
 {
   "name": "Jackiecutz Hair Studio",
   "short_name": "Jackiecutz",
+  "description": "Book appointments and manage services at Jackiecutz Hair Studio.",
   "start_url": "/login",
   "display": "standalone",
   "background_color": "#000000",
@@ -10,12 +11,14 @@
     {
       "src": "/static/img/card_bg.jpg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     },
     {
       "src": "/static/img/card_bg.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }
