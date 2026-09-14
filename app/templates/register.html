@@ -1,55 +1,50 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-black">
-    <!-- MAIN CARD CONTAINER WITH GOLD GLOW -->
     <div class="w-full max-w-lg bg-black/90 p-6 md:p-8 rounded-3xl border border-[#dfba6b]/40 shadow-[0_0_25px_rgba(223,186,107,0.15)] space-y-6">
         
-        <!-- FORM HEADER -->
         <div class="text-center pb-2 border-b border-zinc-800/80">
             <h1 class="text-2xl font-black text-[#f7e3af] tracking-wider uppercase">CLIENT REGISTRATION</h1>
             <p class="text-xs font-semibold text-[#f7e3af]/80 mt-1">Create your studio profile for fast appointment booking.</p>
         </div>
 
-        <!-- REGISTRATION FORM -->
         <form method="POST" action="{{ url_for('main.register') }}" class="space-y-4">
             
-            <!-- USERNAME -->
             <div>
                 <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">USERNAME (OPTIONAL HANDLE)</label>
                 <input type="text" name="username" placeholder="e.g. JOlvera" class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
             </div>
 
-            <!-- FIRST NAME -->
             <div>
                 <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">FIRST NAME *</label>
                 <input type="text" name="first_name" placeholder="First Name" required class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
             </div>
 
-            <!-- LAST NAME -->
             <div>
                 <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">LAST NAME *</label>
                 <input type="text" name="last_name" placeholder="Last Name" required class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
             </div>
 
-            <!-- PHONE NUMBER -->
             <div>
                 <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">PHONE NUMBER *</label>
                 <input type="tel" name="phone" placeholder="832-000-0000" required class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
             </div>
 
-            <!-- EMAIL ADDRESS -->
             <div>
                 <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">EMAIL ADDRESS</label>
                 <input type="email" name="email" placeholder="name@example.com" class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
             </div>
 
-            <!-- ZIP CODE -->
             <div>
-                <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">ZIP CODE *</label>
-                <input type="text" name="zip" placeholder="77073" required class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
+                <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">PASSWORD *</label>
+                <input type="password" name="password" placeholder="••••••••" required class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
             </div>
 
-            <!-- GENDER -->
+            <div>
+                <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">ZIP CODE *</label>
+                <input type="text" name="zip_code" placeholder="77073" required class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 placeholder-zinc-400 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
+            </div>
+
             <div>
                 <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">GENDER</label>
                 <select name="gender" class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition cursor-pointer">
@@ -59,19 +54,16 @@
                 </select>
             </div>
 
-            <!-- BIRTHDAY -->
             <div>
                 <label class="block text-xs font-black text-[#f7e3af] mb-1.5 uppercase tracking-wide">BIRTHDAY (OPTIONAL)</label>
                 <input type="date" name="birthday" class="w-full px-5 py-3.5 bg-[#fffeea] text-zinc-900 rounded-full font-semibold text-sm outline-none focus:ring-2 focus:ring-[#dfba6b] transition">
             </div>
 
-            <!-- SUBMIT BUTTON -->
             <button type="submit" class="w-full py-4 mt-3 bg-gradient-to-r from-[#dfba6b] via-[#e6c280] to-[#c59b4e] text-zinc-950 font-black text-sm uppercase tracking-wider rounded-full hover:brightness-110 transition shadow-[0_4px_15px_rgba(223,186,107,0.3)] flex items-center justify-center gap-2">
                 CREATE PROFILE ✂
             </button>
         </form>
 
-        <!-- FOOTER -->
         <div class="text-center pt-2 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
             Jackiecutz Hair Studio • Ivonne Gonzalez • Divine Salon Suite 105
         </div>
