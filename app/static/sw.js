@@ -1,20 +1,27 @@
-const CACHE_NAME = 'jackiecutz-v1';
+// Increment version to force immediate cache update across all PWA devices
+const CACHE_NAME = 'jackiecutz-v2';
+
 const ASSETS_TO_CACHE = [
+  '/',
   '/login',
+  '/customer_portal',
+  '/walkin_kiosk',
+  '/queue_display',
   '/static/manifest.json',
-  '/static/img/icon-192.png',
-  '/static/img/icon-512.png'
+  '/static/img/card_bg.jpg'
 ];
 
+// Install Event - Pre-cache core shell
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting();
 });
 
+// Activate Event - Clean up stale v1 caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -25,18 +32,30 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+// Fetch Event - Network First with Cache Fallback (Ensures real-time app updates)
 self.addEventListener('fetch', (event) => {
+  // Only handle GET requests
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request);
-    })
+    fetch(event.request)
+      .then((networkResponse) => {
+        // Cache the fresh response dynamically
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // Fallback to offline cache if network fails
+        return caches.match(event.request);
+      })
   );
 });
