@@ -8,6 +8,7 @@ from app.models import db, User, Booking, ServiceCatalog
 main_bp = Blueprint('main', __name__)
 
 # --- LOGIN & AUTH ROUTES ---
+@main_bp.route('/')
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
