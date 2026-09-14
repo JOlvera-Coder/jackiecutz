@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+dashboard_html = """{% extends 'base.html' %}
 
 {% block content %}
 <!-- LEAFLET MAP CSS -->
@@ -10,7 +10,7 @@
     <div class="dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_25px_rgba(230,194,128,0.15)] flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center space-x-4">
             <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-zinc-950 border border-[#e6c280]/30 p-1 overflow-hidden dash-subcard">
-                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Logo" class="w-full h-full object-contain mix-blend-screen">
+                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Logo" class="w-full h-full object-contain">
             </div>
             <div>
                 <h1 class="dash-title text-base sm:text-lg font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
@@ -304,8 +304,7 @@
         </div>
 
         <form method="POST" action="{{ url_for('main.add_client') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <input type="text" name="first_name" placeholder="First Name" required class="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white">
-            <input type="text" name="last_name" placeholder="Last Name" class="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white">
+            <input type="text" name="name" required placeholder="Full Name" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
             <input type="email" name="email" required placeholder="Email Address" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
             <input type="text" name="phone" placeholder="Phone Number" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
             <input type="text" name="zip_code" placeholder="Zip Code (e.g. 77073)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
@@ -896,4 +895,9 @@ html.light-theme .dash-btn-red {
     border-color: #b91c1c !important; 
 }
 </style>
-{% endblock %}
+{% endblock %}"""
+
+with open('app/templates/dashboard.html', 'w', encoding='utf-8') as f:
+    f.write(dashboard_html)
+
+print("Updated dashboard.html with 6th tab: Banking & Payouts!")

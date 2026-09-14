@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-black text-white p-6 max-w-7xl mx-auto space-y-6">
+    <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+        <h1 class="text-xl font-black text-[#f7e3af]">📋 CLIENT DIRECTORY & USER MANAGEMENT</h1>
+        <a href="{{ url_for('main.stylist_dashboard') }}" class="text-xs text-zinc-400 hover:text-white">← Back to Command Center</a>
+    </div>
+    <div class="bg-zinc-950 border border-[#e6c280]/30 rounded-3xl p-6">
+        <table class="w-full text-left text-xs text-zinc-300">
+            <thead class="bg-black text-[#f7e3af] uppercase text-[10px] border-b border-zinc-800">
+                <tr><th class="p-3">ID</th><th class="p-3">Full Name</th><th class="p-3">Email</th><th class="p-3">Phone</th><th class="p-3">Source</th></tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-900">
+                {% for client in clients %}
+                <tr><td class="p-3 font-mono text-zinc-500">#{{ client.id }}</td><td class="p-3 font-bold text-white">{{ client.name }}</td><td class="p-3">{{ client.email }}</td><td class="p-3">{{ client.phone }}</td><td class="p-3">App / Kiosk</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

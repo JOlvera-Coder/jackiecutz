@@ -1,10 +1,5 @@
-from app import db
+models_code = """from app import db
 from datetime import datetime
-
-# Inside class Booking(db.Model):
-payment_method = db.Column(db.String(50), default='Unpaid')
-tip = db.Column(db.Float, default=0.0)
-completed_at = db.Column(db.DateTime, nullable=True)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,3 +82,9 @@ class Expense(db.Model):
     amount = db.Column(db.Float, nullable=False, default=0.0)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     location_id = db.Column(db.Integer, default=1)
+"""
+
+with open('app/models.py', 'w', encoding='utf-8') as f:
+    f.write(models_code)
+
+print("Successfully wrote full schema including BankAccount model to app/models.py!")

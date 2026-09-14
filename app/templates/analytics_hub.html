@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-black text-white p-6 max-w-7xl mx-auto space-y-6">
+    <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+        <h1 class="text-xl font-black text-[#f7e3af]">📊 REVENUE, SALES HISTORY & FUTURE EARNINGS</h1>
+        <a href="{{ url_for('main.stylist_dashboard') }}" class="text-xs text-zinc-400 hover:text-white">← Back to Command Center</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-zinc-950 border border-emerald-500/30 p-5 rounded-2xl">
+            <p class="text-xs text-zinc-400 font-bold uppercase">Projected Future Earnings</p>
+            <p class="text-2xl font-black text-emerald-400 mt-1">\${{ "%.2f"|format(projected_earnings) }}</p>
+        </div>
+        <div class="bg-zinc-950 border border-amber-500/30 p-5 rounded-2xl">
+            <p class="text-xs text-zinc-400 font-bold uppercase">Kiosk Channel Revenue</p>
+            <p class="text-2xl font-black text-amber-400 mt-1">\${{ "%.2f"|format(kiosk_sales) }}</p>
+        </div>
+        <div class="bg-zinc-950 border border-blue-500/30 p-5 rounded-2xl">
+            <p class="text-xs text-zinc-400 font-bold uppercase">Mobile App Revenue</p>
+            <p class="text-2xl font-black text-blue-400 mt-1">\${{ "%.2f"|format(app_sales) }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

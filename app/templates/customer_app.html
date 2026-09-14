@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- LEAFLET MAP CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="min-h-screen bg-black text-white p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
+
+    <!-- HEADER & NAVIGATION -->
+    <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 rounded-2xl bg-zinc-900 border border-amber-500/40 p-1.5 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                <img src="{{ url_for('static', filename='img/jackiecutz_logo.png') }}" alt="Jackiecutz Logo" class="w-full h-full object-contain mix-blend-screen">
+            </div>
+            <div>
+                <h1 class="text-xl font-black uppercase text-[#f7e3af] tracking-wider">JACKIECUTZ HAIR STUDIO</h1>
+                <p class="text-xs text-zinc-400">Divine Salon Suite 105 • 914 E Airtex Dr, Houston, TX 77073</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <a href="{{ url_for('main.walkin_kiosk') }}" class="px-3.5 py-2 bg-amber-500/10 border border-amber-500/40 text-amber-300 font-extrabold text-xs rounded-xl hover:bg-amber-500/20 transition">
+                🚀 Kiosk Mode
+            </a>
+            <a href="{{ url_for('main.login') }}" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 text-xs font-bold rounded-xl hover:bg-zinc-800 transition">
+                Staff Login ↗
+            </a>
+        </div>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="p-4 bg-amber-500/10 border border-amber-500/40 text-amber-300 rounded-2xl text-xs font-bold shadow-lg">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- HERO / ACTIVE QUEUE BANNER -->
+    <div class="bg-gradient-to-r from-zinc-900 via-zinc-950 to-black border border-amber-500/30 rounded-3xl p-6 shadow-2xl space-y-4 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 relative z-10">
+            <div>
+                <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/40 text-amber-400 text-[10px] font-black uppercase tracking-widest rounded-full">
+                    VIP CLIENT PORTAL
+                </span>
+                <h2 class="text-2xl font-black text-white mt-2">Book Appointment & Check Wait Times</h2>
+                <p class="text-xs text-zinc-400 mt-1 max-w-md">
+                    Select a service, choose your preferred stylist, or view live chair availability at Suite 105.
+                </p>
+            </div>
+            <div class="flex flex-col items-start md:items-end bg-black/60 border border-zinc-800 p-4 rounded-2xl">
+                <span class="text-[10px] font-bold text-zinc-400 uppercase">Live Queue Status</span>
+                <div class="flex items-center space-x-2 mt-1">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-sm font-black text-white">Chairs Active</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID: BOOKING + REVIEW & MAP -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- COLUMN 1 & 2: SERVICE CATALOG & BOOKING -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- SERVICES MENU CARD -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 class="text-sm font-black text-[#f7e3af] uppercase tracking-wider">✂️ Select Service</h3>
+                    <span class="text-xs text-zinc-500">Jackiecutz Menu</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-4 bg-zinc-900/70 border border-zinc-800 hover:border-amber-500/50 rounded-2xl cursor-pointer transition space-y-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xs font-bold text-white">Men's Haircut & Razor Finish</h4>
+                            <span class="text-xs font-black text-amber-400">$35.00</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-400">Includes consultation, hot towel & razor lining.</p>
+                    </div>
+
+                    <div class="p-4 bg-zinc-900/70 border border-zinc-800 hover:border-amber-500/50 rounded-2xl cursor-pointer transition space-y-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xs font-bold text-white">Beard Sculpting & Hydration</h4>
+                            <span class="text-xs font-black text-amber-400">$25.00</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-400">Beard oil treatment, trim & line-up.</p>
+                    </div>
+
+                    <div class="p-4 bg-zinc-900/70 border border-zinc-800 hover:border-amber-500/50 rounded-2xl cursor-pointer transition space-y-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xs font-bold text-white">Women's Precision Cut & Style</h4>
+                            <span class="text-xs font-black text-amber-400">$55.00</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-400">Custom style, wash, blowout & finish.</p>
+                    </div>
+
+                    <div class="p-4 bg-zinc-900/70 border border-zinc-800 hover:border-amber-500/50 rounded-2xl cursor-pointer transition space-y-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="text-xs font-bold text-white">Kids Precision Cut</h4>
+                            <span class="text-xs font-black text-amber-400">$25.00</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-400">Clean edge & style for ages 12 and under.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOCATION MAP CARD -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 class="text-sm font-black text-[#f7e3af] uppercase tracking-wider">📍 Location & Directions</h3>
+                    <span class="text-xs text-zinc-400">Divine Salon Suite 105</span>
+                </div>
+                <div id="salon-map" class="w-full h-48 rounded-2xl border border-zinc-800"></div>
+                <p class="text-xs text-zinc-400">
+                    Located inside Divine Salon Suite 105 at <strong>914 E Airtex Dr, Houston, TX 77073</strong>. Call (832) 353-4577 upon arrival.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- COLUMN 3: REVIEWS & REPUTATION SYSTEM -->
+        <div class="space-y-6">
+
+            <!-- RATING / GOOGLE REVIEW CARD -->
+            <div class="bg-zinc-950 border border-amber-500/40 rounded-3xl p-5 space-y-4 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black uppercase text-[#f7e3af] block">⭐ RATE YOUR VISIT</span>
+                    <span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[10px] font-bold rounded-full">Google Verified</span>
+                </div>
+                <p class="text-xs text-zinc-400">Rate your recent haircut or service with Ivonne:</p>
+
+                <form method="POST" action="{{ url_for('main.submit_review') }}" class="space-y-3">
+                    <div class="flex justify-center space-x-2 text-2xl py-1" id="star-rating">
+                        <input type="hidden" name="rating" id="rating-val" value="5">
+                        <button type="button" onclick="setRating(1)" class="star text-amber-400 hover:scale-110 transition">★</button>
+                        <button type="button" onclick="setRating(2)" class="star text-amber-400 hover:scale-110 transition">★</button>
+                        <button type="button" onclick="setRating(3)" class="star text-amber-400 hover:scale-110 transition">★</button>
+                        <button type="button" onclick="setRating(4)" class="star text-amber-400 hover:scale-110 transition">★</button>
+                        <button type="button" onclick="setRating(5)" class="star text-amber-400 hover:scale-110 transition">★</button>
+                    </div>
+
+                    <input type="text" name="client_name" placeholder="Your Name (Optional)" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <textarea name="feedback" rows="3" placeholder="Leave comments or feedback..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+
+                    <button type="submit" class="w-full py-3 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl hover:bg-amber-300 transition shadow-lg">
+                        SUBMIT RATING & FEEDBACK ⭐
+                    </button>
+                </form>
+            </div>
+
+            <!-- PUBLIC GOOGLE REVIEW DIRECT LINK -->
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-5 text-center space-y-2">
+                <h4 class="text-xs font-extrabold text-white">Loved Your Cut?</h4>
+                <p class="text-[11px] text-zinc-400">Leave a 5-star review directly on Google Maps!</p>
+                <a href="https://g.page/r/CafPhbBwHLHwEAI/review" target="_blank" class="inline-block w-full py-2 bg-zinc-900 border border-zinc-700 text-amber-400 text-xs font-bold rounded-xl hover:bg-zinc-800 transition">
+                    Google Review Page ↗
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- LEAFLET MAP SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var map = L.map('salon-map').setView([29.9822, -95.4093], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([29.9822, -95.4093]).addTo(map)
+        .bindPopup('<b>Jackiecutz</b><br>Divine Salon Suite 105')
+        .openPopup();
+});
+
+function setRating(val) {
+    document.getElementById('rating-val').value = val;
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        if (index < val) {
+            star.classList.add('text-amber-400');
+            star.classList.remove('text-zinc-600');
+        } else {
+            star.classList.add('text-zinc-600');
+            star.classList.remove('text-amber-400');
+        }
+    });
+}
+</script>
+{% endblock %}

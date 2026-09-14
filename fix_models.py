@@ -1,10 +1,5 @@
-from app import db
+models_code = """from app import db
 from datetime import datetime
-
-# Inside class Booking(db.Model):
-payment_method = db.Column(db.String(50), default='Unpaid')
-tip = db.Column(db.Float, default=0.0)
-completed_at = db.Column(db.DateTime, nullable=True)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,16 +47,7 @@ class Staff(db.Model):
     location_id = db.Column(db.Integer, default=1)
     
     bookings = db.relationship('Booking', backref='assigned_staff', lazy=True)
-
-class BankAccount(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    bank_name = db.Column(db.String(100), default='Not Connected')
-    account_holder = db.Column(db.String(100), default='Unlinked Account')
-    routing_number = db.Column(db.String(50), default='*****')
-    account_number = db.Column(db.String(50), default='*****')
-    account_type = db.Column(db.String(50), default='Checking')
-    status = db.Column(db.String(50), default='Action Required: Unlinked ⚠️')
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_account = db.relationship('User', backref='linked_staff', uselist=False, foreign_keys=[User.staff_id])
 
 class ServiceCatalog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -87,3 +73,9 @@ class Expense(db.Model):
     amount = db.Column(db.Float, nullable=False, default=0.0)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     location_id = db.Column(db.Integer, default=1)
+"""
+
+with open('app/models.py', 'w', encoding='utf-8') as f:
+    f.write(models_code)
+
+print("Updated app/models.py with Staff <-> User linking for Stylist Mode!")

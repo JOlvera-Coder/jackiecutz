@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+base_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -36,4 +36,9 @@
     {% endblock %}
 
 </body>
-</html>
+</html>"""
+
+with open('app/templates/base.html', 'w', encoding='utf-8') as f:
+    f.write(base_html)
+
+print("Updated app/templates/base.html with clean SEO Schema & HTML hierarchy!")

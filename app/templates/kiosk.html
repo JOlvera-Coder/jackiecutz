@@ -1,335 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walk-In Check-In Terminal — Jackie Cutz</title>
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-        }
+{% extends 'base.html' %}
 
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 70px 20px 60px 20px;
-        }
+{% block content %}
+<div class="min-h-screen bg-black text-white p-4 sm:p-8 pb-24 flex justify-center items-center">
+    <div class="w-full max-w-xl space-y-6">
 
-        /* Top Navigation / Toggle Bar */
-        .top-navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.35);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            z-index: 1000;
-        }
+<!-- KIOSK BRANDING HEADER -->
+<div class="text-center space-y-2 flex flex-col items-center">
+    <img src="{{ url_for('static', filename='img/icon-512.png') }}" alt="JackieCutz Logo" class="h-36 sm:h-44 w-auto mx-auto mb-2 drop-shadow-[0_0_15px_rgba(230,194,128,0.3)]">
+    <h1 class="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] tracking-widest uppercase drop-shadow-[0_0_12px_rgba(247,227,175,0.4)]">
+        Ivonne Gonzalez
+    </h1>
+    <p class="text-xs text-zinc-400 font-bold uppercase tracking-wider">JackieCutz Hair Studio • Kiosk Check-In</p>
+</div>
 
-        .nav-btn {
-            background: transparent;
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            color: #d4af37;
-            padding: 7px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            transition: all 0.2s ease;
-        }
-
-        .nav-btn:hover {
-            background: #d4af37;
-            color: #000000;
-        }
-
-        .nav-btn.active {
-            background: linear-gradient(180deg, #e5c158 0%, #b8860b 100%);
-            color: #000000;
-            border-color: #e5c158;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
-        }
-
-        /* Branding Header (Graphic Only) */
-        .branding-header {
-            text-align: center;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .header-logo {
-            max-width: 480px;
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* Gold Bordered Terminal Card */
-        .kiosk-card {
-            background: #000000;
-            border: 1.5px solid #d4af37;
-            border-radius: 34px;
-            padding: 40px 35px 35px 35px;
-            width: 100%;
-            max-width: 530px;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
-        }
-
-        .terminal-title {
-            color: #e5c158;
-            font-size: 1.35rem;
-            font-weight: 900;
-            text-align: center;
-            letter-spacing: 1.8px;
-            text-transform: uppercase;
-        }
-
-        .terminal-subtitle {
-            color: #8ec5fc;
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-align: center;
-            margin-top: 8px;
-            margin-bottom: 28px;
-        }
-
-        /* Form Fields */
-        .form-row {
-            display: flex;
-            gap: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-            flex: 1;
-        }
-
-        .field-label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 900;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 8px;
-        }
-
-        .input-pill {
-            width: 100%;
-            background-color: #fffdf2;
-            border: 1.5px solid #d4af37;
-            border-radius: 22px;
-            padding: 13px 20px;
-            font-size: 0.95rem;
-            color: #1a1a1a;
-            font-weight: 600;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .input-pill::placeholder {
-            color: #8c9ba5;
-            font-weight: 600;
-        }
-
-        .input-pill:focus {
-            border-color: #ffffff;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-        }
-
-        select.input-pill {
-            appearance: auto;
-            cursor: pointer;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background: linear-gradient(180deg, #e5c158 0%, #b8860b 100%);
-            border: none;
-            border-radius: 22px;
-            padding: 16px;
-            font-size: 1.05rem;
-            font-weight: 900;
-            color: #111111;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-            transition: transform 0.1s, filter 0.2s;
-        }
-
-        .btn-submit:active {
-            transform: scale(0.99);
-            filter: brightness(0.95);
-        }
-
-        .kiosk-footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 0.88rem;
-            color: #8c9ba5;
-            font-weight: 500;
-        }
-
-        .kiosk-footer a {
-            color: #ffffff;
-            font-weight: 800;
-            text-decoration: underline;
-        }
-
-        /* 6-Second Confirmation Overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.93);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .modal-card {
-            background: #000000;
-            border: 1.5px solid #d4af37;
-            border-radius: 28px;
-            padding: 40px 30px;
-            text-align: center;
-            max-width: 440px;
-            width: 90%;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.25);
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Workflow Toggle Bar -->
-    <nav class="top-navbar">
-        <a href="{{ url_for('main.walkin_kiosk') }}" class="nav-btn active">💈 Kiosk</a>
-        <a href="{{ url_for('main.stylist_dashboard') }}" class="nav-btn">✂️ Stylist</a>
-        <a href="{{ url_for('main.live_queue_display') }}" class="nav-btn" target="_blank">📺 Live TV</a>
-    </nav>
-
-    <!-- Header Section (Clean Graphic Emblem Only) -->
-    <div class="branding-header">
-        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" class="header-logo" alt="Jackie Cutz">
-    </div>
-
-    <!-- Walk-In Check-In Terminal Card -->
-    <div class="kiosk-card">
-        <div class="terminal-title">WALK-IN CHECK-IN TERMINAL</div>
-        <div class="terminal-subtitle">Please sign in to join today's active chair waitlist.</div>
-
-        <form method="POST" action="{{ url_for('main.walkin_kiosk') }}">
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="field-label">FIRST NAME *</label>
-                    <input type="text" name="first_name" class="input-pill" placeholder="First Name" required>
-                </div>
-                <div class="form-group">
-                    <label class="field-label">LAST NAME</label>
-                    <input type="text" name="last_name" class="input-pill" placeholder="Last Name">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="field-label">PHONE NUMBER *</label>
-                <input type="tel" name="phone" class="input-pill" placeholder="832-000-0000" required>
-            </div>
-
-            <div class="form-group">
-                <label class="field-label">EMAIL ADDRESS (FOR RECEIPT & QUEUE ALERTS)</label>
-                <input type="email" name="email" class="input-pill" placeholder="name@example.com">
-            </div>
-
-            <div class="form-group">
-                <label class="field-label">ZIP CODE *</label>
-                <input type="text" name="zip_code" class="input-pill" placeholder="77073" required>
-            </div>
-
-            <div class="form-group">
-                <label class="field-label">SELECT SERVICE *</label>
-                <select name="service_id" class="input-pill" required>
-                    {% if services %}
-                        {% for s in services %}
-                            <option value="{{ s.id }}">{{ s.name }} — ${{ "%.2f"|format(s.price) }}</option>
-                        {% endfor %}
-                    {% else %}
-                        <option value="1">Studio Signature Haircut — $35.00</option>
-                        <option value="2">Fade & Beard Sculpt — $45.00</option>
-                        <option value="3">Kids / Senior Cut — $25.00</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="field-label">PAYMENT PREFERENCE *</label>
-                <select name="payment_method" class="input-pill">
-                    <option value="in_app">📱 Client App / Card / Digital Pay</option>
-                    <option value="cash">💵 Cash at Register</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn-submit">SIGN IN & JOIN WAITLIST ✂️</button>
-        </form>
-
-        <div class="kiosk-footer">
-            Prefer to book for a future date? <a href="{{ url_for('main.login') }}">Book Online</a>
-        </div>
-    </div>
-
-    <!-- 6-Second Auto Reset Confirmation -->
-    {% if success_client %}
-    <div class="modal-overlay" id="confirmModal">
-        <div class="modal-card">
-            <div style="font-size: 2.6rem; margin-bottom: 12px;">✂️</div>
-            <div style="color: #e5c158; font-size: 1.35rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">YOU'RE ON THE LIST!</div>
-            <div style="font-size: 1.2rem; font-weight: 800; color: #ffffff; margin: 12px 0;">Welcome, {{ success_client.name }}</div>
+        <!-- MAIN KIOSK CHECK-IN CARD -->
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_30px_rgba(230,194,128,0.18)] space-y-6">
             
-            <div style="background: #0d0d0d; border: 1.5px solid #d4af37; border-radius: 18px; padding: 18px; margin: 18px 0;">
-                <div style="color: #8c9ba5; font-size: 0.8rem; font-weight: 800; text-transform: uppercase;">YOUR CHAIR POSITION</div>
-                <div style="font-size: 2.4rem; font-weight: 900; color: #e5c158;">#{{ success_client.position }}</div>
+            <div class="text-center space-y-1 border-b border-zinc-900 pb-4">
+                <h2 id="txt-kiosk-title" class="text-base sm:text-lg font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
+                    WALK-IN CHECK-IN TERMINAL
+                </h2>
+                <p id="txt-kiosk-subtitle" class="text-xs text-amber-300/90 font-medium">
+                    Please sign in to join today's active chair waitlist.
+                </p>
             </div>
 
-            <p style="color: #8c9ba5; font-size: 0.85rem; font-weight: 500;">Ivonne will call you as soon as your chair is open.</p>
-            <div style="margin-top: 16px; color: #d4af37; font-size: 0.82rem; font-weight: 700;">Screen resetting in <span id="timer">6</span>s...</div>
+            <form id="kiosk-form" method="POST" action="/kiosk" class="space-y-4">
+                
+                <!-- FIRST NAME & LAST NAME -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label id="lbl-kiosk-fname" class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1 tracking-wider">
+                            First Name *
+                        </label>
+                        <input type="text" name="first_name" required placeholder="First Name"
+                               class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-3 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
+                    </div>
+                    <div>
+                        <label id="lbl-kiosk-lname" class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1 tracking-wider">
+                            Last Name
+                        </label>
+                        <input type="text" name="last_name" placeholder="Last Name"
+                               class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-3 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
+                    </div>
+                </div>
+
+                <!-- PHONE NUMBER -->
+                <div>
+                    <label id="lbl-kiosk-phone" class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1 tracking-wider">
+                        Phone Number *
+                    </label>
+                    <input type="tel" name="phone" required placeholder="832-000-0000"
+                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-3 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
+                </div>
+
+                <!-- EMAIL ADDRESS -->
+                <div>
+                    <label id="lbl-kiosk-email" class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1 tracking-wider">
+                        Email Address (For Receipt & Queue Alerts)
+                    </label>
+                    <input type="email" name="email" placeholder="name@example.com"
+                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-3 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
+                </div>
+
+                <!-- ZIP CODE -->
+                <div>
+                    <label id="lbl-kiosk-zip" class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1 tracking-wider">
+                        ZIP Code *
+                    </label>
+                    <input type="text" name="zip_code" required value="77073" placeholder="77073"
+                           class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-3 text-xs text-black font-semibold focus:outline-none focus:border-[#f7e3af]">
+                </div>
+
+                <!-- SELECT SERVICE -->
+                <div>
+                    <label id="lbl-kiosk-service" class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1 tracking-wider">
+                        Select Service *
+                    </label>
+                    <select name="service_id" id="kiosk_service_id" required class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-3 text-xs text-black font-bold focus:outline-none focus:border-[#f7e3af]">
+                        {% for s in services %}
+                            <option value="{{ s.id }}">
+                                {{ s.name }} — ${{ "%.2f"|format(s.price) }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- PAYMENT PREFERENCE -->
+                <div>
+                    <label id="lbl-kiosk-payment" class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-1 tracking-wider">
+                        Payment Preference *
+                    </label>
+                    <select name="payment_preference" class="w-full bg-[#fffee0] border border-[#e6c280]/30 rounded-2xl px-4 py-3 text-xs text-black font-bold focus:outline-none focus:border-[#f7e3af]">
+                        <option value="cash">💈 In-Salon Cash (Preferred)</option>
+                        <option value="zelle">⚡ Zelle (Ivonne Gonzalez)</option>
+                        <option value="cashapp">💵 Cash App ($Jackiecutz)</option>
+                    </select>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="pt-3">
+                    <button type="submit" id="btn-kiosk-submit"
+                            class="w-full py-4 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
+                        SIGN IN & JOIN WAITLIST ✂️
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center pt-2">
+                <p class="text-xs text-zinc-400 font-medium">
+                    Prefer to book for a future date? 
+                    <a href="{{ url_for('main.customer_portal') }}" class="text-[#f7e3af] hover:underline font-bold">Book Online</a>
+                </p>
+            </div>
         </div>
+
     </div>
+</div>
+{% endblock %}
 
-    <script>
-        let countdown = 6;
-        const timerEl = document.getElementById("timer");
-        const interval = setInterval(() => {
-            countdown--;
-            if (timerEl) timerEl.textContent = countdown;
-            if (countdown <= 0) {
-                clearInterval(interval);
-                window.location.href = "{{ url_for('main.walkin_kiosk') }}";
-            }
-        }, 1000);
-    </script>
-    {% endif %}
-
-</body>
-</html>

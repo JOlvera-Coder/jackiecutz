@@ -1,0 +1,87 @@
+<!-- STYLIST MODE HEADER WITH LOGO -->
+<div class="flex justify-between items-center bg-zinc-950 p-5 rounded-2xl border border-zinc-800">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl overflow-hidden border border-[#e6c280]/30 bg-zinc-900 flex-shrink-0">
+            <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackie Cutz Logo" class="w-full h-full object-cover">
+        </div>
+        <div>
+            <h1 class="text-xl font-bold text-[#f7e3af]">STYLIST CHAIRSIDE TERMINAL</h1>
+            <p class="text-xs text-zinc-400">Station Checkout • Live Database Sync</p>
+        </div>
+    </div>
+    <a href="{{ url_for('main.stylist_dashboard') }}" class="px-3 py-1.5 bg-zinc-900 border border-zinc-700 text-xs font-bold rounded-xl text-zinc-300 hover:text-white transition">Admin Matrix</a>
+</div>
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-5xl mx-auto p-6 space-y-6">
+    <!-- STYLIST MODE HEADER -->
+    <div class="flex justify-between items-center bg-zinc-950 p-5 rounded-2xl border border-zinc-800">
+        <div>
+            <h1 class="text-xl font-bold text-[#f7e3af]">STYLIST CHAIRSIDE TERMINAL</h1>
+            <p class="text-xs text-zinc-400">Station Checkout • Live Database Sync</p>
+        </div>
+        <a href="{{ url_for('main.stylist_dashboard') }}" class="px-3 py-1.5 bg-zinc-900 border border-zinc-700 text-xs font-bold rounded-xl text-zinc-300 hover:text-white transition">Admin Matrix</a>
+    </div>
+
+    <!-- ACTIVE CHAIR QUEUE & CHECKOUT -->
+    <div class="bg-zinc-950 p-5 rounded-2xl border border-zinc-800 space-y-4">
+        <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider">Active Clients & Checkout Phase</h2>
+        
+        <div class="space-y-3">
+            {% for b in bookings %}
+            <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <span class="text-xs font-bold text-[#e6c280]">Booking #{{ b.id }}</span>
+                    <h3 class="text-base font-bold text-white">{{ b.service_name }}</h3>
+                    <p class="text-xs text-zinc-400">Service Fee: <strong class="text-emerald-400">${{ '%.2f'|format(b.price|default(35.0)) }}</strong></p>
+                </div>
+
+                <!-- LIVE CHECKOUT FORM -->
+                <form method="POST" action="{{ url_for('main.checkout_booking', booking_id=b.id) }}" class="flex flex-wrap items-center gap-2">
+                    <input type="hidden" name="staff_id" value="{{ staff_id }}">
+                    
+                    <select name="payment_method" class="px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-lg text-xs text-white focus:border-[#f7e3af] outline-none">
+                        <option value="Card Terminal">Card Terminal</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Zelle / Venmo">Zelle / Venmo</option>
+                    </select>
+                    
+                    <input type="number" step="0.01" min="0" name="tip" placeholder="Tip ($)" class="w-24 px-3 py-2 bg-zinc-950 border border-zinc-700 rounded-lg text-xs text-white focus:border-[#f7e3af] outline-none">
+                    
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition">
+                        Complete & Collect ✂️
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="py-8 text-center border border-dashed border-zinc-800 rounded-xl">
+                <p class="text-xs text-zinc-500">No active clients in queue waiting for checkout.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- RECENTLY COMPLETED TODAY -->
+    <div class="bg-zinc-950 p-5 rounded-2xl border border-zinc-800 space-y-4">
+        <h2 class="text-sm font-bold text-zinc-400 uppercase tracking-wider">Completed Haircuts Today</h2>
+        <div class="divide-y divide-zinc-800">
+            {% for c in completed %}
+            <div class="py-3 flex justify-between items-center text-xs">
+                <div>
+                    <span class="font-bold text-white">#{{ c.id }} - {{ c.service_name }}</span>
+                    <span class="text-zinc-500 ml-2">({{ c.payment_method|default('Card') }})</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-emerald-400 font-bold">${{ '%.2f'|format(c.price|default(0.0)) }}</span>
+                    {% if c.tip and c.tip > 0 %}
+                    <span class="text-amber-400 font-bold ml-1">+${{ '%.2f'|format(c.tip) }} Tip</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <p class="text-xs text-zinc-600 py-2">No completed tickets recorded today yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
