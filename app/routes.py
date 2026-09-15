@@ -60,14 +60,12 @@ def privacy():
     return render_template('privacy.html')
 
 # ==========================================
-# 2. CUSTOMER & BOOKING ROUTES
-# ==========================================
-
+# --- CUSTOMER PORTAL FIX ---
 @main_bp.route('/customer_portal')
 @main_bp.route('/customer-portal')
 @main_bp.route('/client_dashboard')
 def customer_portal():
-    return render_template('customer_portal.html')
+    return render_template('customer_app.html')  # Matches actual filename
 
 @main_bp.route('/book_service', methods=['POST'])
 def book_service():
@@ -94,14 +92,25 @@ def queue_display():
     return render_template('queue_display.html')
 
 # ==========================================
-# 4. DASHBOARD & STYLIST PORTAL
-# ==========================================
-
+# --- DASHBOARD FIX ---
 @main_bp.route('/dashboard')
 @main_bp.route('/stylist_dashboard')
 @main_bp.route('/stylist-dashboard')
 def stylist_dashboard():
-    return render_template('dashboard.html')
+    mock_bank = {'status': 'Connected', 'account_number': '•••• 1234'}
+    mock_zip_counts = {'77073': 15, '77060': 8, '77090': 5}
+    mock_stylists = []
+    mock_bookings = []
+    mock_expenses = []
+    
+    return render_template(
+        'dashboard.html', 
+        bank=mock_bank,
+        zip_counts=mock_zip_counts,
+        stylists=mock_stylists,
+        bookings=mock_bookings,
+        expenses=mock_expenses
+    )
 
 @main_bp.route('/stylist_portal/<int:staff_id>')
 def stylist_portal(staff_id):
