@@ -7,7 +7,7 @@ from app.models import db, User, Booking, ServiceCatalog
 
 main_bp = Blueprint('main', __name__)
 
-# --- LOGIN & AUTH ROUTES ---
+# --- AUTH & ROOT ---
 @main_bp.route('/')
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -16,6 +16,34 @@ def login():
         return redirect(url_for('main.stylist_dashboard'))
     endpoints = ['forgot_password', 'register', 'terms', 'privacy']
     return render_template('login.html', endpoints=endpoints)
+
+@main_bp.route('/register', methods=['GET', 'POST'])
+@main_bp.route('/register/', methods=['GET', 'POST'])
+def register():
+    return render_template('register.html')
+
+# --- PORTALS & KIOSK ---
+@main_bp.route('/customer_portal')
+@main_bp.route('/customer-portal')
+@main_bp.route('/client_dashboard')
+def customer_portal():
+    return render_template('customer_portal.html')
+
+@main_bp.route('/walkin_kiosk')
+@main_bp.route('/walkin-kiosk')
+def walkin_kiosk():
+    return render_template('kiosk.html')
+
+@main_bp.route('/queue_display')
+@main_bp.route('/queue-display')
+def queue_display():
+    return render_template('queue_display.html')
+
+@main_bp.route('/dashboard')
+@main_bp.route('/stylist_dashboard')
+@main_bp.route('/stylist-dashboard')
+def stylist_dashboard():
+    return render_template('dashboard.html')
 
 @main_bp.route('/logout')
 def logout():
