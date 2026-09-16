@@ -3,13 +3,11 @@
 {% block content %}
 <div class="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-6">
 
-    <!-- Header Block -->
-    <div class="text-center mb-6">
-        <h1 class="text-3xl font-serif italic text-[#f7e3af] tracking-wide">Jackiecutz</h1>
-        <p class="text-xs text-[#f7e3af]/80 uppercase tracking-widest font-semibold">Hair Studio</p>
-        <p class="text-[11px] text-[#f7e3af] mt-1"><span class="text-red-500">📍</span> 806-E Airtex Dr Suite 105, Houston, TX 77073</p>
-        <p class="text-[11px] text-[#f7e3af]">📱 (832) 353-4577</p>
-        <p class="text-xl font-serif italic text-white pt-1">Ivonne Gonzalez</p>
+    <!-- Actual Graphic Logo Asset -->
+    <div class="text-center mb-4 w-full max-w-sm">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" 
+             alt="JackieCutz Hair Studio" 
+             class="w-full h-auto object-contain mx-auto drop-shadow-2xl">
     </div>
 
     <!-- Login Card Container -->
