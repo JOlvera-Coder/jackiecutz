@@ -47,8 +47,35 @@ def register():
 
     return render_template('register.html')
 
-@main_bp.route('/forgot_password')
+@bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
+    if request.method == 'POST':
+        identifier = request.form.get('reset_identifier', '').strip()
+        birthdate = request.form.get('birthdate', '').strip()
+        new_password = request.form.get('new_password', '').strip()
+        confirm_password = request.form.get('confirm_new_password', '').strip()
+
+        if new_password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'danger')
+            return redirect(url_for('main.forgot_password'))
+
+        # Query user by username, email, or phone
+        user = User.query.filter(
+            (User.username == identifier) | 
+            (User.email == identifier) | 
+            (User.phone == identifier)
+        ).first()
+
+        # Match birthdate for verification
+        if user and getattr(user, 'birthdate', None) == birthdate:
+            user.password_hash = generate_password_hash(new_password)
+            db.session.commit()
+            flash('Password reset successful! You can now log in.', 'success')
+            return redirect(url_for('main.login'))
+        else:
+            flash('Invalid account details or birthdate mismatch.', 'danger')
+            return redirect(url_for('main.forgot_password'))
+
     return render_template('forgot_password.html')
 
 @main_bp.route('/terms')
