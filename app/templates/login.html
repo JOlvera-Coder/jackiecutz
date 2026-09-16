@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-zinc-950 px-4 py-8">
+    <div class="w-full max-w-md space-y-6 bg-zinc-900/90 p-8 rounded-3xl border border-amber-500/20 shadow-2xl backdrop-blur-md">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2">
+            <h1 class="text-3xl font-extrabold tracking-tight text-amber-400">JackieCutz</h1>
+            <p class="text-sm text-zinc-400">Sign in to manage your appointments & account</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-3 rounded-xl text-xs text-center border font-medium {% if category == 'success' %}bg-emerald-500/10 border-emerald-500/30 text-emerald-400{% else %}bg-rose-500/10 border-rose-500/30 text-rose-400{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Login Form -->
+        <form action="{{ url_for('main.login') }}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-2">Phone or Email</label>
+                <input type="text" name="login_identifier" required placeholder="Enter phone or email"
+                    class="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-full text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all">
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">Password</label>
+                    <a href="{{ url_for('main.forgot_password') }}" class="text-xs text-amber-400 hover:text-amber-300 hover:underline">Forgot Password?</a>
+                </div>
+                <input type="password" name="password" required placeholder="••••••••"
+                    class="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-full text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all">
+            </div>
+
+            <button type="submit" 
+                class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-bold rounded-full shadow-lg shadow-amber-500/10 active:scale-[0.98] transition-all">
+                Sign In
+            </button>
+        </form>
+
+        <!-- Navigation Links -->
+        <div class="pt-4 border-t border-zinc-800 text-center space-y-3">
+            <p class="text-sm text-zinc-400">
+                Don't have an account? 
+                <a href="{{ url_for('main.register') }}" class="font-bold text-amber-400 hover:text-amber-300 hover:underline">Register Here</a>
+            </p>
+            <p class="text-xs text-zinc-500 leading-relaxed">
+                By continuing, you agree to our 
+                <a href="{{ url_for('main.terms') }}" class="underline text-zinc-400 hover:text-amber-400">Terms of Service</a> 
+                & 
+                <a href="{{ url_for('main.privacy') }}" class="underline text-zinc-400 hover:text-amber-400">Privacy Policy</a>.
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
