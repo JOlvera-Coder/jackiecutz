@@ -5,60 +5,70 @@
     
     <h2 class="text-center text-lg font-black text-[#f7e3af] gold-glow uppercase tracking-widest mb-2">CREATE ACCOUNT</h2>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="p-2.5 rounded-xl text-xs text-center border font-medium {% if category == 'success' %}bg-emerald-500/10 border-emerald-500/30 text-emerald-400{% else %}bg-rose-500/10 border-rose-500/30 text-rose-400{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <form action="{{ url_for('main.register') }}" method="POST" class="space-y-4">
         
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">FIRST NAME</label>
                 <input type="text" name="first_name" required placeholder="First Name"
-                    class="w-full px-4 py-3 bg-[#fffde8] text-black font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none">
+                    class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
             </div>
             <div>
                 <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">LAST NAME</label>
                 <input type="text" name="last_name" required placeholder="Last Name"
-                    class="w-full px-4 py-3 bg-[#fffde8] text-black font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none">
+                    class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
             </div>
         </div>
 
         <div>
             <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">USERNAME</label>
             <input type="text" name="username" required placeholder="Choose a username"
-                class="w-full px-4 py-3 bg-[#fffde8] text-black font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none">
+                class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
         </div>
 
         <div>
             <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">EMAIL ADDRESS</label>
             <input type="email" name="email" required placeholder="name@example.com"
-                class="w-full px-4 py-3 bg-[#fffde8] text-black font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none">
+                class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">PHONE NUMBER</label>
                 <input type="tel" name="phone" required placeholder="(832) 000-0000"
-                    class="w-full px-4 py-3 bg-[#fffde8] text-black font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none">
+                    class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
             </div>
             <div>
                 <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">ZIP CODE</label>
                 <input type="text" name="zip_code" required placeholder="77073"
-                    class="w-full px-4 py-3 bg-[#fffde8] text-black font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none">
+                    class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
             </div>
         </div>
 
         <div>
             <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">PASSWORD</label>
             <input type="password" name="password" required placeholder="Create password"
-                class="w-full px-4 py-3 bg-[#fffde8] text-black font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none">
+                class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
         </div>
 
         <button type="submit" 
-            class="w-full py-3.5 px-4 champagne-btn text-black font-black tracking-widest text-xs rounded-full shadow-lg active:scale-[0.98] transition-all uppercase mt-2">
+            class="w-full py-3.5 px-4 champagne-btn-gradient text-black font-black tracking-widest text-xs rounded-full shadow-lg active:scale-[0.98] transition-all uppercase mt-2">
             CREATE ACCOUNT
         </button>
     </form>
 
-    <div class="text-center pt-4 border-t border-zinc-800">
-        <p class="text-xs text-zinc-300">
+    <div class="text-center pt-4 border-t border-zinc-800/80">
+        <p class="text-xs text-zinc-200">
             Already have an account? 
             <a href="{{ url_for('main.login') }}" class="font-extrabold text-white hover:text-[#f7e3af] underline ml-1">Log In</a>
         </p>
