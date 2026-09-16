@@ -7,10 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .gold-glow {
-            text-shadow: 0 0 10px rgba(247, 227, 175, 0.6), 0 0 20px rgba(230, 194, 128, 0.4);
+            text-shadow: 0 0 10px rgba(247, 227, 175, 0.6), 0 0 18px rgba(230, 194, 128, 0.4);
         }
         .card-gold-glow {
-            box-shadow: 0 0 20px rgba(247, 227, 175, 0.15), inset 0 0 15px rgba(247, 227, 175, 0.05);
+            box-shadow: 0 0 25px rgba(247, 227, 175, 0.15), inset 0 0 12px rgba(247, 227, 175, 0.05);
         }
         .champagne-btn {
             background: linear-gradient(135deg, #fffde8 0%, #f7e3af 50%, #e6c280 100%);
@@ -18,14 +18,14 @@
         }
     </style>
 </head>
-<body class="bg-black min-h-screen flex flex-col items-center justify-start py-8 px-4 font-sans selection:bg-[#f7e3af] selection:text-black">
+<body class="bg-black min-h-screen flex flex-col items-center justify-start py-6 px-4 font-sans selection:bg-[#f7e3af] selection:text-black">
 
-    <!-- Universal Header Logo Graphic -->
-    <header class="text-center mb-4 w-full max-w-sm flex flex-col items-center">
+    <!-- Universal Header Asset -->
+    <header class="text-center mb-2 w-full max-w-sm flex flex-col items-center">
         <a href="{{ url_for('main.login') }}">
-            <img src="{{ url_for('static', filename='img/logo.png') }}" 
+            <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" 
                  alt="JackieCutz Hair Studio" 
-                 class="w-72 h-auto object-contain mx-auto">
+                 class="w-full h-auto object-contain mx-auto">
         </a>
     </header>
 
