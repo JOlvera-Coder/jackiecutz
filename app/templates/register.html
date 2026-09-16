@@ -55,15 +55,22 @@
             </div>
         </div>
 
-        <div>
-            <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">GENDER (CAMPAIGN METRICS)</label>
-            <select name="gender" required
-                class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
-                <option value="" disabled selected>Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other / Prefer not to say</option>
-            </select>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">GENDER</label>
+                <select name="gender" required
+                    class="w-full px-4 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
+                    <option value="" disabled selected>Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-[#f7e3af] gold-glow uppercase tracking-wider mb-1">BIRTHDATE</label>
+                <input type="date" name="birthdate" required
+                    class="w-full px-3 py-3 bg-[#fffde8] text-zinc-900 font-semibold rounded-2xl border-2 border-[#f7e3af] text-xs focus:outline-none focus:ring-2 focus:ring-[#f7e3af]">
+            </div>
         </div>
 
         <div>
