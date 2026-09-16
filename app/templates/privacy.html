@@ -1,32 +1,18 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+<div class="w-full bg-black border border-[#f7e3af]/50 card-gold-glow rounded-[32px] p-6 space-y-4">
+    
+    <h2 class="text-center text-lg font-black text-[#f7e3af] gold-glow uppercase tracking-widest mb-1">PRIVACY POLICY</h2>
+    <p class="text-center text-xs text-zinc-400 font-semibold mb-4">Jackiecutz Hair Studio - Divine Salon Suite 105</p>
 
-    <!-- LOGO HEADER -->
-    <div class="w-full max-w-md mx-auto mb-6 text-center flex justify-center">
-        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Hair Studio - Ivonne Gonzalez" class="w-full h-auto object-cover rounded-2xl shadow-[0_0_25px_rgba(247,227,175,0.2)]">
+    <div class="space-y-4 text-xs text-zinc-300 leading-relaxed max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+        <p><strong class="text-[#f7e3af]">Information Collection:</strong> We collect details such as your name, contact information, and appointment preferences to deliver personalized salon services.</p>
+        <p><strong class="text-[#f7e3af]">Data Protection:</strong> Your personal information is strictly confidential and will never be shared or sold to third parties.</p>
     </div>
 
-    <!-- PRIVACY CARD -->
-    <div class="w-full max-w-2xl bg-black/90 border-2 border-[#f7e3af]/60 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_30px_rgba(247,227,175,0.15)] backdrop-blur-md">
-        
-        <div class="text-center space-y-1">
-            <h2 class="text-xl font-black uppercase text-[#f7e3af] tracking-wider">PRIVACY POLICY</h2>
-            <p class="text-xs text-zinc-400">Jackiecutz Hair Studio - Divine Salon Suite 105</p>
-        </div>
-
-        <div class="text-xs text-zinc-300 space-y-3 max-h-96 overflow-y-auto pr-2">
-            <p><strong>Information Collection:</strong> We collect details such as your name, phone number, and email solely for appointment booking and service communication.</p>
-            <p><strong>Data Protection:</strong> Your personal information is kept strictly private and is never sold or shared with unauthorized third parties.</p>
-        </div>
-
-        <div class="border-t border-zinc-800/80 pt-4 text-center">
-            <a href="{{ url_for('main.login') }}" class="font-bold text-[#f7e3af] underline hover:text-amber-300 text-xs">
-                Back to Login
-            </a>
-        </div>
-
+    <div class="text-center pt-4 border-t border-zinc-800/80">
+        <a href="{{ url_for('main.login') }}" class="font-extrabold text-white hover:text-[#f7e3af] underline text-xs">Back to Log In</a>
     </div>
 
 </div>
