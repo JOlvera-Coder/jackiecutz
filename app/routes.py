@@ -7,9 +7,9 @@ from flask import (
 )
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Message
 from app.models import User
-from app import db
-# Import your models below as needed (e.g., User, Booking, Stylist, Service, etc.)
+from app import db, mail
 
 main_bp = Blueprint('main', __name__)
 
@@ -97,7 +97,35 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            flash('Registration successful!', 'success')
+
+            # --- AUTOMATED WELCOME EMAIL NOTIFICATION ---
+            try:
+                msg = Message(
+                    subject="Welcome to Jackiecutz Hair Studio - Account Details",
+                    recipients=[new_user.email]
+                )
+                msg.body = f"""Hi {new_user.first_name or 'Valued Client'},
+
+Welcome to Jackiecutz Hair Studio! Your account has been successfully created.
+
+Here are your account details for your records:
+----------------------------------------------
+Username: {new_user.username}
+Email: {new_user.email}
+Phone: {new_user.phone}
+
+You can log in anytime to manage or book appointments:
+https://jackiecutz-app.onrender.com/login
+
+Thank you for choosing Jackiecutz!
+Divine Salon | 806-E Airtex Dr Suite 105, Houston, TX 77073
+(832) 353-4577
+"""
+                mail.send(msg)
+            except Exception as mail_err:
+                print(f"Failed to send welcome email: {mail_err}")
+
+            flash('Registration successful! A confirmation email has been sent to your address.', 'success')
             return redirect(url_for('main.customer_portal'))
         except Exception:
             db.session.rollback()

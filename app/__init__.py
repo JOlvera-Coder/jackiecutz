@@ -2,17 +2,28 @@ import os
 from flask import Flask, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_mail import Mail
 from config import Config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+mail = Mail()
 
 def create_app():
     flask_app = Flask(__name__)
     flask_app.config.from_object(Config)
 
+    # Mail Configuration
+    flask_app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+    flask_app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+    flask_app.config['MAIL_USE_TLS'] = True
+    flask_app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+    flask_app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+    flask_app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
+
     db.init_app(flask_app)
     login_manager.init_app(flask_app)
+    mail.init_app(flask_app)
     login_manager.login_view = 'main.login'
 
     # Register Flask-Login user_loader
