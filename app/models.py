@@ -2,10 +2,6 @@ from app import db
 from datetime import datetime
 from flask_login import UserMixin
 
-# Inside class Booking(db.Model):
-payment_method = db.Column(db.String(50), default='Unpaid')
-tip = db.Column(db.Float, default=0.0)
-completed_at = db.Column(db.DateTime, nullable=True)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,12 +17,19 @@ class User(UserMixin, db.Model):
     birthdate = db.Column(db.String(20), nullable=True)
     password_hash = db.Column(db.String(128))
     source_channel = db.Column(db.String(50), default='App')
+    
+    # ROLE & VERIFICATION FIELDS
     is_stylist = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    invite_code = db.Column(db.String(6), nullable=True)
+    code_expires_at = db.Column(db.DateTime, nullable=True)
+    
     staff_id = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=True)
     location_id = db.Column(db.Integer, default=1)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     bookings = db.relationship('Booking', backref='client', lazy=True)
+
 
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +38,7 @@ class Booking(db.Model):
     service_name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False, default=0.0)
     retail_add_on = db.Column(db.Float, default=0.0)
+    tip = db.Column(db.Float, default=0.0)
     status = db.Column(db.String(30), default='completed')
     source_channel = db.Column(db.String(50), default='App')
     payment_method = db.Column(db.String(50), default='Card')
@@ -42,7 +46,9 @@ class Booking(db.Model):
     duration_minutes = db.Column(db.Integer, default=45)
     service_notes = db.Column(db.String(255), default='')
     location_id = db.Column(db.Integer, default=1)
+    completed_at = db.Column(db.DateTime, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Staff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,6 +65,7 @@ class Staff(db.Model):
     
     bookings = db.relationship('Booking', backref='assigned_staff', lazy=True)
 
+
 class BankAccount(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     bank_name = db.Column(db.String(100), default='Not Connected')
@@ -69,6 +76,7 @@ class BankAccount(db.Model):
     status = db.Column(db.String(50), default='Action Required: Unlinked ⚠️')
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 class ServiceCatalog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     category = db.Column(db.String(50), nullable=False)
@@ -76,6 +84,7 @@ class ServiceCatalog(db.Model):
     price_min = db.Column(db.Float, nullable=False)
     price_max = db.Column(db.Float, nullable=True)
     required_role = db.Column(db.String(50), default='Any')
+
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -85,6 +94,7 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False, default=0.0)
     stock = db.Column(db.Integer, default=0)
     location_id = db.Column(db.Integer, default=1)
+
 
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
