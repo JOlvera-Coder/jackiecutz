@@ -67,7 +67,18 @@ def register():
         gender = request.form.get('gender')
         birthday = request.form.get('birthday')
 
-        # Create new user instance
+        # Check if user already exists
+        existing_user = User.query.filter(
+            (User.email == email) | 
+            (User.phone == phone) | 
+            (User.username == username)
+        ).first()
+
+        if existing_user:
+            flash('An account with this email, phone, or username already exists. Please log in.', 'warning')
+            return redirect(url_for('main.login'))
+
+        # Create new user instance safely
         new_user = User(
             first_name=first_name,
             last_name=last_name,
@@ -79,18 +90,19 @@ def register():
             gender=gender,
             birthdate=birthday,
             password_hash=generate_password_hash(password),
-            is_stylist=False  # New self-registrations default to client
+            is_stylist=False
         )
 
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user)
-
-        flash('Registration successful!', 'success')
-
-        if new_user.is_stylist:
-            return redirect(url_for('main.stylist_dashboard'))
-        return redirect(url_for('main.customer_portal'))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            flash('Registration successful!', 'success')
+            return redirect(url_for('main.customer_portal'))
+        except Exception:
+            db.session.rollback()
+            flash('Registration error occurred. Please try again.', 'danger')
+            return render_template('register.html')
 
     return render_template('register.html')
 
