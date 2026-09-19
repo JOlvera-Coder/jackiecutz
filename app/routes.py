@@ -35,7 +35,7 @@ def login():
             # Route conditionally based on user role
             if getattr(user, 'is_stylist', False):
                 return redirect(url_for('main.stylist_dashboard'))
-            return redirect(url_for('main.index'))  # Client view
+            return redirect(url_for('main.customer_portal'))
         else:
             flash('Invalid credentials. Please try again.', 'danger')
 
@@ -85,7 +85,7 @@ def register():
 
         if new_user.is_stylist:
             return redirect(url_for('main.stylist_dashboard'))
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.customer_portal'))
 
     return render_template('register.html')
 
