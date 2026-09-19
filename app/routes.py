@@ -5,6 +5,8 @@ from flask import (
     Blueprint, render_template, request, redirect,
     url_for, flash, jsonify, make_response
 )
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User
 from app import db
 # Import your models below as needed (e.g., User, Booking, Stylist, Service, etc.)
@@ -24,12 +26,12 @@ def login():
 
         # Lookup user by username, email, or phone
         user = User.query.filter(
-            (User.username == identifier) | 
-            (User.email == identifier) | 
+            (User.username == identifier) |
+            (User.email == identifier) |
             (User.phone == identifier)
         ).first()
 
-        if user and check_password_hash(user.password_hash, password):
+        if user and user.password_hash and check_password_hash(user.password_hash, password):
             login_user(user)
             flash('Login successful!', 'success')
 
