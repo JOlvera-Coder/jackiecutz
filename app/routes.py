@@ -56,6 +56,7 @@ def register():
     if request.method == 'POST':
         first_name = request.form.get('first_name', '').strip()
         last_name = request.form.get('last_name', '').strip()
+        username = request.form.get('username', '').strip()
         phone = request.form.get('phone', '').strip()
         email = request.form.get('email', '').strip()
         password = request.form.get('password')
@@ -67,6 +68,7 @@ def register():
         new_user = User(
             first_name=first_name,
             last_name=last_name,
+            username=username,
             name=f"{first_name} {last_name}".strip(),
             phone=phone,
             email=email,
