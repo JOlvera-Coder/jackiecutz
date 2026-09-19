@@ -18,15 +18,37 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        flash('Login successful!', 'success')
-        return redirect(url_for('main.stylist_dashboard'))
+        identifier = request.form.get('login_identifier', '').strip()
+        password = request.form.get('password', '')
+
+        # Lookup user by username, email, or phone
+        user = User.query.filter(
+            (User.username == identifier) | 
+            (User.email == identifier) | 
+            (User.phone == identifier)
+        ).first()
+
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            flash('Login successful!', 'success')
+
+            # Route conditionally based on user role
+            if getattr(user, 'is_stylist', False):
+                return redirect(url_for('main.stylist_dashboard'))
+            return redirect(url_for('main.index'))  # Client view
+        else:
+            flash('Invalid credentials. Please try again.', 'danger')
+
     endpoints = ['forgot_password', 'register', 'terms', 'privacy']
     return render_template('login.html', endpoints=endpoints)
 
+
 @main_bp.route('/logout')
 def logout():
+    logout_user()
     flash('Logged out successfully.', 'info')
     return redirect(url_for('main.login'))
+
 
 @main_bp.route('/register', methods=['GET', 'POST'])
 @main_bp.route('/register/', methods=['GET', 'POST'])
@@ -41,13 +63,34 @@ def register():
         gender = request.form.get('gender')
         birthday = request.form.get('birthday')
 
-        # Add your database user creation logic here
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('main.login'))
+        # Create new user instance
+        new_user = User(
+            first_name=first_name,
+            last_name=last_name,
+            name=f"{first_name} {last_name}".strip(),
+            phone=phone,
+            email=email,
+            zip_code=zip_code,
+            gender=gender,
+            birthdate=birthday,
+            password_hash=generate_password_hash(password),
+            is_stylist=False  # New self-registrations default to client
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+
+        flash('Registration successful!', 'success')
+
+        if new_user.is_stylist:
+            return redirect(url_for('main.stylist_dashboard'))
+        return redirect(url_for('main.index'))
 
     return render_template('register.html')
 
-@bp.route('/forgot_password', methods=['GET', 'POST'])
+
+@main_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         identifier = request.form.get('reset_identifier', '').strip()
@@ -59,14 +102,12 @@ def forgot_password():
             flash('Passwords do not match. Please try again.', 'danger')
             return redirect(url_for('main.forgot_password'))
 
-        # Query user by username, email, or phone
         user = User.query.filter(
             (User.username == identifier) | 
             (User.email == identifier) | 
             (User.phone == identifier)
         ).first()
 
-        # Match birthdate for verification
         if user and getattr(user, 'birthdate', None) == birthdate:
             user.password_hash = generate_password_hash(new_password)
             db.session.commit()
@@ -78,9 +119,11 @@ def forgot_password():
 
     return render_template('forgot_password.html')
 
+
 @main_bp.route('/terms')
 def terms():
     return render_template('terms.html')
+
 
 @main_bp.route('/privacy')
 def privacy():
