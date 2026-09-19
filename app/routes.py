@@ -2,9 +2,10 @@ import csv
 import io
 from datetime import datetime
 from flask import (
-    Blueprint, render_template, request, redirect, 
+    Blueprint, render_template, request, redirect,
     url_for, flash, jsonify, make_response
 )
+from app.models import User
 from app import db
 # Import your models below as needed (e.g., User, Booking, Stylist, Service, etc.)
 

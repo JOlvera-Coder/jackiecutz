@@ -1,18 +1,24 @@
 from app import db
 from datetime import datetime
+from flask_login import UserMixin
 
 # Inside class Booking(db.Model):
 payment_method = db.Column(db.String(50), default='Unpaid')
 tip = db.Column(db.Float, default=0.0)
 completed_at = db.Column(db.DateTime, nullable=True)
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=True, index=True)
+    first_name = db.Column(db.String(64), nullable=True)
+    last_name = db.Column(db.String(64), nullable=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     phone = db.Column(db.String(20), index=True)
     zip_code = db.Column(db.String(10), default='77073')
     city = db.Column(db.String(50), default='Houston')
+    gender = db.Column(db.String(30), nullable=True)
+    birthdate = db.Column(db.String(20), nullable=True)
     password_hash = db.Column(db.String(128))
     source_channel = db.Column(db.String(50), default='App')
     is_stylist = db.Column(db.Boolean, default=False)
