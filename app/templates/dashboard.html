@@ -4,60 +4,60 @@
 <!-- LEAFLET MAP CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-<div class="min-h-screen bg-black text-white p-4 sm:p-6 space-y-6 max-w-7xl mx-auto dashboard-container">
+<div class="w-full min-h-screen bg-black text-white p-2 sm:p-4 lg:p-6 space-y-6 max-w-7xl mx-auto dashboard-container transition-all duration-300">
 
-    <!-- TOP HEADER -->
-    <div class="dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_25px_rgba(230,194,128,0.15)] flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center space-x-4">
-            <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-zinc-950 border border-[#e6c280]/30 p-1 overflow-hidden dash-subcard">
+    <!-- TOP HEADER & BRANDING (RESPONSIVE FLEX/GRID) -->
+    <div class="dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] flex flex-col lg:flex-row items-center justify-between gap-5">
+        <div class="flex flex-col sm:flex-row items-center text-center sm:text-left space-y-2 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
+            <div class="w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-2xl bg-zinc-950 border border-[#e6c280]/30 p-1.5 overflow-hidden dash-subcard">
                 <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Logo" class="w-full h-full object-contain mix-blend-screen">
             </div>
             <div>
-                <h1 class="dash-title text-base sm:text-lg font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
+                <h1 class="dash-title text-base sm:text-xl font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
                     COMMAND CENTER & ENTERPRISE MATRIX
                 </h1>
                 <p class="dash-subtext text-xs text-zinc-400 font-medium">Ivonne Gonzalez • Divine Salon Suite 105</p>
             </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2">
-            <a href="{{ url_for('main.export_tax_csv') }}" class="px-3 py-1.5 bg-emerald-950/80 border border-emerald-500/50 hover:bg-emerald-900 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-btn-green">
+        <div class="flex flex-wrap items-center justify-center lg:justify-end gap-2 w-full lg:w-auto">
+            <a href="{{ url_for('main.export_tax_csv') }}" class="px-3.5 py-2 bg-emerald-950/80 border border-emerald-500/50 hover:bg-emerald-900 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-btn-green">
                 📄 TAX EXPORT ⬇
             </a>
-            <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="px-3 py-1.5 bg-zinc-950 border border-[#e6c280]/40 hover:border-[#f7e3af] text-[#f7e3af] text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-subcard dash-gold-text">
+            <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="px-3.5 py-2 bg-zinc-950 border border-[#e6c280]/40 hover:border-[#f7e3af] text-[#f7e3af] text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-subcard dash-gold-text">
                 📱 KIOSK ↗
             </a>
-            <a href="{{ url_for('main.customer_portal') }}" target="_blank" class="px-3 py-1.5 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-btn">
+            <a href="{{ url_for('main.customer_portal') }}" target="_blank" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-btn">
                 Client App ↗
             </a>
-            <button id="theme-toggle" type="button" onclick="toggleDashboardTheme()" class="px-3 py-1.5 bg-zinc-900 border border-amber-500/40 hover:border-amber-400 text-amber-300 text-xs font-bold rounded-xl transition dash-btn">
+            <button id="theme-toggle" type="button" onclick="toggleDashboardTheme()" class="px-3.5 py-2 bg-zinc-900 border border-amber-500/40 hover:border-amber-400 text-amber-300 text-xs font-bold rounded-xl transition dash-btn">
                 🌙/☀️ Theme
             </button>
-            <a href="{{ url_for('main.logout') }}" class="px-3 py-1.5 bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-400 text-xs font-bold rounded-xl transition dash-btn-red">
+            <a href="{{ url_for('main.logout') }}" class="px-3.5 py-2 bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-400 text-xs font-bold rounded-xl transition dash-btn-red">
                 Sign Out
             </a>
         </div>
     </div>
 
-    <!-- TABS BAR (CONTAINS BANKING & PAYOUTS) -->
-    <div class="dash-tab-bar flex flex-wrap items-center justify-start gap-2 bg-zinc-950/80 p-2 border border-zinc-800 rounded-2xl shadow-md">
-        <button onclick="switchDashboardTab('overview')" id="tab-overview" class="tab-btn px-4 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl transition active-tab">
+    <!-- TABS BAR (GRID SYSTEM: 2 COLS MOBILE -> 3 COLS TABLET -> 6 COLS DESKTOP) -->
+    <div class="dash-tab-bar grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 bg-zinc-950/80 p-2 border border-zinc-800 rounded-2xl shadow-md">
+        <button onclick="switchDashboardTab('overview')" id="tab-overview" class="tab-btn py-2.5 px-3 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl transition text-center active-tab">
             📊 Overview
         </button>
-        <button onclick="switchDashboardTab('roster')" id="tab-roster" class="tab-btn px-4 py-2 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition inactive-tab">
+        <button onclick="switchDashboardTab('roster')" id="tab-roster" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
             ✂️ Roster & Payroll
         </button>
-        <button onclick="switchDashboardTab('clients')" id="tab-clients" class="tab-btn px-4 py-2 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition inactive-tab">
-            📋 Client CRM & Live Map
+        <button onclick="switchDashboardTab('clients')" id="tab-clients" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
+            📋 Client CRM
         </button>
-        <button onclick="switchDashboardTab('menu')" id="tab-menu" class="tab-btn px-4 py-2 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition inactive-tab">
+        <button onclick="switchDashboardTab('menu')" id="tab-menu" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
             📜 Catalog
         </button>
-        <button onclick="switchDashboardTab('expenses')" id="tab-expenses" class="tab-btn px-4 py-2 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition inactive-tab">
-            💸 Expenses & Overhead
+        <button onclick="switchDashboardTab('expenses')" id="tab-expenses" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
+            💸 Expenses
         </button>
-        <button onclick="switchDashboardTab('banking')" id="tab-banking" class="tab-btn px-4 py-2 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition inactive-tab">
-            🏦 Banking & Payouts
+        <button onclick="switchDashboardTab('banking')" id="tab-banking" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
+            🏦 Banking
         </button>
     </div>
 
@@ -99,11 +99,11 @@
     </div>
 
     <!-- TAB 2: ROSTER & PAYROLL -->
-    <div id="sec-roster" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
+    <div id="sec-roster" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
         <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">✂️ TEAM ROSTER, SPECIALTIES & PAYROLL MATRIX</h2>
         
         <!-- IN-CHAIR CLIENT QUEUE -->
-        <div class="dash-subbox bg-zinc-950 p-5 rounded-2xl border border-amber-500/40 shadow-md">
+        <div class="dash-subbox bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-amber-500/40 shadow-md">
             <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] block mb-2">💈 IN-CHAIR QUEUE & STYLIST CASH-OUT ENGINE</span>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs text-zinc-300 dash-table">
@@ -159,19 +159,19 @@
         </div>
 
         <!-- STAFF REGISTRATION FORM -->
-        <form method="POST" action="{{ url_for('main.add_stylist') }}" class="dash-subbox bg-zinc-950 p-5 rounded-2xl border border-zinc-800 space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <form method="POST" action="{{ url_for('main.add_stylist') }}" class="dash-subbox bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-zinc-800 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
                     <label class="dash-label text-[10px] uppercase font-bold">Full Name</label>
-                    <input type="text" name="name" required placeholder="Name" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white mt-1">
+                    <input type="text" name="name" required placeholder="Name" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
                 </div>
                 <div>
                     <label class="dash-label text-[10px] uppercase font-bold">App Email (For Stylist Mode)</label>
-                    <input type="email" name="email" placeholder="stylist@jackiecutz.com" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white mt-1">
+                    <input type="email" name="app_email" placeholder="stylist@jackiecutz.com" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
                 </div>
                 <div>
                     <label class="dash-label text-[10px] uppercase font-bold">Role Distinction</label>
-                    <select name="role" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white mt-1">
+                    <select name="role" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
                         <option value="Barber">Barber (Men's Cuts & Beard)</option>
                         <option value="Stylist">Stylist (Women's, Color & Wax)</option>
                         <option value="Master">Master Stylist / Barber (All)</option>
@@ -179,7 +179,7 @@
                 </div>
                 <div>
                     <label class="dash-label text-[10px] uppercase font-bold text-amber-400 dash-gold-text">Cash-Out Frequency</label>
-                    <select name="cashout_frequency" class="dash-input w-full bg-zinc-900 border border-amber-500/50 rounded-xl p-2 text-xs text-amber-300 font-bold mt-1">
+                    <select name="cashout_frequency" class="dash-input w-full bg-zinc-900 border border-amber-500/50 rounded-xl p-2.5 text-xs text-amber-300 font-bold mt-1">
                         <option value="Daily">Daily Cash-Out</option>
                         <option value="Weekly" selected>Weekly Payout</option>
                         <option value="Bi-Weekly">Bi-Weekly Payout</option>
@@ -190,7 +190,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                     <label class="dash-label text-[10px] uppercase font-bold">Pay Model</label>
-                    <select name="pay_type" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white mt-1">
+                    <select name="pay_type" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
                         <option value="Commission">Commission Split</option>
                         <option value="Booth Rent">Booth Rent Fee</option>
                         <option value="Hourly">Hourly Rate</option>
@@ -198,15 +198,17 @@
                 </div>
                 <div>
                     <label class="dash-label text-[10px] uppercase font-bold">Commission / Pay Rate (%)</label>
-                    <input type="number" step="0.1" name="pay_rate" value="70.0" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white mt-1">
+                    <input type="number" step="0.1" name="pay_rate" value="70.0" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
                 </div>
                 <div>
                     <label class="dash-label text-[10px] uppercase font-bold">Weekly Booth Rent Deduction ($)</label>
-                    <input type="number" step="1" name="booth_rent" value="0.0" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white mt-1">
+                    <input type="number" step="1" name="booth_rent" value="0.0" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
                 </div>
             </div>
 
-            <button type="submit" class="dash-primary-btn w-full py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">REGISTER TEAM MEMBER & ENABLE STYLIST APP ACCESS ✂️</button>
+            <button type="submit" class="dash-primary-btn w-full py-3 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl shadow-md transition">
+                REGISTER TEAM MEMBER & ENABLE STYLIST APP ACCESS ✂️
+            </button>
         </form>
 
         <!-- TEAM CARDS WITH EXPANDABLE NESTED WORK HISTORY SUB-TABS -->
@@ -224,8 +226,8 @@
                             <p class="text-[11px] text-zinc-400 mt-0.5 dash-subtext">Specialties: {{ s.specialties }} • Pay: {{ s.pay_type }} ({{ s.pay_rate }}%)</p>
                         </div>
 
-                        <div class="flex items-center gap-3">
-                            <div class="text-right">
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                            <div class="text-left sm:text-right">
                                 <p class="text-[10px] text-zinc-400 uppercase font-bold dash-label">Pending Payout</p>
                                 <p class="font-bold text-emerald-400 font-mono text-sm dash-val-green">${{ '%.2f'|format(s.net_payout|default(0.0)) }}</p>
                             </div>
@@ -244,32 +246,34 @@
                     <!-- NESTED CLIENT HISTORY SUB-TAB -->
                     <div id="subtab-{{ s.id }}" class="hidden dash-subbox-inner bg-black/60 border border-zinc-800 rounded-xl p-3 text-xs space-y-2">
                         <span class="dash-gold-text text-[10px] font-black uppercase text-[#f7e3af]">📜 CLIENT SERVICE HISTORY AUDIT FOR {{ s.name }}</span>
-                        <table class="w-full text-left text-zinc-300 dash-table">
-                            <thead class="text-[9px] uppercase text-zinc-500 border-b border-zinc-800 dash-thead">
-                                <tr>
-                                    <th class="p-2">Date</th>
-                                    <th class="p-2">Client Name</th>
-                                    <th class="p-2">Service Rendered</th>
-                                    <th class="p-2">Gross Price</th>
-                                    <th class="p-2">Stylist Share</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-zinc-800/60 dash-divide">
-                                {% if s.completed_bookings %}
-                                    {% for cb in s.completed_bookings %}
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-zinc-300 dash-table">
+                                <thead class="text-[9px] uppercase text-zinc-500 border-b border-zinc-800 dash-thead">
                                     <tr>
-                                        <td class="p-2 font-mono text-zinc-400 dash-subtext">{{ cb.timestamp.strftime('%Y-%m-%d %H:%M') if cb.timestamp else 'Today' }}</td>
-                                        <td class="p-2 font-bold text-white dash-text-main">{{ cb.client.name if cb.client else 'Walk-In' }}</td>
-                                        <td class="p-2 text-amber-300 dash-gold-text">{{ cb.service_name }}</td>
-                                        <td class="p-2 font-mono text-emerald-400 dash-val-green">${{ '%.2f'|format(cb.price) }}</td>
-                                        <td class="p-2 font-mono text-emerald-400 dash-val-green">${{ '%.2f'|format(cb.price * (s.pay_rate / 100.0)) }}</td>
+                                        <th class="p-2">Date</th>
+                                        <th class="p-2">Client Name</th>
+                                        <th class="p-2">Service Rendered</th>
+                                        <th class="p-2">Gross Price</th>
+                                        <th class="p-2">Stylist Share</th>
                                     </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr><td colspan="5" class="p-3 text-center text-zinc-500 dash-subtext">No completed client appointments logged yet for {{ s.name }}.</td></tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-zinc-800/60 dash-divide">
+                                    {% if s.completed_bookings %}
+                                        {% for cb in s.completed_bookings %}
+                                        <tr>
+                                            <td class="p-2 font-mono text-zinc-400 dash-subtext">{{ cb.timestamp.strftime('%Y-%m-%d %H:%M') if cb.timestamp else 'Today' }}</td>
+                                            <td class="p-2 font-bold text-white dash-text-main">{{ cb.client.name if cb.client else 'Walk-In' }}</td>
+                                            <td class="p-2 text-amber-300 dash-gold-text">{{ cb.service_name }}</td>
+                                            <td class="p-2 font-mono text-emerald-400 dash-val-green">${{ '%.2f'|format(cb.price) }}</td>
+                                            <td class="p-2 font-mono text-emerald-400 dash-val-green">${{ '%.2f'|format(cb.price * (s.pay_rate / 100.0)) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr><td colspan="5" class="p-3 text-center text-zinc-500 dash-subtext">No completed client appointments logged yet for {{ s.name }}.</td></tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -280,7 +284,7 @@
     </div>
 
     <!-- TAB 3: CLIENT CRM & LIVE MAP -->
-    <div id="sec-clients" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
+    <div id="sec-clients" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 dash-border">
             <div>
                 <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">📋 CLIENT CRM MATRIX & GEOGRAPHIC ANALYTICS</h2>
@@ -303,13 +307,13 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ url_for('main.add_client') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <form method="POST" action="{{ url_for('main.add_client') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <input type="text" name="first_name" placeholder="First Name" required class="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white">
             <input type="text" name="last_name" placeholder="Last Name" class="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white">
             <input type="email" name="email" required placeholder="Email Address" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
             <input type="text" name="phone" placeholder="Phone Number" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-            <input type="text" name="zip_code" placeholder="Zip Code (e.g. 77073)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-            <button type="submit" class="dash-primary-btn sm:col-span-4 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD CLIENT TO CRM 📋</button>
+            <input type="text" name="zip_code" placeholder="Zip Code (e.g. 77073)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white sm:col-span-2 lg:col-span-3">
+            <button type="submit" class="dash-primary-btn sm:col-span-2 lg:col-span-1 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD CLIENT TO CRM 📋</button>
         </form>
 
         <div class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 dash-subbox">
@@ -380,15 +384,15 @@
     </div>
 
     <!-- TAB 4: CATALOG -->
-    <div id="sec-menu" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
-        <div class="flex items-center justify-between border-b border-zinc-800 pb-4 dash-border">
+    <div id="sec-menu" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4 dash-border">
             <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">📜 SALON ENTERPRISE CATALOGS</h2>
             
-            <div class="flex items-center gap-2 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 dash-subbox">
-                <button type="button" onclick="switchCatalogSubtab('services')" id="btn-subcat-services" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition">
+            <div class="flex items-center gap-2 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 dash-subbox w-full sm:w-auto">
+                <button type="button" onclick="switchCatalogSubtab('services')" id="btn-subcat-services" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition flex-1 sm:flex-none">
                     ✂️ Service Catalog
                 </button>
-                <button type="button" onclick="switchCatalogSubtab('inventory')" id="btn-subcat-inventory" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition">
+                <button type="button" onclick="switchCatalogSubtab('inventory')" id="btn-subcat-inventory" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition flex-1 sm:flex-none">
                     📦 Inventory Catalog
                 </button>
             </div>
@@ -396,7 +400,7 @@
 
         <!-- SUB-TAB 1: SERVICE CATALOG -->
         <div id="subcat-services" class="space-y-5">
-            <form method="POST" action="{{ url_for('main.add_service') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-5 gap-3">
+            <form method="POST" action="{{ url_for('main.add_service') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <input type="text" name="category" required placeholder="Category (e.g. Men's)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
                 <input type="text" name="name" required placeholder="Service Name" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
                 <input type="number" step="0.01" name="price_min" required placeholder="Min Price ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
@@ -406,7 +410,7 @@
                     <option value="Stylist">Stylist</option>
                     <option value="Master">Master</option>
                 </select>
-                <button type="submit" class="dash-primary-btn sm:col-span-5 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD SERVICE TO CATALOG ✂️</button>
+                <button type="submit" class="dash-primary-btn sm:col-span-2 lg:col-span-5 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD SERVICE TO CATALOG ✂️</button>
             </form>
 
             <div class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 dash-subbox">
@@ -464,13 +468,13 @@
 
         <!-- SUB-TAB 2: INVENTORY PRODUCT CATALOG -->
         <div id="subcat-inventory" class="hidden space-y-5">
-            <form method="POST" action="{{ url_for('main.add_product') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-5 gap-3">
+            <form method="POST" action="{{ url_for('main.add_product') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <input type="text" name="sku" required placeholder="SKU Code" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
                 <input type="text" name="name" required placeholder="Product Name" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
                 <input type="number" step="0.01" name="cost" placeholder="Wholesale Cost ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
                 <input type="number" step="0.01" name="price" required placeholder="Retail Price ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
                 <input type="number" name="stock" required placeholder="Stock Quantity" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <button type="submit" class="dash-primary-btn sm:col-span-5 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD PRODUCT TO INVENTORY 📦</button>
+                <button type="submit" class="dash-primary-btn sm:col-span-2 lg:col-span-5 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD PRODUCT TO INVENTORY 📦</button>
             </form>
 
             <div class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 dash-subbox">
@@ -528,7 +532,7 @@
     </div>
 
     <!-- TAB 5: EXPENSES -->
-    <div id="sec-expenses" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
+    <div id="sec-expenses" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
         <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">💸 OVERHEAD & EXPENSE TRACKER</h2>
         <form method="POST" action="{{ url_for('main.add_expense') }}" class="dash-subbox grid grid-cols-1 sm:grid-cols-3 gap-3 bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
             <select name="category" required class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
@@ -541,12 +545,12 @@
             </select>
             <input type="text" name="description" placeholder="Description" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
             <input type="number" step="0.01" name="amount" required placeholder="Amount ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
-            <button type="submit" class="sm:col-span-3 py-2 bg-red-600 text-white font-extrabold text-xs rounded-xl dash-btn-red">LOG EXPENSE 💸</button>
+            <button type="submit" class="sm:col-span-3 py-2.5 bg-red-600 text-white font-extrabold text-xs rounded-xl dash-btn-red">LOG EXPENSE 💸</button>
         </form>
     </div>
 
     <!-- TAB 6: BANKING & PAYOUTS -->
-    <div id="sec-banking" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
+    <div id="sec-banking" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 dash-border">
             <div>
                 <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">🏦 BUSINESS BANKING & DIRECT DEPOSIT PAYOUT SETUP</h2>
@@ -645,13 +649,13 @@ function switchCatalogSubtab(subId) {
     if (subId === 'services') {
         svcSec.classList.remove('hidden');
         invSec.classList.add('hidden');
-        btnSvc.className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition";
-        btnInv.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition";
+        btnSvc.className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition flex-1 sm:flex-none";
+        btnInv.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition flex-1 sm:flex-none";
     } else {
         svcSec.classList.add('hidden');
         invSec.classList.remove('hidden');
-        btnInv.className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition";
-        btnSvc.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition";
+        btnInv.className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition flex-1 sm:flex-none";
+        btnSvc.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition flex-1 sm:flex-none";
     }
 }
 
