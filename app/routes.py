@@ -23,6 +23,7 @@ def login():
     if request.method == 'POST':
         identifier = request.form.get('login_identifier', '').strip()
         password = request.form.get('password', '')
+        user_role = request.form.get('user_role', 'client')
 
         # Lookup user by username, email, or phone
         user = User.query.filter(
@@ -32,18 +33,33 @@ def login():
         ).first()
 
         if user and user.password_hash and check_password_hash(user.password_hash, password):
-            login_user(user)
-            flash('Login successful!', 'success')
+            # Enforce access permissions based on active tab
+            if user_role == 'admin':
+                if getattr(user, 'is_admin', False) or getattr(user, 'is_stylist', False):
+                    login_user(user)
+                    flash('Welcome to the Admin Dashboard!', 'success')
+                    return redirect(url_for('main.stylist_dashboard'))
+                else:
+                    flash('Unauthorized admin access attempt.', 'danger')
+                    return render_template('login.html')
 
-            # Route conditionally based on user role
-            if getattr(user, 'is_stylist', False):
-                return redirect(url_for('main.stylist_dashboard'))
-            return redirect(url_for('main.customer_portal'))
+            elif user_role == 'stylist':
+                if getattr(user, 'is_stylist', False) or getattr(user, 'is_admin', False):
+                    login_user(user)
+                    flash(f'Welcome back, {user.first_name or "Stylist"}!', 'success')
+                    return redirect(url_for('main.stylist_portal', staff_id=user.id))
+                else:
+                    flash('Account is not registered as a stylist.', 'danger')
+                    return render_template('login.html')
+
+            else:  # Client login
+                login_user(user)
+                flash('Login successful!', 'success')
+                return redirect(url_for('main.customer_portal'))
         else:
             flash('Invalid credentials. Please try again.', 'danger')
 
-    endpoints = ['forgot_password', 'register', 'terms', 'privacy']
-    return render_template('login.html', endpoints=endpoints)
+    return render_template('login.html')
 
 
 @main_bp.route('/logout')
