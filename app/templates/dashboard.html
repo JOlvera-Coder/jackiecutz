@@ -899,5 +899,13 @@ html.light-theme .dash-btn-red {
     color: #ffffff !important; 
     border-color: #b91c1c !important; 
 }
+
+/* OVERRIDE FIXED MOBILE BEZEL RESTRICTIONS ON TABLET/DESKTOP */
+@media (min-width: 768px) {
+    .dashboard-container, .dash-card, .dash-subbox {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
 </style>
 {% endblock %}
