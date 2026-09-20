@@ -900,11 +900,16 @@ html.light-theme .dash-btn-red {
     border-color: #b91c1c !important; 
 }
 
-/* OVERRIDE FIXED MOBILE BEZEL RESTRICTIONS ON TABLET/DESKTOP */
+/* FORCE DESKTOP EXPANSION ON TABLETS, LAPTOPS & DESKTOPS */
 @media (min-width: 768px) {
-    .dashboard-container, .dash-card, .dash-subbox {
+    .dashboard-container, .dash-card, .dash-subbox, main, header {
         width: 100% !important;
         max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    .dash-card {
+        border-radius: 20px !important;
     }
 }
 </style>
