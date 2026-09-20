@@ -908,4 +908,22 @@ html.light-theme .dash-btn-red {
     }
 }
 </style>
+/* GOOGLE PLAY LARGE-SCREEN EXPANSION OVERRIDE */
+@media (min-width: 768px) {
+    .dashboard-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+    .dash-card {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .dash-tab-bar {
+        display: grid !important;
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+        width: 100% !important;
+    }
+}
 {% endblock %}
