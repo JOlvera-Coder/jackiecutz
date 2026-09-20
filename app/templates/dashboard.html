@@ -919,4 +919,25 @@ html.light-theme .dash-btn-red {
     }
 }
 </style>
+/* BRUTE-FORCE DESKTOP EXPANSION OVERRIDE */
+@media (min-width: 768px) {
+    body, main, .dashboard-container, .dash-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    .dash-card {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    .dash-tab-bar {
+        display: grid !important;
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+        width: 100% !important;
+    }
+}
 {% endblock %}
