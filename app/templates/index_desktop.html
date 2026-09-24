@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="w-full min-h-screen bg-black text-white p-6 space-y-8">
+
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="flex items-center justify-between border-b border-[#e6c280]/30 pb-4">
+        <div class="flex items-center gap-4">
+            <a href="{{ url_for('main.login') }}" class="text-2xl text-[#f7e3af] hover:text-white transition" title="Menu & Sign On">
+                ☰
+            </a>
+            <a href="{{ url_for('main.login') }}" class="text-xs font-black uppercase text-[#f7e3af] border border-[#e6c280]/40 px-4 py-2 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">
+                Sign On 🔑
+            </a>
+        </div>
+
+        <!-- CENTERED OFFICIAL BRAND LOGO (CARD_BG) -->
+        <div class="text-center flex-1 max-w-lg mx-auto">
+            <a href="{{ url_for('main.index') }}">
+                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="JackieCutz Hair Studio" class="h-24 w-auto object-contain mx-auto mix-blend-screen drop-shadow-[0_0_15px_rgba(247,227,175,0.35)]">
+            </a>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="#booking" class="bg-[#f7e3af] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-lg hover:bg-white transition">
+                Book Online ✂️
+            </a>
+        </div>
+    </nav>
+
+    <!-- CAMPAIGN AD & BULLETIN GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- CAMPAIGN AD (2 COLS) -->
+        <div class="md:col-span-2 bg-gradient-to-r from-zinc-950 via-black to-zinc-950 border border-[#e6c280]/50 rounded-3xl p-6 shadow-[0_0_20px_rgba(230,194,128,0.15)] flex flex-col justify-between">
+            <span class="px-3 py-1 text-[10px] font-black uppercase rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 w-max">
+                ⚡ SPECIAL PROMOTION
+            </span>
+            <div class="my-4">
+                <h2 class="text-2xl sm:text-3xl font-black text-[#f7e3af] tracking-wide gold-glow">
+                    DIVINE SALON SUITE 105 EXPERIENCE
+                </h2>
+                <p class="text-xs text-zinc-400 mt-1">Master Styling by Ivonne Gonzalez • Book early to reserve prime weekend slots.</p>
+            </div>
+            <a href="{{ url_for('main.login') }}" class="w-max bg-[#f7e3af] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition hover:scale-105">
+                CLAIM OFFER & BOOK NOW ↗
+            </a>
+        </div>
+
+        <!-- BULLETIN BOARD (1 COL) -->
+        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 flex flex-col justify-between space-y-4">
+            <h3 class="text-xs font-black uppercase text-[#f7e3af] border-b border-zinc-800 pb-2 flex items-center gap-2">
+                📢 SALON BULLETIN
+            </h3>
+            <div class="space-y-3 text-xs text-zinc-300">
+                <p class="border-l-2 border-amber-400 pl-2">💈 <strong>Walk-Ins Welcome:</strong> Check live kiosk status before heading over.</p>
+                <p class="border-l-2 border-emerald-400 pl-2">📍 <strong>Suite Location:</strong> 806-E Airtex Dr, Suite 105, Houston, TX.</p>
+            </div>
+            <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="block text-center py-2 bg-zinc-900 border border-zinc-700 hover:border-amber-400 text-amber-300 text-xs font-bold rounded-xl transition">
+                📱 Open Walk-In Kiosk
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN BOOKING & PRODUCTS CONTAINER -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8" id="booking">
+        
+        <!-- BOOKING CATEGORIES (3 COLS) -->
+        <div class="lg:col-span-3 space-y-8">
+            
+            <!-- WOMEN'S HAIRCUTS ROW -->
+            <div class="space-y-4">
+                <h3 class="text-sm font-black uppercase text-[#f7e3af] tracking-wider flex items-center gap-2">
+                    ✂️ Women's Services & Styling
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {% for svc in services if svc.required_role in ['Stylist', 'Master'] %}
+                    <div class="bg-zinc-950 border border-zinc-800 hover:border-[#f7e3af]/60 rounded-2xl p-3 flex flex-col justify-between space-y-3 transition group">
+                        <div class="h-28 bg-zinc-900 rounded-xl overflow-hidden relative">
+                            {% if svc.image_url %}
+                                <img src="{{ url_for('static', filename=svc.image_url) }}" alt="{{ svc.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="{{ svc.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                            {% endif %}
+                            <span class="absolute top-2 right-2 bg-black/80 text-emerald-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                ${{ '%.2f'|format(svc.price_min) }}
+                            </span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white text-xs">{{ svc.name }}</p>
+                            <p class="text-[10px] text-zinc-400 mt-0.5">{{ svc.category }}</p>
+                        </div>
+                        <a href="{{ url_for('main.login') }}" class="block text-center py-1.5 bg-[#f7e3af] text-black font-black text-[10px] rounded-lg hover:bg-white transition">
+                            BOOK NOW
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3 space-y-2 text-center">
+                        <div class="h-24 bg-zinc-900 rounded-xl flex items-center justify-center text-2xl">✂️</div>
+                        <p class="font-bold text-white text-xs">Women's Haircut</p>
+                        <p class="text-emerald-400 font-mono text-xs">$65.00+</p>
+                        <a href="{{ url_for('main.login') }}" class="block text-center py-1 bg-[#f7e3af] text-black font-bold text-[10px] rounded-lg">BOOK NOW</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- MEN'S HAIRCUTS ROW -->
+            <div class="space-y-4">
+                <h3 class="text-sm font-black uppercase text-[#f7e3af] tracking-wider flex items-center gap-2">
+                    💈 Men's Cuts & Beard Grooming
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {% for svc in services if svc.required_role in ['Barber', 'Master'] %}
+                    <div class="bg-zinc-950 border border-zinc-800 hover:border-[#f7e3af]/60 rounded-2xl p-3 flex flex-col justify-between space-y-3 transition group">
+                        <div class="h-28 bg-zinc-900 rounded-xl overflow-hidden relative">
+                            {% if svc.image_url %}
+                                <img src="{{ url_for('static', filename=svc.image_url) }}" alt="{{ svc.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="{{ svc.name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                            {% endif %}
+                            <span class="absolute top-2 right-2 bg-black/80 text-emerald-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md">
+                                ${{ '%.2f'|format(svc.price_min) }}
+                            </span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white text-xs">{{ svc.name }}</p>
+                            <p class="text-[10px] text-zinc-400 mt-0.5">{{ svc.category }}</p>
+                        </div>
+                        <a href="{{ url_for('main.login') }}" class="block text-center py-1.5 bg-[#f7e3af] text-black font-black text-[10px] rounded-lg hover:bg-white transition">
+                            BOOK NOW
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-3 space-y-2 text-center">
+                        <div class="h-24 bg-zinc-900 rounded-xl flex items-center justify-center text-2xl">💈</div>
+                        <p class="font-bold text-white text-xs">Men's Fade & Beard</p>
+                        <p class="text-emerald-400 font-mono text-xs">$45.00+</p>
+                        <a href="{{ url_for('main.login') }}" class="block text-center py-1 bg-[#f7e3af] text-black font-bold text-[10px] rounded-lg">BOOK NOW</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PRODUCTS SIDEBAR (1 COL) -->
+        <div class="space-y-4">
+            <h3 class="text-sm font-black uppercase text-[#f7e3af] tracking-wider flex items-center gap-2">
+                📦 Salon Products
+            </h3>
+            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-4 space-y-4">
+                {% if products %}
+                    {% for prod in products %}
+                    <div class="flex items-center gap-3 border-b border-zinc-900 pb-3 last:border-0">
+                        <div class="w-12 h-12 bg-zinc-900 rounded-xl flex-shrink-0 flex items-center justify-center text-xl">🧴</div>
+                        <div class="flex-1">
+                            <p class="font-bold text-white text-xs">{{ prod.name }}</p>
+                            <p class="text-emerald-400 font-mono text-xs mt-0.5">${{ '%.2f'|format(prod.price) }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-6 text-zinc-500 text-xs">
+                        <p class="text-2xl mb-2">🧴</p>
+                        <p>Luxury pomades, oils, and styling gels available at the suite!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

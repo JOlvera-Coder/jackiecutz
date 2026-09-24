@@ -30,8 +30,6 @@ def allowed_file(filename):
 @main_bp.route('/')
 @main_bp.route('/index')
 def index():
-    # Pass live services and products to the public landing page
-    # Fallbacks prevent empty page errors if database tables are initialising
     services = []
     products = []
     try:
@@ -41,7 +39,7 @@ def index():
     except Exception as e:
         print(f"Index query fallback: {e}")
 
-    return render_template('index.html', services=services, products=products)
+    return render_template('index_desktop.html', services=services, products=products)
 
 # ==========================================
 # 1. AUTH & ENTRY ROUTES
