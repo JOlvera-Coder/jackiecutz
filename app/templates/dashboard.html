@@ -32,13 +32,13 @@
             <!-- Action Links -->
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ url_for('main.export_tax_csv') }}" class="px-3.5 py-2 bg-emerald-950/80 border border-emerald-500/50 hover:bg-emerald-900 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
-                    📄 TAX EXPORT ⬇
+                    📄 1-CLICK TAX EXPORT (CSV) ⬇
                 </a>
                 <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="px-3.5 py-2 bg-zinc-950 border border-[#e6c280]/40 hover:border-[#f7e3af] text-[#f7e3af] text-xs font-bold rounded-xl flex items-center gap-1.5 transition shadow-[0_0_10px_rgba(247,227,175,0.2)]">
                     📱 KIOSK TERMINAL ↗
                 </a>
-                <a href="{{ url_for('main.index') }}" target="_blank" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
-                    Public Website ↗
+                <a href="{{ url_for('main.customer_portal') }}" target="_blank" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+                    Client App ↗
                 </a>
                 <a href="{{ url_for('main.logout') }}" class="px-3.5 py-2 bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-400 text-xs font-bold rounded-xl transition">
                     Sign Out
@@ -74,29 +74,27 @@
             </div>
         </div>
 
-        <!-- NEW INDEX SECTION: PUBLIC WEBSITE GALLERY MANAGER -->
+        <!-- INDEX PAGE PORTFOLIO GALLERY MANAGER (5 WOMEN / 5 MEN PICS) -->
         <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
                 <div>
                     <h2 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider flex items-center gap-2">
-                        🖼️ INDEX LANDING PAGE & PORTFOLIO GALLERY MANAGER
+                        🖼️ PUBLIC INDEX PAGE PORTFOLIO MANAGER
                     </h2>
-                    <p class="text-xs text-zinc-400 mt-1">Upload 5 female and 5 male client haircut photos to populate the desktop marketing showcase.</p>
+                    <p class="text-xs text-zinc-400 mt-1">Upload portfolio images for display on the landing page showcase.</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
-                <!-- FEMALE CLIENT PORTFOLIO (5 PICS) -->
+                <!-- WOMEN PORTFOLIO (5 SLOTS) -->
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 space-y-4">
-                    <h3 class="text-xs font-black uppercase text-[#f7e3af] tracking-widest border-b border-zinc-800 pb-2 flex items-center justify-between">
-                        <span>✂️ Women's Showcase (5 Photos)</span>
-                        <span class="text-[10px] text-zinc-500 font-mono">Live Sync</span>
+                    <h3 class="text-xs font-black uppercase text-[#f7e3af] tracking-widest border-b border-zinc-800 pb-2">
+                        ✂️ Women's Showcase (5 Photos)
                     </h3>
                     <form method="POST" action="{{ url_for('main.add_service') }}" enctype="multipart/form-data" class="space-y-3">
                         <div class="grid grid-cols-5 gap-2">
                             {% for i in range(1, 6) %}
-                            <div class="h-24 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col items-center justify-center p-1 text-center relative overflow-hidden group">
+                            <div class="h-20 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col items-center justify-center p-1 text-center relative overflow-hidden group">
                                 <span class="text-[9px] font-bold text-zinc-500 uppercase">Pic {{ i }}</span>
                                 <input type="file" name="female_pic_{{ i }}" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                                 <span class="text-[8px] text-[#f7e3af] mt-1 font-semibold group-hover:underline">+ Upload</span>
@@ -104,21 +102,20 @@
                             {% endfor %}
                         </div>
                         <button type="submit" class="w-full py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl hover:bg-white transition uppercase tracking-widest">
-                            UPDATE WOMEN'S PORTFOLIO PICS
+                            SAVE WOMEN'S PORTFOLIO
                         </button>
                     </form>
                 </div>
 
-                <!-- MALE CLIENT PORTFOLIO (5 PICS) -->
+                <!-- MEN PORTFOLIO (5 SLOTS) -->
                 <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 space-y-4">
-                    <h3 class="text-xs font-black uppercase text-[#f7e3af] tracking-widest border-b border-zinc-800 pb-2 flex items-center justify-between">
-                        <span>💈 Men's Showcase (5 Photos)</span>
-                        <span class="text-[10px] text-zinc-500 font-mono">Live Sync</span>
+                    <h3 class="text-xs font-black uppercase text-[#f7e3af] tracking-widest border-b border-zinc-800 pb-2">
+                        💈 Men's Showcase (5 Photos)
                     </h3>
                     <form method="POST" action="{{ url_for('main.add_service') }}" enctype="multipart/form-data" class="space-y-3">
                         <div class="grid grid-cols-5 gap-2">
                             {% for i in range(1, 6) %}
-                            <div class="h-24 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col items-center justify-center p-1 text-center relative overflow-hidden group">
+                            <div class="h-20 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col items-center justify-center p-1 text-center relative overflow-hidden group">
                                 <span class="text-[9px] font-bold text-zinc-500 uppercase">Pic {{ i }}</span>
                                 <input type="file" name="male_pic_{{ i }}" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                                 <span class="text-[8px] text-[#f7e3af] mt-1 font-semibold group-hover:underline">+ Upload</span>
@@ -126,11 +123,10 @@
                             {% endfor %}
                         </div>
                         <button type="submit" class="w-full py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl hover:bg-white transition uppercase tracking-widest">
-                            UPDATE MEN'S PORTFOLIO PICS
+                            SAVE MEN'S PORTFOLIO
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
 
