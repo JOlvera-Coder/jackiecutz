@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="w-full min-h-screen bg-black text-white p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
+<div class="min-h-screen bg-black text-white p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
 
     <!-- TOP HEADER & BRANDING BAR -->
     <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-5 shadow-[0_0_25px_rgba(230,194,128,0.15)] flex flex-col md:flex-row items-center justify-between gap-4">
@@ -17,16 +17,16 @@
             </div>
         </div>
 
-        <!-- ACTION LINKS -->
+        <!-- Action Links -->
         <div class="flex flex-wrap items-center gap-2">
             <a href="{{ url_for('main.export_tax_csv') }}" class="px-3.5 py-2 bg-emerald-950/80 border border-emerald-500/50 hover:bg-emerald-900 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
-                📄 TAX EXPORT ⬇
+                📄 1-CLICK TAX EXPORT (CSV) ⬇
             </a>
             <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="px-3.5 py-2 bg-zinc-950 border border-[#e6c280]/40 hover:border-[#f7e3af] text-[#f7e3af] text-xs font-bold rounded-xl flex items-center gap-1.5 transition shadow-[0_0_10px_rgba(247,227,175,0.2)]">
                 📱 KIOSK TERMINAL ↗
             </a>
-            <a href="{{ url_for('main.index') }}" target="_blank" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
-                Public Website ↗
+            <a href="{{ url_for('main.customer_portal') }}" target="_blank" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+                Client App ↗
             </a>
             <a href="{{ url_for('main.logout') }}" class="px-3.5 py-2 bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-400 text-xs font-bold rounded-xl transition">
                 Sign Out
@@ -55,212 +55,179 @@
             </p>
         </div>
         <div class="bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
-            <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">ACTIVE SERVICES IN CATALOG</p>
+            <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">ACTIVE QUEUE / WALK-INS</p>
             <p class="text-2xl sm:text-3xl font-black text-white mt-2">
-                {{ services|length|default(0) }}
+                {{ bookings|length|default(0) }}
             </p>
         </div>
     </div>
 
-    <!-- DASHBOARD TAB NAVIGATION BUTTONS -->
-    <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
-        <button onclick="switchTab('sec-catalog')" id="btn-catalog" class="tab-btn px-4 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl shadow-md transition uppercase">
-            ✂️ Service Catalog & Photos
-        </button>
-        <button onclick="switchTab('sec-roster')" id="btn-roster" class="tab-btn px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-extrabold text-xs rounded-xl hover:text-white transition uppercase">
-            💈 Stylist Roster
-        </button>
-        <button onclick="switchTab('sec-inventory')" id="btn-inventory" class="tab-btn px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-extrabold text-xs rounded-xl hover:text-white transition uppercase">
-            📦 Retail Inventory
-        </button>
-        <button onclick="switchTab('sec-analytics')" id="btn-analytics" class="tab-btn px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-extrabold text-xs rounded-xl hover:text-white transition uppercase">
-            📊 Analytics & Traffic
-        </button>
-    </div>
+    <!-- STYLIST/BARBER TEAM & SPECIALTY MANAGEMENT MODULE -->
+    <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
+            <div>
+                <h2 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)] flex items-center gap-2">
+                    ✂️ STYLIST & BARBER ROSTER WITH SPECIALTIES
+                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40">
+                        {{ staff|length|default(0) }} ACTIVE CHAIRS
+                    </span>
+                </h2>
+                <p class="text-xs text-zinc-400 mt-1">Assign stylist specialties so clients only book services that the selected team member performs.</p>
+            </div>
+        </div>
 
-    <!-- TAB 1: SERVICE CATALOG & PHOTO MANAGEMENT -->
-    <div id="sec-catalog" class="tab-content space-y-6">
-        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
+        <!-- Add Stylist Form -->
+        <div class="bg-zinc-950 border border-dashed border-[#e6c280]/40 rounded-2xl p-4 sm:p-5">
+            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider block mb-3 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
+                + ADD STYLIST / BARBER & PERMITTED SERVICES
+            </span>
+            <form method="POST" action="{{ url_for('main.add_stylist') }}" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" name="name" required placeholder="Stylist / Barber Full Name" 
+                           class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
+                    <select name="role" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none">
+                        <option value="Stylist">Stylist</option>
+                        <option value="Barber">Barber</option>
+                        <option value="Master Stylist">Master Stylist</option>
+                    </select>
+                </div>
+
+                <!-- Specialty Checkboxes -->
                 <div>
-                    <h2 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider flex items-center gap-2">
-                        ✂️ LIVE SERVICE CATALOG & MARKETING PHOTO UPLOADER
-                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40">
-                            {{ services|length|default(0) }} SERVICES
-                        </span>
-                    </h2>
-                    <p class="text-xs text-zinc-400 mt-1">Add new services or upload haircut marketing photos to display live on the website.</p>
+                    <label class="block text-[11px] font-bold uppercase text-[#f7e3af] mb-2">Approved Specialties & Service Categories:</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Haircuts" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Haircuts</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Beard & Shave" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Beard & Shave</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="VIP Combos" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">VIP Combos</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Kids" checked class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Kids</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Color" class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Color</span>
+                        </label>
+                        <label class="flex items-center space-x-2 bg-black border border-zinc-800 p-2 rounded-xl cursor-pointer">
+                            <input type="checkbox" name="specialties" value="Waxing" class="text-[#f7e3af] rounded">
+                            <span class="text-xs font-semibold text-zinc-300">Waxing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-wider text-xs rounded-2xl shadow-[0_0_15px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
+                    REGISTER STYLIST TO SYSTEM ✂️
+                </button>
+            </form>
+        </div>
+
+        <!-- Active Stylist Roster Display -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+            {% for person in staff %}
+            <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-black text-[#f7e3af]">{{ person.name }}</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-300">{{ person.role }}</span>
+                </div>
+                <div class="flex flex-wrap gap-1 pt-1">
+                    {% for spec in person.specialties %}
+                        <span class="text-[9px] font-bold px-2 py-0.5 bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/30 rounded-lg">{{ spec }}</span>
+                    {% endfor %}
                 </div>
             </div>
+            {% endfor %}
+        </div>
+    </div>
 
-            <!-- ADD NEW SERVICE FORM -->
-            <div class="bg-zinc-950 border border-dashed border-[#e6c280]/40 rounded-2xl p-4 sm:p-5">
-                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider block mb-3">
-                    + ADD SERVICE WITH MARKETING PHOTO
+    <!-- 3 ANALYTICS CHARTS ROW -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-4">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_5px_rgba(247,227,175,0.4)]">
+                    📢 LIVE TRAFFIC ACQUISITION
                 </span>
-                <form method="POST" action="{{ url_for('main.add_service') }}" enctype="multipart/form-data" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Service Title</label>
-                            <input type="text" name="name" required placeholder="e.g. Women's Haircut" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Category</label>
-                            <select name="category" required class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
-                                <option value="Women's Services">Women's Services</option>
-                                <option value="Men's Services">Men's Services</option>
-                                <option value="Wax Services">Wax Services</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Price ($)</label>
-                            <input type="number" step="0.01" name="price_min" required placeholder="30.00" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Role Requirement</label>
-                            <select name="required_role" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
-                                <option value="Stylist">Stylist</option>
-                                <option value="Barber">Barber</option>
-                                <option value="Master">Master</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Upload Marketing Photo</label>
-                        <input type="file" name="image" accept="image/*" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-zinc-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#f7e3af] file:text-black">
-                    </div>
-
-                    <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-wider text-xs rounded-xl shadow-md transition">
-                        SAVE SERVICE & SYNC TO PUBLIC WEBSITE ✂️
-                    </button>
-                </form>
+                <span class="text-[10px] text-zinc-500 font-mono">Marketing ROI</span>
             </div>
+            <div class="h-56 flex items-center justify-center">
+                <canvas id="trafficChart"></canvas>
+            </div>
+        </div>
 
-            <!-- CURRENT SERVICES GRID -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-2">
-                {% for svc in services %}
-                <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl space-y-3 relative group">
-                    <div class="h-28 bg-zinc-900 rounded-xl overflow-hidden relative flex items-center justify-center border border-zinc-800">
-                        {% if svc.image_url %}
-                            <img src="{{ url_for('static', filename=svc.image_url) }}" alt="{{ svc.name }}" class="w-full h-full object-cover">
-                        {% else %}
-                            <span class="text-[10px] uppercase text-zinc-500 font-bold">No Photo Uploaded</span>
-                        {% endif %}
-                        <span class="absolute top-2 right-2 bg-black/90 text-emerald-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-500/30">
-                            ${{ "%.2f"|format(svc.price_min) }}
-                        </span>
-                    </div>
-                    <div>
-                        <p class="font-bold text-white text-xs">{{ svc.name }}</p>
-                        <p class="text-[10px] text-zinc-400">{{ svc.category }}</p>
-                    </div>
-                    <form method="POST" action="{{ url_for('main.delete_service', service_id=svc.id) }}">
-                        <button type="submit" class="w-full py-1 text-center bg-red-950/60 border border-red-800/40 text-red-400 text-[10px] font-bold rounded-lg hover:bg-red-900 transition">
-                            Remove Service
-                        </button>
-                    </form>
-                </div>
-                {% else %}
-                <p class="text-xs text-zinc-500 col-span-full text-center py-6">No services in database. Use the form above to add services.</p>
-                {% endfor %}
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-4">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_5px_rgba(247,227,175,0.4)]">
+                    📍 GEOGRAPHIC DENSITY MAP
+                </span>
+                <span class="text-[10px] text-zinc-500 font-mono">Top Zip Codes</span>
+            </div>
+            <div class="h-56 flex items-center justify-center">
+                <canvas id="geoChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-2 mb-4">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_5px_rgba(247,227,175,0.4)]">
+                    ⚖️ REVENUE VS OVERHEAD
+                </span>
+                <span class="text-[10px] text-zinc-500 font-mono">Profit Margin</span>
+            </div>
+            <div class="h-56 flex items-center justify-center">
+                <canvas id="revChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- TAB 2: STYLIST ROSTER -->
-    <div id="sec-roster" class="tab-content hidden space-y-6">
-        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-5">
-            <h2 class="text-sm font-black uppercase text-[#f7e3af] tracking-wider">✂️ STYLIST & BARBER ROSTER</h2>
-            <div class="bg-zinc-950 border border-dashed border-[#e6c280]/40 rounded-2xl p-4 sm:p-5">
-                <form method="POST" action="{{ url_for('main.add_stylist') }}" class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <input type="text" name="name" required placeholder="Stylist Full Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
-                        <select name="role" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
-                            <option value="Stylist">Stylist</option>
-                            <option value="Barber">Barber</option>
-                            <option value="Master Stylist">Master Stylist</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-black uppercase tracking-wider text-xs rounded-2xl shadow-md">
-                        REGISTER STYLIST
-                    </button>
-                </form>
+    <!-- RETAIL INVENTORY & PO ENGINE -->
+    <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
+            <div>
+                <h2 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)] flex items-center gap-2">
+                    📦 RETAIL INVENTORY & PURCHASE ORDER (PO) ENGINE
+                    <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40">
+                        {{ products|length|default(0) }} ITEMS IN STOCK
+                    </span>
+                </h2>
+                <p class="text-xs text-zinc-400 mt-1">Manage products, wholesale costs, retail pricing, create/receive POs, and sync items with Kiosk/App.</p>
             </div>
         </div>
-    </div>
 
-    <!-- TAB 3: RETAIL INVENTORY -->
-    <div id="sec-inventory" class="tab-content hidden space-y-6">
-        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
-            <h2 class="text-sm font-black uppercase text-[#f7e3af] tracking-wider">📦 RETAIL INVENTORY</h2>
+        <!-- Add New Product Form -->
+        <div class="bg-zinc-950 border border-dashed border-[#e6c280]/40 rounded-2xl p-4 sm:p-5">
+            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider block mb-3 drop-shadow-[0_0_4px_rgba(247,227,175,0.3)]">
+                + ADD NEW PRODUCT
+            </span>
             <form method="POST" action="{{ url_for('main.add_product') }}" class="space-y-3">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input type="text" name="sku" placeholder="SKU" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
-                    <input type="text" name="name" required placeholder="Product Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                    <input type="text" name="sku" placeholder="SKU (e.g. JC-WAX-04)" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
+                    <input type="text" name="name" required placeholder="Product Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
                 </div>
                 <div class="grid grid-cols-3 gap-3">
-                    <input type="number" step="0.01" name="cost" placeholder="Cost ($)" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
-                    <input type="number" step="0.01" name="price" required placeholder="Retail ($)" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
-                    <input type="number" name="stock" required placeholder="Qty" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                    <input type="number" step="0.01" name="cost" placeholder="Cost ($)" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
+                    <input type="number" step="0.01" name="price" required placeholder="Retail ($)" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
+                    <input type="number" name="stock" required placeholder="Qty" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
                 </div>
-                <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-black uppercase text-xs rounded-2xl shadow-md">
-                    SAVE PRODUCT TO CATALOG
-                </button>
+                <div>
+                    <input type="text" name="description" placeholder="Description..." class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold focus:outline-none placeholder-zinc-500">
+                </div>
+                <div class="pt-1">
+                    <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-wider text-xs rounded-2xl shadow-[0_0_15px_rgba(230,194,128,0.35)] transition duration-150 transform active:scale-95">
+                        SAVE PRODUCT TO CATALOG
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- TAB 4: ANALYTICS CHARTS -->
-    <div id="sec-analytics" class="tab-content hidden space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] h-64">
-                <p class="text-xs font-black uppercase text-[#f7e3af] mb-4">📢 LIVE TRAFFIC ACQUISITION</p>
-                <div class="h-44 flex items-center justify-center">
-                    <canvas id="trafficChart"></canvas>
-                </div>
-            </div>
-            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] h-64">
-                <p class="text-xs font-black uppercase text-[#f7e3af] mb-4">📍 GEOGRAPHIC DENSITY MAP</p>
-                <div class="h-44 flex items-center justify-center">
-                    <canvas id="geoChart"></canvas>
-                </div>
-            </div>
-            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] h-64">
-                <p class="text-xs font-black uppercase text-[#f7e3af] mb-4">⚖️ REVENUE VS OVERHEAD</p>
-                <div class="h-44 flex items-center justify-center">
-                    <canvas id="revChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
-
-<!-- TAB SWITCHING SCRIPT -->
-<script>
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.getElementById(tabId).classList.remove('hidden');
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-[#f7e3af]', 'text-black');
-        btn.classList.add('bg-zinc-900', 'text-zinc-300');
-    });
-
-    const activeBtnMap = {
-        'sec-catalog': 'btn-catalog',
-        'sec-roster': 'btn-roster',
-        'sec-inventory': 'btn-inventory',
-        'sec-analytics': 'btn-analytics'
-    };
-    const activeBtn = document.getElementById(activeBtnMap[tabId]);
-    if (activeBtn) {
-        activeBtn.classList.remove('bg-zinc-900', 'text-zinc-300');
-        activeBtn.classList.add('bg-[#f7e3af]', 'text-black');
-    }
-}
-</script>
 
 <!-- CHART.JS SCRIPT ENGINES -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -271,9 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
         new Chart(trafficCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Direct Booking', 'Walk-In Kiosk', 'Instagram / Social', 'Client Referral'],
+                labels: {{ chart_channel_labels|default(['Direct Booking', 'Walk-In Kiosk', 'Instagram / Social', 'Client Referral'])|tojson }},
                 datasets: [{
-                    data: [12, 5, 8, 4],
+                    data: {{ chart_channel_data|default([12, 5, 8, 4])|tojson }},
                     backgroundColor: ['#caa055', '#3b82f6', '#ec4899', '#10b981'],
                     borderWidth: 0
                 }]
@@ -287,9 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
         new Chart(geoCtx, {
             type: 'pie',
             data: {
-                labels: ['77073 (Airtex)', '77090 (Spring)', '77067 (North)', '77373 (Old Town)'],
+                labels: {{ chart_zip_labels|default(['77073 (Airtex)', '77090 (Spring)', '77067 (North)', '77373 (Old Town)'])|tojson }},
                 datasets: [{
-                    data: [18, 9, 6, 3],
+                    data: {{ chart_zip_data|default([18, 9, 6, 3])|tojson }},
                     backgroundColor: ['#caa055', '#f97316', '#06b6d4', '#84cc16'],
                     borderWidth: 0
                 }]
