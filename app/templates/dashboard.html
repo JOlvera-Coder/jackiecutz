@@ -143,11 +143,11 @@
         </div>
     </div>
 
-    <!-- TAB 2: INDEX MANAGER (PORTFOLIO PHOTO UPLOADER) -->
+<!-- TAB 2: INDEX MANAGER (PORTFOLIO PHOTO UPLOADER & CAMPAIGN AD CONTROL) -->
     <div id="sec-indexmanager" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
         <div class="border-b border-zinc-800 pb-3">
-            <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">🖼️ PUBLIC INDEX PAGE PORTFOLIO MANAGER</h2>
-            <p class="dash-subtext text-xs text-zinc-400 mt-1">Upload portfolio images for live display on the public desktop showcase.</p>
+            <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">🖼️ PUBLIC INDEX PAGE PORTFOLIO & CAMPAIGN MANAGER</h2>
+            <p class="dash-subtext text-xs text-zinc-400 mt-1">Upload portfolio images and update marketing banner promotions live on the desktop showcase.</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -169,6 +169,75 @@
                     <button type="submit" class="dash-primary-btn w-full py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl uppercase">SAVE WOMEN'S PORTFOLIO</button>
                 </form>
             </div>
+
+            <!-- MEN PORTFOLIO (5 SLOTS) -->
+            <div class="dash-subbox bg-zinc-950 border border-zinc-800 rounded-2xl p-5 space-y-4">
+                <h3 class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] border-b border-zinc-800 pb-2">
+                    💈 Men's Showcase (5 Photos)
+                </h3>
+                <form method="POST" action="{{ url_for('main.add_service') }}" enctype="multipart/form-data" class="space-y-3">
+                    <div class="grid grid-cols-5 gap-2">
+                        {% for i in range(1, 6) %}
+                        <div class="h-20 bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col items-center justify-center p-1 text-center relative overflow-hidden group">
+                            <span class="text-[9px] font-bold text-zinc-500 uppercase">Pic {{ i }}</span>
+                            <input type="file" name="male_pic_{{ i }}" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <span class="text-[8px] text-[#f7e3af] mt-1 font-semibold group-hover:underline">+ Upload</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="dash-primary-btn w-full py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl uppercase">SAVE MEN'S PORTFOLIO</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- NEW: CAMPAIGN AD & BULLETIN EDIT CONTROL PANEL -->
+        <div class="dash-subbox bg-zinc-950 border border-amber-500/30 rounded-2xl p-6 space-y-5">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] flex items-center gap-2">
+                    📢 CAMPAIGN AD & HOMEPAGE BULLETIN CONTROL
+                </h3>
+                <span class="text-[10px] text-emerald-400 font-mono font-bold">🟢 Live Website Sync</span>
+            </div>
+
+            <form method="POST" action="{{ url_for('main.add_service') }}" enctype="multipart/form-data" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Campaign Ad Title / Headline</label>
+                        <input type="text" name="campaign_title" value="DIVINE SALON SUITE 105 EXPERIENCE" placeholder="e.g. DIVINE SALON SPECIAL" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Badge Tagline</label>
+                        <input type="text" name="campaign_badge" value="SPECIAL PROMOTION" placeholder="e.g. SPECIAL PROMOTION" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-amber-300 font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Campaign Description</label>
+                    <textarea name="campaign_desc" rows="2" placeholder="Master Styling & Barbering by Ivonne Gonzalez • Reserve your slot today." class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">Master Styling & Barbering by Ivonne Gonzalez • Reserve your slot today.</textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Bulletin Announcement Line 1</label>
+                        <input type="text" name="bulletin_1" value="Walk-Ins Welcome: Check live floor status before visiting." class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                    </div>
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Bulletin Announcement Line 2</label>
+                        <input type="text" name="bulletin_2" value="Address: 806-E Airtex Dr, Suite 105, Houston, TX 77073." class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Custom Promo Banner Image (Optional Upload)</label>
+                    <input type="file" name="campaign_banner" accept="image/*" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-zinc-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#f7e3af] file:text-black">
+                </div>
+
+                <button type="submit" class="dash-primary-btn w-full py-2.5 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-extrabold text-xs rounded-xl shadow-md uppercase tracking-wider">
+                    UPDATE CAMPAIGN AD & BULLETIN ANNOUNCEMENTS 📢
+                </button>
+            </form>
+        </div>
+    </div>
 
             <!-- MEN PORTFOLIO (5 SLOTS) -->
             <div class="dash-subbox bg-zinc-950 border border-zinc-800 rounded-2xl p-5 space-y-4">
