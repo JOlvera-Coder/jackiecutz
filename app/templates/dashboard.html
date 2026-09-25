@@ -1,733 +1,300 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- LEAFLET MAP CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<div class="w-full min-h-screen bg-black text-white p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
 
-<div class="w-full min-h-screen bg-black text-white p-2 sm:p-4 lg:p-6 space-y-6 max-w-7xl mx-auto dashboard-container transition-all duration-300">
-
-    <!-- TOP HEADER & BRANDING -->
-    <div class="dash-card w-full bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-5">
-        <div class="flex flex-col sm:flex-row items-center text-center sm:text-left space-y-2 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
-            <div class="w-14 h-14 flex-shrink-0 flex items-center justify-center rounded-2xl bg-zinc-950 border border-[#e6c280]/30 p-1.5 overflow-hidden dash-subcard">
-                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Logo" class="w-full h-full object-contain mix-blend-screen">
+    <!-- TOP HEADER & BRANDING BAR -->
+    <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-5 shadow-[0_0_25px_rgba(230,194,128,0.15)] flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+            <div class="w-16 h-12 flex items-center justify-center rounded-xl bg-zinc-950 border border-[#e6c280]/30 p-1 overflow-hidden">
+                <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Logo" class="w-full h-full object-contain">
             </div>
             <div>
-                <h1 class="dash-title text-base sm:text-xl font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
-                    COMMAND CENTER & ENTERPRISE MATRIX
+                <h1 class="text-base sm:text-lg font-black uppercase text-[#f7e3af] tracking-wider drop-shadow-[0_0_6px_rgba(247,227,175,0.4)]">
+                    COMMAND CENTER & ANALYTICS MATRIX
                 </h1>
-                <p class="dash-subtext text-xs text-zinc-400 font-medium">Ivonne Gonzalez • Divine Salon Suite 105</p>
+                <p class="text-xs text-zinc-400 font-medium">Ivonne Gonzalez • Divine Salon Suite 105</p>
             </div>
         </div>
 
-        <div class="flex flex-wrap items-center justify-center lg:justify-end gap-2 w-full lg:w-auto">
-            <a href="{{ url_for('main.export_tax_csv') }}" class="px-3.5 py-2 bg-emerald-950/80 border border-emerald-500/50 hover:bg-emerald-900 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-btn-green">
+        <!-- ACTION LINKS -->
+        <div class="flex flex-wrap items-center gap-2">
+            <a href="{{ url_for('main.export_tax_csv') }}" class="px-3.5 py-2 bg-emerald-950/80 border border-emerald-500/50 hover:bg-emerald-900 text-emerald-400 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
                 📄 TAX EXPORT ⬇
             </a>
-            <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="px-3.5 py-2 bg-zinc-950 border border-[#e6c280]/40 hover:border-[#f7e3af] text-[#f7e3af] text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-subcard dash-gold-text">
-                📱 KIOSK ↗
+            <a href="{{ url_for('main.walkin_kiosk') }}" target="_blank" class="px-3.5 py-2 bg-zinc-950 border border-[#e6c280]/40 hover:border-[#f7e3af] text-[#f7e3af] text-xs font-bold rounded-xl flex items-center gap-1.5 transition shadow-[0_0_10px_rgba(247,227,175,0.2)]">
+                📱 KIOSK TERMINAL ↗
             </a>
-            <a href="{{ url_for('main.customer_portal') }}" target="_blank" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition dash-btn">
-                Client App ↗
+            <a href="{{ url_for('main.index') }}" target="_blank" class="px-3.5 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+                Public Website ↗
             </a>
-            <button id="theme-toggle" type="button" onclick="toggleDashboardTheme()" class="px-3.5 py-2 bg-zinc-900 border border-amber-500/40 hover:border-amber-400 text-amber-300 text-xs font-bold rounded-xl transition dash-btn">
-                🌙/☀️ Theme
-            </button>
-            <a href="{{ url_for('main.logout') }}" class="px-3.5 py-2 bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-400 text-xs font-bold rounded-xl transition dash-btn-red">
+            <a href="{{ url_for('main.logout') }}" class="px-3.5 py-2 bg-red-950/60 border border-red-800/50 hover:bg-red-900 text-red-400 text-xs font-bold rounded-xl transition">
                 Sign Out
             </a>
         </div>
     </div>
 
-    <!-- TABS BAR -->
-    <div class="dash-tab-bar grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 bg-zinc-950/80 p-2 border border-zinc-800 rounded-2xl shadow-md">
-        <button onclick="switchDashboardTab('overview')" id="tab-overview" class="tab-btn py-2.5 px-3 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl transition text-center active-tab">
-            📊 Overview
-        </button>
-        <button onclick="switchDashboardTab('roster')" id="tab-roster" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
-            ✂️ Roster & Payroll
-        </button>
-        <button onclick="switchDashboardTab('clients')" id="tab-clients" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
-            📋 Client CRM
-        </button>
-        <button onclick="switchDashboardTab('menu')" id="tab-menu" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
-            📜 Catalog
-        </button>
-        <button onclick="switchDashboardTab('expenses')" id="tab-expenses" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
-            💸 Expenses
-        </button>
-        <button onclick="switchDashboardTab('banking')" id="tab-banking" class="tab-btn py-2.5 px-3 bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-800 font-bold text-xs rounded-xl transition text-center inactive-tab">
-            🏦 Banking
-        </button>
-    </div>
-
-    <!-- TAB 1: OVERVIEW -->
-    <div id="sec-overview" class="tab-content space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div class="dash-card bg-black border border-amber-500/60 rounded-3xl p-5 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                <p class="dash-label text-[11px] font-black uppercase tracking-wider text-amber-400">⚡ TODAY'S SALES</p>
-                <p class="dash-val-main text-2xl sm:text-3xl font-black text-amber-400 mt-2">${{ '%.2f'|format(today_revenue|default(0.0)) }}</p>
-            </div>
-            <div class="dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-lg">
-                <p class="dash-label text-[11px] font-black uppercase tracking-wider">GROSS REVENUE (YTD)</p>
-                <p class="dash-val-gold text-2xl sm:text-3xl font-black text-[#f7e3af] mt-2">${{ '%.2f'|format(gross_revenue|default(0.0)) }}</p>
-            </div>
-            <div class="dash-card bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
-                <p class="dash-label text-[11px] font-black uppercase tracking-wider">TOTAL OVERHEAD</p>
-                <p class="dash-val-red text-2xl sm:text-3xl font-black text-red-500 mt-2">${{ '%.2f'|format(total_overhead|default(0.0)) }}</p>
-            </div>
-            <div class="dash-card bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
-                <p class="dash-label text-[11px] font-black uppercase tracking-wider">NET TAXABLE PROFIT</p>
-                <p class="dash-val-green text-2xl sm:text-3xl font-black text-emerald-400 mt-2">${{ '%.2f'|format(net_income|default(0.0)) }}</p>
-            </div>
-            <div class="dash-card bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
-                <p class="dash-label text-[11px] font-black uppercase tracking-wider">RevPASH (REV / HOUR)</p>
-                <p class="dash-val-blue text-2xl sm:text-3xl font-black text-blue-400 mt-2">${{ '%.2f'|format(revpash|default(0.0)) }}/hr</p>
-            </div>
+    <!-- 4 CORE KPI METRIC CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.12)]">
+            <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">GROSS REVENUE (YTD)</p>
+            <p class="text-2xl sm:text-3xl font-black text-[#f7e3af] mt-2 drop-shadow-[0_0_8px_rgba(247,227,175,0.5)]">
+                ${{ "%.2f"|format(gross_revenue|default(0.0)) }}
+            </p>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div class="dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-5">
-                <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af]">📢 REVENUE BY CHANNEL</span>
-                <div class="h-64 mt-4"><canvas id="channelChart"></canvas></div>
-            </div>
-            <div class="dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-5">
-                <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af]">⚖️ REVENUE VS OVERHEAD</span>
-                <div class="h-64 mt-4"><canvas id="revChart"></canvas></div>
-            </div>
+        <div class="bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
+            <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">TOTAL STUDIO OVERHEAD</p>
+            <p class="text-2xl sm:text-3xl font-black text-red-400 mt-2">
+                ${{ "%.2f"|format(total_overhead|default(0.0)) }}
+            </p>
+        </div>
+        <div class="bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
+            <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">NET TAXABLE PROFIT</p>
+            <p class="text-2xl sm:text-3xl font-black text-emerald-400 mt-2">
+                ${{ "%.2f"|format(net_income|default(0.0)) }}
+            </p>
+        </div>
+        <div class="bg-black border border-zinc-800 rounded-3xl p-5 shadow-lg">
+            <p class="text-[11px] font-black uppercase text-zinc-400 tracking-wider">ACTIVE SERVICES IN CATALOG</p>
+            <p class="text-2xl sm:text-3xl font-black text-white mt-2">
+                {{ services|length|default(0) }}
+            </p>
         </div>
     </div>
 
-    <!-- TAB 2: ROSTER & PAYROLL -->
-    <div id="sec-roster" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
-        <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">✂️ TEAM ROSTER, SPECIALTIES & PAYROLL MATRIX</h2>
-        
-        <div class="dash-subbox bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-amber-500/40 shadow-md">
-            <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] block mb-2">💈 IN-CHAIR QUEUE & STYLIST CASH-OUT ENGINE</span>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-zinc-300 dash-table">
-                    <thead class="dash-thead bg-black text-[#f7e3af] uppercase text-[10px] border-b border-zinc-800">
-                        <tr>
-                            <th class="p-3">Ref</th>
-                            <th class="p-3">Client</th>
-                            <th class="p-3">Requested Service</th>
-                            <th class="p-3">Assigned Barber / Stylist</th>
-                            <th class="p-3">Queue Status</th>
-                            <th class="p-3 text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-800 dash-divide">
-                        {% if active_queue %}
-                            {% for b in active_queue %}
-                            <tr>
-                                <td class="p-3 font-mono text-zinc-500 dash-subtext">#{{ b.id }}</td>
-                                <td class="p-3 font-bold text-white dash-text-main">{{ b.client.name if b.client else 'Walk-In' }}</td>
-                                <td class="p-3 font-bold text-amber-300 dash-gold-text">{{ b.service_name }} (${{ '%.2f'|format(b.price) }})</td>
-                                <form method="POST" action="{{ url_for('main.update_booking_status') }}">
-                                    <input type="hidden" name="booking_id" value="{{ b.id }}">
-                                    <td class="p-3">
-                                        <select name="stylist_id" class="dash-input bg-zinc-900 border border-zinc-700 rounded-lg p-1.5 text-xs text-white">
-                                            {% for s in staff %}
-                                                <option value="{{ s.id }}" {% if b.stylist_id == s.id %}selected{% endif %}>{{ s.name }} ({{ s.role }})</option>
-                                            {% endfor %}
-                                        </select>
-                                    </td>
-                                    <td class="p-3">
-                                        {% if b.status == 'in-chair' %}
-                                            <span class="px-2 py-0.5 text-[9px] font-extrabold rounded bg-amber-500/20 text-amber-400 border border-amber-500/50 dash-badge-amber">💈 In Chair</span>
-                                        {% else %}
-                                            <span class="px-2 py-0.5 text-[9px] font-extrabold rounded bg-zinc-800 text-zinc-400 dash-badge-gray">⌛ Waiting in Queue</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="p-3 text-center">
-                                        {% if b.status == 'in-queue' %}
-                                            <button type="submit" name="status" value="in-chair" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-[10px] rounded-lg transition dash-primary-btn">Set In Chair 💈</button>
-                                        {% elif b.status == 'in-chair' %}
-                                            <button type="submit" name="status" value="completed" class="px-3 py-1 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold text-[10px] rounded-lg transition dash-btn-green">Cash Out & Complete 💵</button>
-                                        {% endif %}
-                                    </td>
-                                </form>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr><td colspan="6" class="p-4 text-center text-zinc-500 dash-subtext">No clients currently waiting or in chair. Check-in walk-ins via Kiosk!</td></tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <!-- DASHBOARD TAB NAVIGATION BUTTONS -->
+    <div class="flex flex-wrap gap-2 border-b border-zinc-800 pb-3">
+        <button onclick="switchTab('sec-catalog')" id="btn-catalog" class="tab-btn px-4 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl shadow-md transition uppercase">
+            ✂️ Service Catalog & Photos
+        </button>
+        <button onclick="switchTab('sec-roster')" id="btn-roster" class="tab-btn px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-extrabold text-xs rounded-xl hover:text-white transition uppercase">
+            💈 Stylist Roster
+        </button>
+        <button onclick="switchTab('sec-inventory')" id="btn-inventory" class="tab-btn px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-extrabold text-xs rounded-xl hover:text-white transition uppercase">
+            📦 Retail Inventory
+        </button>
+        <button onclick="switchTab('sec-analytics')" id="btn-analytics" class="tab-btn px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-extrabold text-xs rounded-xl hover:text-white transition uppercase">
+            📊 Analytics & Traffic
+        </button>
+    </div>
 
-        <form method="POST" action="{{ url_for('main.add_stylist') }}" class="dash-subbox bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-zinc-800 space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <!-- TAB 1: SERVICE CATALOG & PHOTO MANAGEMENT -->
+    <div id="sec-catalog" class="tab-content space-y-6">
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
                 <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Full Name</label>
-                    <input type="text" name="name" required placeholder="Name" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">App Email (For Stylist Mode)</label>
-                    <input type="email" name="app_email" placeholder="stylist@jackiecutz.com" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Role Distinction</label>
-                    <select name="role" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                        <option value="Barber">Barber (Men's Cuts & Beard)</option>
-                        <option value="Stylist">Stylist (Women's, Color & Wax)</option>
-                        <option value="Master">Master Stylist / Barber (All)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold text-amber-400 dash-gold-text">Cash-Out Frequency</label>
-                    <select name="cashout_frequency" class="dash-input w-full bg-zinc-900 border border-amber-500/50 rounded-xl p-2.5 text-xs text-amber-300 font-bold mt-1">
-                        <option value="Daily">Daily Cash-Out</option>
-                        <option value="Weekly" selected>Weekly Payout</option>
-                        <option value="Bi-Weekly">Bi-Weekly Payout</option>
-                    </select>
+                    <h2 class="text-sm sm:text-base font-black uppercase text-[#f7e3af] tracking-wider flex items-center gap-2">
+                        ✂️ LIVE SERVICE CATALOG & MARKETING PHOTO UPLOADER
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#f7e3af]/10 text-[#f7e3af] border border-[#e6c280]/40">
+                            {{ services|length|default(0) }} SERVICES
+                        </span>
+                    </h2>
+                    <p class="text-xs text-zinc-400 mt-1">Add new services or upload haircut marketing photos to display live on the website.</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Pay Model</label>
-                    <select name="pay_type" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                        <option value="Commission">Commission Split</option>
-                        <option value="Booth Rent">Booth Rent Fee</option>
-                        <option value="Hourly">Hourly Rate</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Commission / Pay Rate (%)</label>
-                    <input type="number" step="0.1" name="pay_rate" value="70.0" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Weekly Booth Rent Deduction ($)</label>
-                    <input type="number" step="1" name="booth_rent" value="0.0" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-            </div>
-
-            <button type="submit" class="dash-primary-btn w-full py-3 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl shadow-md transition">
-                REGISTER TEAM MEMBER & ENABLE STYLIST APP ACCESS ✂️
-            </button>
-        </form>
-
-        <div class="space-y-4">
-            {% if staff %}
-                {% for s in staff %}
-                <div class="dash-subbox bg-zinc-950 border border-zinc-800 rounded-2xl p-4 space-y-3">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <!-- ADD NEW SERVICE FORM -->
+            <div class="bg-zinc-950 border border-dashed border-[#e6c280]/40 rounded-2xl p-4 sm:p-5">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider block mb-3">
+                    + ADD SERVICE WITH MARKETING PHOTO
+                </span>
+                <form method="POST" action="{{ url_for('main.add_service') }}" enctype="multipart/form-data" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                         <div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-white text-sm dash-text-main">{{ s.name }}</span>
-                                <span class="px-2 py-0.5 text-[9px] font-bold rounded bg-amber-950/60 text-amber-400 border border-amber-800/50 dash-badge-amber">{{ s.role }}</span>
-                                <span class="px-2 py-0.5 text-[9px] font-extrabold rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/50 dash-badge-cyan">{{ s.cashout_frequency or 'Weekly' }}</span>
-                            </div>
-                            <p class="text-[11px] text-zinc-400 mt-0.5 dash-subtext">Specialties: {{ s.specialties }} • Pay: {{ s.pay_type }} ({{ s.pay_rate }}%)</p>
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Service Title</label>
+                            <input type="text" name="name" required placeholder="e.g. Women's Haircut" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
                         </div>
-
-                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                            <div class="text-left sm:text-right">
-                                <p class="text-[10px] text-zinc-400 uppercase font-bold dash-label">Pending Payout</p>
-                                <p class="font-bold text-emerald-400 font-mono text-sm dash-val-green">${{ '%.2f'|format(s.net_payout|default(0.0)) }}</p>
-                            </div>
-                            <form method="POST" action="{{ url_for('main.cashout_staff', staff_id=s.id) }}" onsubmit="return confirm('Process cash out payout of ${{ '%.2f'|format(s.net_payout|default(0.0)) }} for {{ s.name }}?');">
-                                <button type="submit" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold text-[10px] rounded-lg transition dash-btn-green">Cash Out 💵</button>
-                            </form>
-                            <button type="button" onclick="toggleRosterSubtab({{ s.id }})" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-amber-300 font-bold text-[10px] rounded-lg border border-zinc-700 transition dash-btn">
-                                Roster History 📋
-                            </button>
-                            <a href="{{ url_for('main.stylist_portal', staff_id=s.id) }}" target="_blank" class="px-2.5 py-1.5 bg-zinc-900 border border-zinc-700 text-zinc-300 text-[10px] font-bold rounded-lg hover:text-white dash-btn">
-                                Stylist Mode ↗
-                            </a>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Category</label>
+                            <select name="category" required class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
+                                <option value="Women's Services">Women's Services</option>
+                                <option value="Men's Services">Men's Services</option>
+                                <option value="Wax Services">Wax Services</option>
+                            </select>
                         </div>
-                    </div>
-
-                    <div id="subtab-{{ s.id }}" class="hidden dash-subbox-inner bg-black/60 border border-zinc-800 rounded-xl p-3 text-xs space-y-2">
-                        <span class="dash-gold-text text-[10px] font-black uppercase text-[#f7e3af]">📜 CLIENT SERVICE HISTORY AUDIT FOR {{ s.name }}</span>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-zinc-300 dash-table">
-                                <thead class="text-[9px] uppercase text-zinc-500 border-b border-zinc-800 dash-thead">
-                                    <tr>
-                                        <th class="p-2">Date</th>
-                                        <th class="p-2">Client Name</th>
-                                        <th class="p-2">Service Rendered</th>
-                                        <th class="p-2">Gross Price</th>
-                                        <th class="p-2">Stylist Share</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-zinc-800/60 dash-divide">
-                                    {% if s.completed_bookings %}
-                                        {% for cb in s.completed_bookings %}
-                                        <tr>
-                                            <td class="p-2 font-mono text-zinc-400 dash-subtext">{{ cb.timestamp.strftime('%Y-%m-%d %H:%M') if cb.timestamp else 'Today' }}</td>
-                                            <td class="p-2 font-bold text-white dash-text-main">{{ cb.client.name if cb.client else 'Walk-In' }}</td>
-                                            <td class="p-2 text-amber-300 dash-gold-text">{{ cb.service_name }}</td>
-                                            <td class="p-2 font-mono text-emerald-400 dash-val-green">${{ '%.2f'|format(cb.price) }}</td>
-                                            <td class="p-2 font-mono text-emerald-400 dash-val-green">${{ '%.2f'|format(cb.price * (s.pay_rate / 100.0)) }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    {% else %}
-                                        <tr><td colspan="5" class="p-3 text-center text-zinc-500 dash-subtext">No completed client appointments logged yet for {{ s.name }}.</td></tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Price ($)</label>
+                            <input type="number" step="0.01" name="price_min" required placeholder="30.00" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Role Requirement</label>
+                            <select name="required_role" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-3 py-2 text-xs text-black font-semibold">
+                                <option value="Stylist">Stylist</option>
+                                <option value="Barber">Barber</option>
+                                <option value="Master">Master</option>
+                            </select>
                         </div>
                     </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-center text-zinc-500 py-4 dash-subtext">No team members registered yet.</p>
-            {% endif %}
-        </div>
-    </div>
 
-    <!-- TAB 3: CLIENT CRM & LIVE MAP -->
-    <div id="sec-clients" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 dash-border">
-            <div>
-                <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">📋 CLIENT CRM MATRIX & GEOGRAPHIC ANALYTICS</h2>
-                <p class="dash-subtext text-xs text-zinc-400 mt-1">Interactive map, location metrics, and client profile management.</p>
-            </div>
-        </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-zinc-400 uppercase mb-1">Upload Marketing Photo</label>
+                        <input type="file" name="image" accept="image/*" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-zinc-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#f7e3af] file:text-black">
+                    </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div class="dash-card bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af]">📍 LIVE INTERACTIVE CLIENT MAP</span>
-                    <span class="text-[9px] text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/50 font-bold dash-badge-green">🟢 Green Markers = Active Clients</span>
-                </div>
-                <div id="clientMap" class="h-64 w-full rounded-xl border border-zinc-800 z-10 overflow-hidden dash-border"></div>
+                    <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-wider text-xs rounded-xl shadow-md transition">
+                        SAVE SERVICE & SYNC TO PUBLIC WEBSITE ✂️
+                    </button>
+                </form>
             </div>
 
-            <div class="dash-card bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
-                <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af]">📊 CLIENT VOLUME BY ZIP CODE</span>
-                <div class="h-64 mt-3"><canvas id="geoMapChart"></canvas></div>
-            </div>
-        </div>
-
-        <form method="POST" action="{{ url_for('main.add_client') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <input type="text" name="first_name" placeholder="First Name" required class="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white">
-            <input type="text" name="last_name" placeholder="Last Name" class="px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-white">
-            <input type="email" name="email" required placeholder="Email Address" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-            <input type="text" name="phone" placeholder="Phone Number" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-            <input type="text" name="zip_code" placeholder="Zip Code (e.g. 77073)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white sm:col-span-2 lg:col-span-3">
-            <button type="submit" class="dash-primary-btn sm:col-span-2 lg:col-span-1 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD CLIENT TO CRM 📋</button>
-        </form>
-
-        <div class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 dash-subbox">
-            <table class="w-full text-left text-xs text-zinc-300 dash-table">
-                <thead class="dash-thead bg-black text-[#f7e3af] uppercase text-[10px] tracking-wider border-b border-zinc-800">
-                    <tr>
-                        <th class="p-3.5">ID</th>
-                        <th class="p-3.5">Client Name</th>
-                        <th class="p-3.5">Email Address</th>
-                        <th class="p-3.5">Phone</th>
-                        <th class="p-3.5">Zip Code</th>
-                        <th class="p-3.5">LTV</th>
-                        <th class="p-3.5">Channel</th>
-                        <th class="p-3.5 text-center">Action Controls</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-zinc-800/80 dash-divide">
-                    {% if clients %}
-                        {% for client in clients %}
-                        <tr id="row-{{ client.id }}" class="hover:bg-zinc-900/50 transition">
-                            <td class="p-3.5 font-mono text-zinc-500 font-bold dash-subtext">#{{ client.id }}</td>
-                            <td class="p-3.5">
-                                <input type="text" id="name-{{ client.id }}" form="edit-form-{{ client.id }}" name="name" value="{{ client.name }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-white w-full transition">
-                            </td>
-                            <td class="p-3.5">
-                                <input type="email" id="email-{{ client.id }}" form="edit-form-{{ client.id }}" name="email" value="{{ client.email }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-zinc-300 w-full transition">
-                            </td>
-                            <td class="p-3.5">
-                                <input type="text" id="phone-{{ client.id }}" form="edit-form-{{ client.id }}" name="phone" value="{{ client.phone or '' }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-zinc-300 w-full transition">
-                            </td>
-                            <td class="p-3.5">
-                                <input type="text" id="zip-{{ client.id }}" form="edit-form-{{ client.id }}" name="zip_code" value="{{ client.zip_code or '77073' }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-amber-300 w-20 transition">
-                            </td>
-                            <td class="p-3.5 font-bold text-emerald-400 font-mono dash-val-green">${{ '%.2f'|format(client.total_spent|default(0.0)) }}</td>
-                            
-                            <td class="p-3.5 whitespace-nowrap">
-                                {% if client.source_channel == 'Kiosk Terminal' %}
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-500/15 text-amber-400 border border-amber-500/40 shadow-sm dash-badge-amber">
-                                        📱 Kiosk Terminal
-                                    </span>
-                                {% else %}
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 shadow-sm dash-badge-cyan">
-                                        📲 Mobile App
-                                    </span>
-                                {% endif %}
-                            </td>
-
-                            <td class="p-3.5">
-                                <div class="flex items-center justify-center gap-1.5">
-                                    <form id="edit-form-{{ client.id }}" method="POST" action="{{ url_for('main.edit_client') }}" class="inline-flex gap-1.5">
-                                        <input type="hidden" name="client_id" value="{{ client.id }}">
-                                        <button type="button" onclick="enableRowEdit({{ client.id }})" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-amber-300 font-bold text-[10px] rounded-lg border border-zinc-700 transition dash-btn">Edit ✏️</button>
-                                        <button type="submit" id="save-btn-{{ client.id }}" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-[10px] rounded-lg transition opacity-40 cursor-not-allowed dash-primary-btn" disabled>Save 💾</button>
-                                    </form>
-                                    <form method="POST" action="{{ url_for('main.delete_client', client_id=client.id) }}" onsubmit="return confirm('Delete client record #{{ client.id }}?');" class="inline">
-                                        <button type="submit" class="px-2.5 py-1 bg-red-950/80 hover:bg-red-900 text-red-400 font-bold text-[10px] rounded-lg border border-red-800/50 transition dash-btn-red">Delete 🗑️</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr><td colspan="8" class="p-4 text-center text-zinc-500 dash-subtext">No client records found.</td></tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- TAB 4: CATALOG -->
-    <div id="sec-menu" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-zinc-800 pb-4 dash-border">
-            <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">📜 SALON ENTERPRISE CATALOGS</h2>
-            
-            <div class="flex items-center gap-2 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 dash-subbox w-full sm:w-auto">
-                <button type="button" onclick="switchCatalogSubtab('services')" id="btn-subcat-services" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition flex-1 sm:flex-none">
-                    ✂️ Service Catalog
-                </button>
-                <button type="button" onclick="switchCatalogSubtab('inventory')" id="btn-subcat-inventory" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition flex-1 sm:flex-none">
-                    📦 Inventory Catalog
-                </button>
-            </div>
-        </div>
-
-        <!-- SUB-TAB 1: SERVICE CATALOG -->
-        <div id="subcat-services" class="space-y-5">
-            <form method="POST" action="{{ url_for('main.add_service') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <input type="text" name="category" required placeholder="Category (e.g. Men's)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="text" name="name" required placeholder="Service Name" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="number" step="0.01" name="price_min" required placeholder="Min Price ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="number" step="0.01" name="price_max" placeholder="Max Price (Optional)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <select name="required_role" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                    <option value="Barber">Barber</option>
-                    <option value="Stylist">Stylist</option>
-                    <option value="Master">Master</option>
-                </select>
-                <button type="submit" class="dash-primary-btn sm:col-span-2 lg:col-span-5 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD SERVICE TO CATALOG ✂️</button>
-            </form>
-
-            <div class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 dash-subbox">
-                <table class="w-full text-left text-xs text-zinc-300 dash-table">
-                    <thead class="dash-thead bg-black text-[#f7e3af] uppercase text-[10px] tracking-wider border-b border-zinc-800">
-                        <tr>
-                            <th class="p-3.5">Category</th>
-                            <th class="p-3.5">Service Name</th>
-                            <th class="p-3.5">Min Price ($)</th>
-                            <th class="p-3.5">Max Price ($)</th>
-                            <th class="p-3.5">Required Role</th>
-                            <th class="p-3.5 text-center">Action Controls</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-800/80 dash-divide">
-                        {% for svc in services %}
-                        <tr id="svc-row-{{ svc.id }}" class="hover:bg-zinc-900/50 transition">
-                            <td class="p-3.5">
-                                <input type="text" id="svc-cat-{{ svc.id }}" form="edit-svc-{{ svc.id }}" name="category" value="{{ svc.category }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-amber-400 font-bold w-full transition">
-                            </td>
-                            <td class="p-3.5">
-                                <input type="text" id="svc-name-{{ svc.id }}" form="edit-svc-{{ svc.id }}" name="name" value="{{ svc.name }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-white font-bold w-full transition">
-                            </td>
-                            <td class="p-3.5">
-                                <input type="number" step="0.01" id="svc-pmin-{{ svc.id }}" form="edit-svc-{{ svc.id }}" name="price_min" value="{{ '%.2f'|format(svc.price_min) }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-emerald-400 font-bold w-24 transition">
-                            </td>
-                            <td class="p-3.5">
-                                <input type="number" step="0.01" id="svc-pmax-{{ svc.id }}" form="edit-svc-{{ svc.id }}" name="price_max" value="{{ '%.2f'|format(svc.price_max) if svc.price_max else '' }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-emerald-400 font-bold w-24 transition">
-                            </td>
-                            <td class="p-3.5">
-                                <select id="svc-role-{{ svc.id }}" form="edit-svc-{{ svc.id }}" name="required_role" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-zinc-300 transition">
-                                    <option value="Barber" {% if svc.required_role == 'Barber' %}selected{% endif %}>Barber</option>
-                                    <option value="Stylist" {% if svc.required_role == 'Stylist' %}selected{% endif %}>Stylist</option>
-                                    <option value="Master" {% if svc.required_role == 'Master' %}selected{% endif %}>Master</option>
-                                </select>
-                            </td>
-                            <td class="p-3.5">
-                                <div class="flex items-center justify-center gap-1.5">
-                                    <form id="edit-svc-{{ svc.id }}" method="POST" action="{{ url_for('main.edit_service') }}" class="inline-flex gap-1.5">
-                                        <input type="hidden" name="service_id" value="{{ svc.id }}">
-                                        <button type="button" onclick="enableServiceEdit({{ svc.id }})" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-amber-300 font-bold text-[10px] rounded-lg border border-zinc-700 transition dash-btn">Edit ✏️</button>
-                                        <button type="submit" id="save-svc-btn-{{ svc.id }}" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-[10px] rounded-lg transition opacity-40 cursor-not-allowed dash-primary-btn" disabled>Save 💾</button>
-                                    </form>
-                                    <form method="POST" action="{{ url_for('main.delete_service', service_id=svc.id) }}" onsubmit="return confirm('Delete {{ svc.name }} from Service Catalog?');" class="inline">
-                                        <button type="submit" class="px-2.5 py-1 bg-red-950/80 hover:bg-red-900 text-red-400 font-bold text-[10px] rounded-lg border border-red-800/50 transition dash-btn-red">Delete 🗑️</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- SUB-TAB 2: INVENTORY PRODUCT CATALOG -->
-        <div id="subcat-inventory" class="hidden space-y-5">
-            <form method="POST" action="{{ url_for('main.add_product') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                <input type="text" name="sku" required placeholder="SKU Code" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="text" name="name" required placeholder="Product Name" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="number" step="0.01" name="cost" placeholder="Wholesale Cost ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="number" step="0.01" name="price" required placeholder="Retail Price ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="number" name="stock" required placeholder="Stock Quantity" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <button type="submit" class="dash-primary-btn sm:col-span-2 lg:col-span-5 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD PRODUCT TO INVENTORY 📦</button>
-            </form>
-
-            <div class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 dash-subbox">
-                <table class="w-full text-left text-xs text-zinc-300 dash-table">
-                    <thead class="dash-thead bg-black text-[#f7e3af] uppercase text-[10px] tracking-wider border-b border-zinc-800">
-                        <tr>
-                            <th class="p-3.5">SKU Code</th>
-                            <th class="p-3.5">Product Name</th>
-                            <th class="p-3.5">Wholesale Cost ($)</th>
-                            <th class="p-3.5">Retail Price ($)</th>
-                            <th class="p-3.5">Stock Count</th>
-                            <th class="p-3.5 text-center">Action Controls</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-800/80 dash-divide">
-                        {% if products %}
-                            {% for prod in products %}
-                            <tr id="prod-row-{{ prod.id }}" class="hover:bg-zinc-900/50 transition">
-                                <td class="p-3.5">
-                                    <input type="text" id="prod-sku-{{ prod.id }}" form="edit-prod-{{ prod.id }}" name="sku" value="{{ prod.sku }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-zinc-400 w-full transition">
-                                </td>
-                                <td class="p-3.5">
-                                    <input type="text" id="prod-name-{{ prod.id }}" form="edit-prod-{{ prod.id }}" name="name" value="{{ prod.name }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-white font-bold w-full transition">
-                                </td>
-                                <td class="p-3.5">
-                                    <input type="number" step="0.01" id="prod-cost-{{ prod.id }}" form="edit-prod-{{ prod.id }}" name="cost" value="{{ '%.2f'|format(prod.cost|default(0.0)) }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-red-400 w-24 transition">
-                                </td>
-                                <td class="p-3.5">
-                                    <input type="number" step="0.01" id="prod-price-{{ prod.id }}" form="edit-prod-{{ prod.id }}" name="price" value="{{ '%.2f'|format(prod.price) }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-emerald-400 font-bold w-24 transition">
-                                </td>
-                                <td class="p-3.5">
-                                    <input type="number" id="prod-stock-{{ prod.id }}" form="edit-prod-{{ prod.id }}" name="stock" value="{{ prod.stock }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-amber-300 font-bold w-20 transition">
-                                </td>
-                                <td class="p-3.5">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <form id="edit-prod-{{ prod.id }}" method="POST" action="{{ url_for('main.edit_product') }}" class="inline-flex gap-1.5">
-                                            <input type="hidden" name="product_id" value="{{ prod.id }}">
-                                            <button type="button" onclick="enableProductEdit({{ prod.id }})" class="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-amber-300 font-bold text-[10px] rounded-lg border border-zinc-700 transition dash-btn">Edit ✏️</button>
-                                            <button type="submit" id="save-prod-btn-{{ prod.id }}" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-[10px] rounded-lg transition opacity-40 cursor-not-allowed dash-primary-btn" disabled>Save 💾</button>
-                                        </form>
-                                        <form method="POST" action="{{ url_for('main.delete_product', product_id=prod.id) }}" onsubmit="return confirm('Delete {{ prod.name }} from Inventory Catalog?');" class="inline">
-                                            <button type="submit" class="px-2.5 py-1 bg-red-950/80 hover:bg-red-900 text-red-400 font-bold text-[10px] rounded-lg border border-red-800/50 transition dash-btn-red">Delete 🗑️</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
+            <!-- CURRENT SERVICES GRID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-2">
+                {% for svc in services %}
+                <div class="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl space-y-3 relative group">
+                    <div class="h-28 bg-zinc-900 rounded-xl overflow-hidden relative flex items-center justify-center border border-zinc-800">
+                        {% if svc.image_url %}
+                            <img src="{{ url_for('static', filename=svc.image_url) }}" alt="{{ svc.name }}" class="w-full h-full object-cover">
                         {% else %}
-                            <tr><td colspan="6" class="p-4 text-center text-zinc-500 dash-subtext">No inventory products registered yet.</td></tr>
+                            <span class="text-[10px] uppercase text-zinc-500 font-bold">No Photo Uploaded</span>
                         {% endif %}
-                    </tbody>
-                </table>
+                        <span class="absolute top-2 right-2 bg-black/90 text-emerald-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md border border-emerald-500/30">
+                            ${{ "%.2f"|format(svc.price_min) }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white text-xs">{{ svc.name }}</p>
+                        <p class="text-[10px] text-zinc-400">{{ svc.category }}</p>
+                    </div>
+                    <form method="POST" action="{{ url_for('main.delete_service', service_id=svc.id) }}">
+                        <button type="submit" class="w-full py-1 text-center bg-red-950/60 border border-red-800/40 text-red-400 text-[10px] font-bold rounded-lg hover:bg-red-900 transition">
+                            Remove Service
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <p class="text-xs text-zinc-500 col-span-full text-center py-6">No services in database. Use the form above to add services.</p>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- TAB 5: EXPENSES -->
-    <div id="sec-expenses" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
-        <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">💸 OVERHEAD & EXPENSE TRACKER</h2>
-        <form method="POST" action="{{ url_for('main.add_expense') }}" class="dash-subbox grid grid-cols-1 sm:grid-cols-3 gap-3 bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
-            <select name="category" required class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
-                <option value="Rent">Rent / Suite Lease</option>
-                <option value="Utilities">Utilities & Water</option>
-                <option value="Payroll">Payroll / Stylist Payouts</option>
-                <option value="Equipment">Equipment Purchase</option>
-                <option value="Inventory Cost">Inventory Wholesale Cost</option>
-                <option value="Damaged / Loss">Damaged Equipment / Loss</option>
-            </select>
-            <input type="text" name="description" placeholder="Description" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
-            <input type="number" step="0.01" name="amount" required placeholder="Amount ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
-            <button type="submit" class="sm:col-span-3 py-2.5 bg-red-600 text-white font-extrabold text-xs rounded-xl dash-btn-red">LOG EXPENSE 💸</button>
-        </form>
+    <!-- TAB 2: STYLIST ROSTER -->
+    <div id="sec-roster" class="tab-content hidden space-y-6">
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-5">
+            <h2 class="text-sm font-black uppercase text-[#f7e3af] tracking-wider">✂️ STYLIST & BARBER ROSTER</h2>
+            <div class="bg-zinc-950 border border-dashed border-[#e6c280]/40 rounded-2xl p-4 sm:p-5">
+                <form method="POST" action="{{ url_for('main.add_stylist') }}" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <input type="text" name="name" required placeholder="Stylist Full Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                        <select name="role" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                            <option value="Stylist">Stylist</option>
+                            <option value="Barber">Barber</option>
+                            <option value="Master Stylist">Master Stylist</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-black uppercase tracking-wider text-xs rounded-2xl shadow-md">
+                        REGISTER STYLIST
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <!-- TAB 6: BANKING & PAYOUTS -->
-    <div id="sec-banking" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-4 sm:p-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-4 dash-border">
-            <div>
-                <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">🏦 BUSINESS BANKING & DIRECT DEPOSIT PAYOUT SETUP</h2>
-                <p class="dash-subtext text-xs text-zinc-400 mt-1">Connect your operating bank account to issue direct payouts and ACH transfers to team members.</p>
-            </div>
-            <span class="px-3 py-1 rounded-xl text-xs font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                {{ bank.status }}
-            </span>
+    <!-- TAB 3: RETAIL INVENTORY -->
+    <div id="sec-inventory" class="tab-content hidden space-y-6">
+        <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
+            <h2 class="text-sm font-black uppercase text-[#f7e3af] tracking-wider">📦 RETAIL INVENTORY</h2>
+            <form method="POST" action="{{ url_for('main.add_product') }}" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" name="sku" placeholder="SKU" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                    <input type="text" name="name" required placeholder="Product Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <input type="number" step="0.01" name="cost" placeholder="Cost ($)" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                    <input type="number" step="0.01" name="price" required placeholder="Retail ($)" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                    <input type="number" name="stock" required placeholder="Qty" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2 text-xs text-black font-semibold">
+                </div>
+                <button type="submit" class="w-full py-2.5 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-black uppercase text-xs rounded-2xl shadow-md">
+                    SAVE PRODUCT TO CATALOG
+                </button>
+            </form>
         </div>
+    </div>
 
-        <div class="dash-subbox bg-zinc-950 p-5 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-                <p class="dash-label text-[10px] uppercase font-bold text-zinc-400">Connected Financial Institution</p>
-                <p class="dash-text-main text-base font-black text-white mt-1">{{ bank.bank_name }}</p>
+    <!-- TAB 4: ANALYTICS CHARTS -->
+    <div id="sec-analytics" class="tab-content hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] h-64">
+                <p class="text-xs font-black uppercase text-[#f7e3af] mb-4">📢 LIVE TRAFFIC ACQUISITION</p>
+                <div class="h-44 flex items-center justify-center">
+                    <canvas id="trafficChart"></canvas>
+                </div>
             </div>
-            <div>
-                <p class="dash-label text-[10px] uppercase font-bold text-zinc-400">Account Holder</p>
-                <p class="dash-text-main text-base font-black text-amber-300 mt-1">{{ bank.account_holder }}</p>
+            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] h-64">
+                <p class="text-xs font-black uppercase text-[#f7e3af] mb-4">📍 GEOGRAPHIC DENSITY MAP</p>
+                <div class="h-44 flex items-center justify-center">
+                    <canvas id="geoChart"></canvas>
+                </div>
             </div>
-            <div>
-                <p class="dash-label text-[10px] uppercase font-bold text-zinc-400">Account Ending In</p>
-                <p class="dash-subtext text-base font-mono font-bold text-emerald-400 mt-1">{{ bank.account_number }} ({{ bank.account_type }})</p>
+            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.1)] h-64">
+                <p class="text-xs font-black uppercase text-[#f7e3af] mb-4">⚖️ REVENUE VS OVERHEAD</p>
+                <div class="h-44 flex items-center justify-center">
+                    <canvas id="revChart"></canvas>
+                </div>
             </div>
         </div>
-
-        <form method="POST" action="{{ url_for('main.save_bank_account') }}" class="dash-subbox bg-zinc-950 p-5 rounded-2xl border border-zinc-800 space-y-4">
-            <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] block">🔒 CONNECT / UPDATE OPERATING BANK DETAILS</span>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Bank Name</label>
-                    <input type="text" name="bank_name" required placeholder="e.g. Chase, Wells Fargo, Bank of America" value="{{ bank.bank_name }}" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Business Account Holder Name</label>
-                    <input type="text" name="account_holder" required placeholder="Jackiecutz LLC" value="{{ bank.account_holder }}" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">ACH Routing Number (9 Digits)</label>
-                    <input type="password" name="routing_number" required placeholder="122000030" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Account Number</label>
-                    <input type="password" name="account_number" required placeholder="000123456789" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                </div>
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold">Account Type</label>
-                    <select name="account_type" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white mt-1">
-                        <option value="Business Checking" selected>Business Checking</option>
-                        <option value="Personal Checking">Personal Checking</option>
-                        <option value="Savings">Savings</option>
-                    </select>
-                </div>
-            </div>
-
-            <button type="submit" class="dash-btn-green w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition">
-                VERIFY & LINK BANK ACCOUNT FOR PAYOUTS 🏦
-            </button>
-        </form>
     </div>
 
 </div>
 
-<!-- SCRIPTS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+<!-- TAB SWITCHING SCRIPT -->
 <script>
-function switchDashboardTab(tabId) {
+function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById(tabId).classList.remove('hidden');
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active-tab');
-        btn.classList.add('inactive-tab');
+        btn.classList.remove('bg-[#f7e3af]', 'text-black');
+        btn.classList.add('bg-zinc-900', 'text-zinc-300');
     });
-    const targetSec = document.getElementById('sec-' + tabId);
-    const targetBtn = document.getElementById('tab-' + tabId);
-    if (targetSec) targetSec.classList.remove('hidden');
-    if (targetBtn) {
-        targetBtn.classList.remove('inactive-tab');
-        targetBtn.classList.add('active-tab');
-    }
-    if (tabId === 'clients' && window.leafletMap) {
-        setTimeout(() => { window.leafletMap.invalidateSize(); }, 200);
-    }
-}
 
-function switchCatalogSubtab(subId) {
-    const svcSec = document.getElementById('subcat-services');
-    const invSec = document.getElementById('subcat-inventory');
-    const btnSvc = document.getElementById('btn-subcat-services');
-    const btnInv = document.getElementById('btn-subcat-inventory');
-
-    if (subId === 'services') {
-        svcSec.classList.remove('hidden');
-        invSec.classList.add('hidden');
-        btnSvc.className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition flex-1 sm:flex-none";
-        btnInv.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition flex-1 sm:flex-none";
-    } else {
-        svcSec.classList.add('hidden');
-        invSec.classList.remove('hidden');
-        btnInv.className = "px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#f7e3af] text-black transition flex-1 sm:flex-none";
-        btnSvc.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white transition flex-1 sm:flex-none";
+    const activeBtnMap = {
+        'sec-catalog': 'btn-catalog',
+        'sec-roster': 'btn-roster',
+        'sec-inventory': 'btn-inventory',
+        'sec-analytics': 'btn-analytics'
+    };
+    const activeBtn = document.getElementById(activeBtnMap[tabId]);
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-zinc-900', 'text-zinc-300');
+        activeBtn.classList.add('bg-[#f7e3af]', 'text-black');
     }
 }
+</script>
 
-function enableServiceEdit(id) {
-    ['cat', 'name', 'pmin', 'pmax', 'role'].forEach(field => {
-        const input = document.getElementById(`svc-${field}-${id}`);
-        if (input) {
-            input.disabled = false;
-            input.classList.remove('bg-transparent', 'disabled:bg-transparent', 'disabled:border-transparent');
-            input.classList.add('bg-zinc-900', 'border-amber-500');
-        }
-    });
-    const saveBtn = document.getElementById(`save-svc-btn-${id}`);
-    if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.classList.remove('opacity-40', 'cursor-not-allowed');
-    }
-}
-
-function enableProductEdit(id) {
-    ['sku', 'name', 'cost', 'price', 'stock'].forEach(field => {
-        const input = document.getElementById(`prod-${field}-${id}`);
-        if (input) {
-            input.disabled = false;
-            input.classList.remove('bg-transparent', 'disabled:bg-transparent', 'disabled:border-transparent');
-            input.classList.add('bg-zinc-900', 'border-amber-500');
-        }
-    });
-    const saveBtn = document.getElementById(`save-prod-btn-${id}`);
-    if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.classList.remove('opacity-40', 'cursor-not-allowed');
-    }
-}
-
-function toggleRosterSubtab(id) {
-    const el = document.getElementById('subtab-' + id);
-    if (el) el.classList.toggle('hidden');
-}
-
-function enableRowEdit(id) {
-    ['name', 'email', 'phone', 'zip'].forEach(field => {
-        const input = document.getElementById(`${field}-${id}`);
-        if (input) {
-            input.disabled = false;
-            input.classList.remove('bg-transparent', 'disabled:border-transparent');
-            input.classList.add('bg-zinc-900', 'border-amber-500');
-        }
-    });
-    const saveBtn = document.getElementById(`save-btn-${id}`);
-    if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.classList.remove('opacity-40', 'cursor-not-allowed');
-    }
-}
-
-function toggleDashboardTheme() {
-    const root = document.documentElement;
-    const isLight = root.classList.toggle('light-theme');
-    localStorage.setItem('dashboard_theme', isLight ? 'light' : 'dark');
-}
-
+<!-- CHART.JS SCRIPT ENGINES -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('dashboard_theme') === 'light') {
-        document.documentElement.classList.add('light-theme');
-    }
-
-    const channelCtx = document.getElementById('channelChart');
-    if (channelCtx) {
-        new Chart(channelCtx, {
+    const trafficCtx = document.getElementById('trafficChart');
+    if (trafficCtx) {
+        new Chart(trafficCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Kiosk Terminal', 'Mobile App'],
-                datasets: [{ data: [{{ kiosk_revenue|default(0.0) }}, {{ app_revenue|default(0.0) }}], backgroundColor: ['#f59e0b', '#06b6d4'], borderWidth: 0 }]
+                labels: ['Direct Booking', 'Walk-In Kiosk', 'Instagram / Social', 'Client Referral'],
+                datasets: [{
+                    data: [12, 5, 8, 4],
+                    backgroundColor: ['#caa055', '#3b82f6', '#ec4899', '#10b981'],
+                    borderWidth: 0
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    }
+
+    const geoCtx = document.getElementById('geoChart');
+    if (geoCtx) {
+        new Chart(geoCtx, {
+            type: 'pie',
+            data: {
+                labels: ['77073 (Airtex)', '77090 (Spring)', '77067 (North)', '77373 (Old Town)'],
+                datasets: [{
+                    data: [18, 9, 6, 3],
+                    backgroundColor: ['#caa055', '#f97316', '#06b6d4', '#84cc16'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
     }
 
@@ -738,183 +305,22 @@ document.addEventListener('DOMContentLoaded', () => {
             data: {
                 labels: ['Gross Revenue', 'Overhead Expenses', 'Net Profit'],
                 datasets: [{
-                    label: 'Financial Performance ($)',
                     data: [{{ gross_revenue|default(0.0) }}, {{ total_overhead|default(0.0) }}, {{ net_income|default(0.0) }}],
                     backgroundColor: ['#caa055', '#f87171', '#34d399'],
                     borderRadius: 8
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#27272a' }, ticks: { color: '#a1a1aa' } },
+                    x: { grid: { display: false }, ticks: { color: '#a1a1aa' } }
+                }
+            }
         });
-    }
-
-    const geoCtx = document.getElementById('geoMapChart');
-    if (geoCtx) {
-        new Chart(geoCtx, {
-            type: 'bar',
-            data: {
-                labels: [{% for z in zip_counts.keys() %}'Zip {{ z }}',{% endfor %}],
-                datasets: [{
-                    label: 'Client Volume by Location',
-                    data: [{% for c in zip_counts.values() %}{{ c }},{% endfor %}],
-                    backgroundColor: ['#caa055', '#3b82f6', '#ec4899', '#10b981', '#8b5cf6'],
-                    borderRadius: 6
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
-
-    const mapContainer = document.getElementById('clientMap');
-    if (mapContainer) {
-        const map = L.map('clientMap').setView([29.98, -95.40], 10);
-        window.leafletMap = map;
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        const zipCoords = {
-            "77073": [29.9822, -95.3852],
-            "77090": [30.0075, -95.4372],
-            "77067": [29.9482, -95.4222],
-            "77373": [30.0632, -95.3882],
-            "77060": [29.9322, -95.3522]
-        };
-
-        {% for client in clients %}
-            var zip = "{{ client.zip_code or '77073' }}";
-            var coords = zipCoords[zip] || [29.9822 + (Math.random() - 0.5) * 0.05, -95.3852 + (Math.random() - 0.5) * 0.05];
-            
-            L.circleMarker(coords, {
-                radius: 9,
-                fillColor: "#10b981",
-                color: "#059669",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9
-            }).addTo(map).bindPopup("<b>{{ client.name }}</b><br>Zip: " + zip + "<br>Channel: {{ client.source_channel }}");
-        {% endfor %}
     }
 });
 </script>
-
-<style>
-/* --- DARK MODE DEFAULTS --- */
-.dash-label { color: #a1a1aa !important; }
-.active-tab { background-color: #f7e3af !important; color: #000000 !important; font-weight: 800 !important; border: 1px solid #e6c280 !important; }
-.inactive-tab { background-color: #18181b !important; color: #a1a1aa !important; border: 1px solid #27272a !important; }
-
-/* --- LIGHT MODE OVERRIDES --- */
-html.light-theme body, html.light-theme .dashboard-container { 
-    background-color: #f4f4f5 !important; 
-    color: #18181b !important; 
-}
-
-html.light-theme .dash-card { 
-    background-color: #ffffff !important; 
-    border-color: #e4e4e7 !important; 
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06) !important; 
-}
-html.light-theme .dash-subbox { 
-    background-color: #fafafa !important; 
-    border-color: #e4e4e7 !important; 
-}
-html.light-theme .dash-subbox-inner { 
-    background-color: #f4f4f5 !important; 
-    border-color: #e4e4e7 !important; 
-}
-html.light-theme .dash-tab-bar { 
-    background-color: #ffffff !important; 
-    border-color: #e4e4e7 !important; 
-}
-
-html.light-theme .dash-title { color: #854d0e !important; text-shadow: none !important; }
-html.light-theme .dash-subtext { color: #71717a !important; }
-html.light-theme .dash-label { color: #52525b !important; font-weight: 800 !important; }
-html.light-theme .dash-[#f7e3af], html.light-theme .dash-gold-text { color: #854d0e !important; }
-html.light-theme .dash-text-main { color: #09090b !important; }
-
-html.light-theme .dash-val-main { color: #09090b !important; }
-html.light-theme .dash-[#f7e3af], html.light-theme .dash-val-gold { color: #854d0e !important; }
-html.light-theme .dash-val-red { color: #dc2626 !important; }
-html.light-theme .dash-val-green { color: #059669 !important; }
-html.light-theme .dash-val-blue { color: #2563eb !important; }
-
-html.light-theme .dash-input, 
-html.light-theme .dash-input-row { 
-    background-color: #ffffff !important; 
-    color: #18181b !important; 
-    border-color: #d4d4d8 !important; 
-}
-html.light-theme .dash-input::placeholder { color: #a1a1aa !important; }
-
-html.light-theme .dash-table { color: #18181b !important; }
-html.light-theme .dash-thead { 
-    background-color: #f4f4f5 !important; 
-    color: #854d0e !important; 
-    border-bottom: 2px solid #e4e4e7 !important; 
-}
-html.light-theme .dash-divide > tr { border-color: #f4f4f5 !important; }
-html.light-theme .dash-border { border-color: #e4e4e7 !important; }
-
-html.light-theme .active-tab { 
-    background-color: #854d0e !important; 
-    color: #ffffff !important; 
-    font-weight: 800 !important; 
-    border-color: #713f12 !important; 
-}
-html.light-theme .inactive-tab { 
-    background-color: #ffffff !important; 
-    color: #52525b !important; 
-    border-color: #e4e4e7 !important; 
-}
-
-html.light-theme .dash-badge-amber { background-color: #fef3c7 !important; color: #92400e !important; border-color: #fde68a !important; }
-html.light-theme .dash-badge-cyan { background-color: #e0f2fe !important; color: #075985 !important; border-color: #bae6fd !important; }
-html.light-theme .dash-badge-green { background-color: #d1fae5 !important; color: #065f46 !important; border-color: #a7f3d0 !important; }
-html.light-theme .dash-badge-gray { background-color: #f4f4f5 !important; color: #52525b !important; border-color: #e4e4e7 !important; }
-
-html.light-theme .dash-btn { 
-    background-color: #ffffff !important; 
-    border-color: #d4d4d8 !important; 
-    color: #18181b !important; 
-}
-html.light-theme .dash-primary-btn { 
-    background-color: #854d0e !important; 
-    color: #ffffff !important; 
-}
-html.light-theme .dash-btn-green { 
-    background-color: #059669 !important; 
-    color: #ffffff !important; 
-    border-color: #047857 !important; 
-}
-html.light-theme .dash-btn-red { 
-    background-color: #dc2626 !important; 
-    color: #ffffff !important; 
-    border-color: #b91c1c !important; 
-}
-
-/* FORCE FULL DESKTOP EXPANSION (NO MEDIA QUERY REQUIRED) */
-body, main, .dashboard-container, .dash-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-.dash-card {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-}
-.dash-tab-bar {
-    display: grid !important;
-    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-    width: 100% !important;
-}
-</style>
-
 {% endblock %}
