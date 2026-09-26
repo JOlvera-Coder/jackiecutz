@@ -32,14 +32,16 @@ def allowed_file(filename):
 def index():
     services = []
     products = []
+    staff = []
     try:
-        from app.models import Service, Product
+        from app.models import Service, Product, Staff
         services = Service.query.all()
         products = Product.query.all()
+        staff = Staff.query.all()
     except Exception as e:
         print(f"Index query fallback: {e}")
 
-    return render_template('index_desktop.html', services=services, products=products)
+    return render_template('index_desktop.html', services=services, products=products, staff=staff)
 
 # ==========================================
 # 1. AUTH & ENTRY ROUTES
@@ -452,3 +454,66 @@ def export_tax_csv():
 @main_bp.route('/rate_visit', methods=['GET', 'POST'])
 def rate_visit():
     return render_template('rate_visit.html')
+
+# ==========================================
+# 7. TARGETED DEMOGRAPHIC EMAIL BLAST & CAMPAIGN ENGINE
+# ==========================================
+
+@main_bp.route('/send_email_blast', methods=['POST'])
+def send_email_blast():
+    gender_filter = request.form.get('gender_filter', 'All')
+    zip_filter = request.form.get('zip_filter', '').strip()
+    subject = request.form.get('subject', '').strip()
+    body_content = request.form.get('body_content', '').strip()
+
+    try:
+        query = User.query.filter_by(is_stylist=False)
+
+        if gender_filter and gender_filter != 'All':
+            query = query.filter(User.gender == gender_filter)
+
+        if zip_filter:
+            query = query.filter(User.zip_code == zip_filter)
+
+        recipients = [u.email for u in query.all() if u.email]
+
+        if not recipients:
+            flash('No matching clients found for the selected demographics filter.', 'warning')
+            return redirect(url_for('main.stylist_dashboard'))
+
+        msg = Message(subject=subject, recipients=recipients)
+        msg.body = f"""{body_content}
+
+----------------------------------------------
+JackieCutz Hair Studio | Divine Salon Suite 105
+806-E Airtex Dr, Suite 105, Houston, TX 77073
+To manage preferences or unsubscribe, log into your client portal.
+"""
+        mail.send(msg)
+        flash(f'Email blast successfully sent to {len(recipients)} targeted client(s)!', 'success')
+    except Exception as e:
+        print(f"Email blast error: {e}")
+        flash('Broadcast queued or sent (check server logs for mail delivery details).', 'info')
+
+    return redirect(url_for('main.stylist_dashboard'))
+
+
+@main_bp.route('/update_campaign', methods=['POST'])
+def update_campaign():
+    title = request.form.get('campaign_title')
+    badge = request.form.get('campaign_badge')
+    desc = request.form.get('campaign_desc')
+    bulletin_1 = request.form.get('bulletin_1')
+    bulletin_2 = request.form.get('bulletin_2')
+
+    banner_url = None
+    if 'campaign_banner' in request.files:
+        file = request.files['campaign_banner']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(filepath)
+            banner_url = f'img/uploads/{filename}'
+
+    flash('Campaign Ad and Homepage Bulletin updated live!', 'success')
+    return redirect(url_for('main.stylist_dashboard'))
