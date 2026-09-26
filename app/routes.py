@@ -60,7 +60,6 @@ def login():
         ).first()
 
         if user and user.password_hash and check_password_hash(user.password_hash, password):
-            # Enforce access permissions based on active tab
             if user_role == 'admin':
                 if getattr(user, 'is_admin', False) or getattr(user, 'is_stylist', False):
                     login_user(user)
@@ -110,7 +109,6 @@ def register():
         gender = request.form.get('gender')
         birthday = request.form.get('birthday')
 
-        # Check if user already exists
         existing_user = User.query.filter(
             (User.email == email) | 
             (User.phone == phone) | 
@@ -121,7 +119,6 @@ def register():
             flash('An account with this email, phone, or username already exists. Please log in.', 'warning')
             return redirect(url_for('main.login'))
 
-        # Create new user instance safely
         new_user = User(
             first_name=first_name,
             last_name=last_name,
@@ -141,7 +138,6 @@ def register():
             db.session.commit()
             login_user(new_user)
 
-            # --- AUTOMATED WELCOME EMAIL NOTIFICATION ---
             try:
                 msg = Message(
                     subject="Welcome to Jackiecutz Hair Studio - Account Details",
@@ -218,19 +214,37 @@ def privacy():
     return render_template('privacy.html')
 
 # ==========================================
-# 2. CUSTOMER PORTAL
+# 2. CUSTOMER PORTAL & BOOKING PAGE
 # ==========================================
+
+@main_bp.route('/booking')
+def booking():
+    services = []
+    staff = []
+    products = []
+    try:
+        from app.models import Service, Staff, Product
+        services = Service.query.all()
+        staff = Staff.query.all()
+        products = Product.query.all()
+    except Exception as e:
+        print(f"Booking query fallback: {e}")
+
+    return render_template('booking.html', services=services, staff=staff, products=products)
+
 
 @main_bp.route('/customer_portal')
 @main_bp.route('/customer-portal')
 @main_bp.route('/client_dashboard')
 def customer_portal():
-    return render_template('customer_app.html')  # Matches actual filename
+    return render_template('customer_app.html')
+
 
 @main_bp.route('/book_service', methods=['POST'])
 def book_service():
     flash('Service booked successfully!', 'success')
     return redirect(url_for('main.customer_portal'))
+
 
 @main_bp.route('/api/available-slots')
 @main_bp.route('/api/get_slots')
@@ -245,6 +259,7 @@ def available_slots():
 @main_bp.route('/walkin-kiosk')
 def walkin_kiosk():
     return render_template('kiosk.html')
+
 
 @main_bp.route('/queue_display')
 @main_bp.route('/queue-display')
@@ -262,7 +277,6 @@ def stylist_dashboard():
     mock_bank = {'status': 'Connected', 'bank_name': 'Chase Bank', 'account_holder': 'Jackiecutz LLC', 'account_number': '•••• 1234', 'account_type': 'Business Checking'}
     mock_zip_counts = {'77073': 15, '77060': 8, '77090': 5}
     
-    # Query database objects safely if available
     services = []
     products = []
     clients = []
@@ -291,14 +305,17 @@ def stylist_dashboard():
         revpash=65.50
     )
 
+
 @main_bp.route('/stylist_portal/<int:staff_id>')
 def stylist_portal(staff_id):
     return render_template('stylist_portal.html', staff_id=staff_id)
+
 
 @main_bp.route('/update_booking_status', methods=['POST'])
 @main_bp.route('/update_status/<int:booking_id>', methods=['POST'])
 def update_booking_status(booking_id=None):
     return jsonify({'status': 'success'})
+
 
 @main_bp.route('/add_stylist', methods=['POST'])
 def add_stylist():
@@ -306,10 +323,12 @@ def add_stylist():
     flash(f"Stylist {full_name} registered successfully!", "success")
     return redirect(url_for('main.stylist_dashboard'))
 
+
 @main_bp.route('/cashout_staff/<int:staff_id>', methods=['POST'])
 def cashout_staff(staff_id):
     flash('Staff cashed out successfully.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
+
 
 @main_bp.route('/checkout_booking/<int:booking_id>', methods=['POST'])
 def checkout_booking(booking_id):
@@ -317,7 +336,7 @@ def checkout_booking(booking_id):
     return redirect(url_for('main.stylist_dashboard'))
 
 # ==========================================
-# 5. CLIENT & SERVICE MANAGEMENT (WITH PHOTO UPLOAD)
+# 5. CLIENT & SERVICE MANAGEMENT
 # ==========================================
 
 @main_bp.route('/add_client', methods=['POST'])
@@ -325,15 +344,18 @@ def add_client():
     flash('Client added to CRM.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
 
+
 @main_bp.route('/edit_client', methods=['POST'])
 def edit_client():
     flash('Client record updated.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
 
+
 @main_bp.route('/delete_client/<int:client_id>', methods=['POST'])
 def delete_client(client_id):
     flash('Client deleted.', 'info')
     return redirect(url_for('main.stylist_dashboard'))
+
 
 @main_bp.route('/add_service', methods=['POST'])
 def add_service():
@@ -342,7 +364,6 @@ def add_service():
     price_min = request.form.get('price_min')
     required_role = request.form.get('required_role', 'Stylist')
     
-    # Handle Photo Upload for Ivonne's Website
     image_url = None
     if 'image' in request.files:
         file = request.files['image']
@@ -371,10 +392,12 @@ def add_service():
 
     return redirect(url_for('main.stylist_dashboard'))
 
+
 @main_bp.route('/edit_service', methods=['POST'])
 def edit_service():
     flash('Service catalog updated.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
+
 
 @main_bp.route('/delete_service/<int:service_id>', methods=['POST'])
 def delete_service(service_id):
@@ -390,25 +413,30 @@ def add_product():
     flash('Product added to inventory.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
 
+
 @main_bp.route('/edit_product', methods=['POST'])
 def edit_product():
     flash('Product updated.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
+
 
 @main_bp.route('/delete_product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
     flash('Product removed.', 'info')
     return redirect(url_for('main.stylist_dashboard'))
 
+
 @main_bp.route('/add_expense', methods=['POST'])
 def add_expense():
     flash('Expense logged.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
 
+
 @main_bp.route('/save_bank_account', methods=['POST'])
 def save_bank_account():
     flash('Operating bank details verified and linked.', 'success')
     return redirect(url_for('main.stylist_dashboard'))
+
 
 @main_bp.route('/export_tax_csv')
 def export_tax_csv():
@@ -419,6 +447,7 @@ def export_tax_csv():
     response.headers["Content-Disposition"] = "attachment; filename=tax_report.csv"
     response.headers["Content-type"] = "text/csv"
     return response
+
 
 @main_bp.route('/rate_visit', methods=['GET', 'POST'])
 def rate_visit():
