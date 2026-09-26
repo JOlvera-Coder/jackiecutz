@@ -3,177 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JackieCutz Hair Studio | Enterprise Desktop Portal</title>
+    <title>JackieCutz Hair Studio | Enterprise Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000000; color: #ffffff; font-family: ui-sans-serif, system-ui, sans-serif; }
+        body { background-color: #000000; color: #ffffff; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         .gold-glow { text-shadow: 0 0 12px rgba(247, 227, 175, 0.4); }
     </style>
 </head>
-<body class="w-full min-h-screen bg-black text-white p-6 lg:p-10 space-y-8">
+<body class="w-full min-h-screen bg-black text-white p-6 lg:p-10 space-y-8 max-w-7xl mx-auto">
 
-    <!-- OFF-CANVAS SIDEBAR MENU -->
-    <div id="side-menu" class="fixed top-0 left-0 h-full w-80 bg-zinc-950 border-r border-[#e6c280]/40 z-50 transform -translate-x-full transition-transform duration-300 p-6 space-y-6 shadow-2xl">
+    <!-- OFF-CANVAS NAVIGATION SIDEBAR -->
+    <div id="side-menu" class="fixed top-0 left-0 h-full w-80 bg-zinc-950 border-r border-[#e6c280]/30 z-50 transform -translate-x-full transition-transform duration-300 p-6 space-y-6 shadow-2xl">
         <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-            <span class="text-sm font-black uppercase text-[#f7e3af] tracking-wider">NAVIGATION</span>
-            <button onclick="toggleSideMenu()" class="text-zinc-400 hover:text-white font-bold text-lg">✕</button>
+            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest">Navigation</span>
+            <button onclick="toggleSideMenu()" class="text-zinc-400 hover:text-white font-bold text-base">✕</button>
         </div>
-        <nav class="space-y-4 flex flex-col text-sm font-bold uppercase tracking-wider">
+        <nav class="space-y-4 flex flex-col text-xs font-extrabold uppercase tracking-widest">
             <a href="{{ url_for('main.login') }}" class="text-[#f7e3af] hover:underline">Sign On</a>
-            <a href="{{ url_for('main.register') }}" class="text-zinc-300 hover:text-white">Register</a>
-            <a href="#about-us" onclick="toggleSideMenu()" class="text-zinc-300 hover:text-white">About Us</a>
-            <a href="#gallery-section" onclick="toggleSideMenu()" class="text-zinc-300 hover:text-white">Gallerie</a>
-            <a href="#contact-section" onclick="toggleSideMenu()" class="text-zinc-300 hover:text-white">Contact Us</a>
+            <a href="{{ url_for('main.register') }}" class="text-zinc-300 hover:text-white transition">Register</a>
+            <a href="#hours-section" onclick="toggleSideMenu()" class="text-zinc-300 hover:text-white transition">Hours & Location</a>
+            <a href="#gallery-section" onclick="toggleSideMenu()" class="text-zinc-300 hover:text-white transition">Portfolio Showcase</a>
+            <a href="#booking-section" onclick="toggleSideMenu()" class="text-zinc-300 hover:text-white transition">Services & Reservation</a>
         </nav>
     </div>
 
-    <!-- TOP HEADER WITH HAMBURGER & LOGO -->
+    <!-- HEADER WITH NAVIGATION CONTROL & LOGO -->
     <header class="flex items-center justify-between border-b border-zinc-900 pb-4">
-        <button onclick="toggleSideMenu()" class="flex items-center space-x-2 px-3 py-2 bg-zinc-950 border border-[#e6c280]/40 rounded-xl text-[#f7e3af] hover:border-[#f7e3af] transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            <span class="text-xs font-black uppercase tracking-wider">Sign On</span>
+        <button onclick="toggleSideMenu()" class="flex items-center space-x-2.5 px-4 py-2 bg-zinc-950 border border-[#e6c280]/40 rounded-xl text-[#f7e3af] hover:border-[#f7e3af] transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span class="text-xs font-black uppercase tracking-widest">Menu</span>
         </button>
 
         <div class="text-center">
             <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Jackiecutz Logo" class="h-16 mx-auto object-contain">
-            <p class="text-[10px] text-zinc-400 font-medium mt-1">Ivonne Gonzalez • Divine Salon Suite 105</p>
+            <p class="text-[10px] text-zinc-400 font-medium tracking-wide mt-1">Ivonne Gonzalez • Divine Salon Suite 105</p>
         </div>
 
-        <a href="{{ url_for('main.login') }}" class="px-4 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold rounded-xl transition">
-            Account Login ↗
-        </a>
+        <div>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.customer_portal') }}" class="px-4 py-2 bg-zinc-900 border border-[#e6c280]/40 text-[#f7e3af] text-xs font-bold uppercase tracking-wider rounded-xl transition">Client Portal ↗</a>
+            {% else %}
+                <a href="{{ url_for('main.login') }}" class="px-4 py-2 bg-zinc-900 border border-zinc-700 hover:text-white text-zinc-300 text-xs font-bold uppercase tracking-wider rounded-xl transition">Client Sign In ↗</a>
+            {% endif %}
+        </div>
     </header>
 
-    <!-- TOP SECTION 1: AUTO-ROTATING GALLERY SHOWCASE -->
-    <section id="gallery-section" class="space-y-4">
-        <h2 class="text-xs font-black uppercase text-[#f7e3af] tracking-widest text-center">✨ RECENT PORTFOLIO SHOWCASE (AUTO-ROTATING)</h2>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- WOMEN'S GALLERY -->
-            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 space-y-3">
-                <span class="text-xs font-black uppercase text-[#f7e3af] block border-b border-zinc-800 pb-2">✂️ Women's Haircuts</span>
-                <div class="grid grid-cols-4 gap-2 overflow-hidden" id="women-gallery-grid">
-                    {% for i in range(1, 5) %}
-                    <div class="h-28 bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
-                        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" class="w-full h-full object-cover">
-                    </div>
-                    {% endfor %}
-                </div>
+    <!-- SECTION 1: WEEKLY HOURS & AVAILABILITY -->
+    <section id="hours-section" class="bg-black border border-[#e6c280]/40 rounded-3xl p-5 shadow-[0_0_20px_rgba(230,194,128,0.12)] space-y-3">
+        <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
+            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest">
+                Hours of Operation
+            </span>
+            <span class="text-[10px] text-zinc-500 font-mono tracking-wider">Houston, TX (Central Time)</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col justify-center">
+                <p class="text-[11px] font-black uppercase text-black">Sunday – Monday</p>
+                <p class="text-xs font-bold text-red-700 mt-0.5 uppercase tracking-wider">Closed</p>
             </div>
-
-            <!-- MEN'S GALLERY -->
-            <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 space-y-3">
-                <span class="text-xs font-black uppercase text-[#f7e3af] block border-b border-zinc-800 pb-2">💈 Men's Cuts & Styles</span>
-                <div class="grid grid-cols-4 gap-2 overflow-hidden" id="men-gallery-grid">
-                    {% for i in range(1, 5) %}
-                    <div class="h-28 bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
-                        <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" class="w-full h-full object-cover">
-                    </div>
-                    {% endfor %}
-                </div>
+            <div class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col justify-center">
+                <p class="text-[11px] font-black uppercase text-black">Tuesday</p>
+                <p class="text-xs font-bold text-black mt-0.5">10:00 AM – 6:00 PM</p>
+                <p class="text-[9px] text-zinc-600 font-semibold uppercase tracking-wider">(By Appointment)</p>
+            </div>
+            <div class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col justify-center">
+                <p class="text-[11px] font-black uppercase text-black">Wednesday – Thursday</p>
+                <p class="text-xs font-bold text-black mt-0.5">10:00 AM – 6:00 PM</p>
+            </div>
+            <div class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col justify-center">
+                <p class="text-[11px] font-black uppercase text-black">Friday – Saturday</p>
+                <p class="text-xs font-bold text-black mt-0.5">10:00 AM – 7:00 PM</p>
             </div>
         </div>
     </section>
 
-    <!-- HERO MARKETING ROW: CAMPAIGN AD & BULLETIN -->
+    <!-- SECTION 2 & 3: PORTFOLIO SHOWCASE GALLERIES -->
+    <section id="gallery-section" class="space-y-6">
+        <!-- 2. WOMEN'S GALLERY -->
+        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-5 space-y-3">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest">Women's Portfolio Showcase</span>
+                <span class="text-[9px] text-zinc-500 uppercase font-mono tracking-wider">Auto-Rotating</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {% for i in range(1, 6) %}
+                <div class="h-32 bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden shadow-md">
+                    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Women Portfolio" class="w-full h-full object-cover">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 3. MEN'S GALLERY -->
+        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-5 space-y-3">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest">Men's Portfolio Showcase</span>
+                <span class="text-[9px] text-zinc-500 uppercase font-mono tracking-wider">Auto-Rotating</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                {% for i in range(1, 6) %}
+                <div class="h-32 bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden shadow-md">
+                    <img src="{{ url_for('static', filename='img/card_bg.jpg') }}" alt="Men Portfolio" class="w-full h-full object-cover">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- CAMPAIGN ANNOUNCEMENT & STUDIO BULLETIN -->
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-gradient-to-r from-zinc-950 via-black to-zinc-950 border border-[#e6c280]/40 rounded-3xl p-6 flex flex-col justify-between shadow-xl">
+        <div class="lg:col-span-2 bg-gradient-to-r from-zinc-950 via-black to-zinc-950 border border-[#e6c280]/40 rounded-3xl p-6 shadow-xl flex flex-col justify-between">
             <div>
-                <span class="px-3 py-1 text-[10px] font-black uppercase rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">SPECIAL PROMOTION</span>
-                <h2 class="text-xl font-black uppercase text-[#f7e3af] mt-3">DIVINE SALON SUITE 105 EXPERIENCE</h2>
-                <p class="text-xs text-zinc-300 mt-2">Master Styling & Barbering by Ivonne Gonzalez • Reserve your slot today.</p>
+                <span class="px-3 py-1 text-[9px] font-black uppercase tracking-widest rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">SPECIAL PROMOTION</span>
+                <h2 class="text-base sm:text-lg font-black uppercase text-[#f7e3af] tracking-wider mt-3">DIVINE SALON SUITE 105 EXPERIENCE</h2>
+                <p class="text-xs text-zinc-300 font-medium mt-2 leading-relaxed">Master Styling & Barbering by Ivonne Gonzalez. Reserve your appointment online.</p>
             </div>
         </div>
-        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-3">
-            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider block border-b border-zinc-800 pb-2">📌 STUDIO BULLETIN</span>
-            <p class="text-xs text-zinc-300 font-medium">Walk-Ins Welcome: Check live floor status before visiting.</p>
-            <p class="text-[11px] text-zinc-500">Address: 806-E Airtex Dr, Suite 105, Houston, TX 77073.</p>
+        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-2">
+            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest block border-b border-zinc-800 pb-2">Studio Bulletin</span>
+            <p class="text-xs text-zinc-300 font-medium">Walk-Ins Welcome: Please review live floor status prior to arrival.</p>
+            <p class="text-[11px] text-zinc-500 font-mono">Location: 806-E Airtex Dr, Suite 105, Houston, TX 77073</p>
         </div>
     </section>
 
-    <!-- MAIN DESKTOP CONTENT GRID: BOOKING ENGINE (CENTER) + PRODUCTS (RIGHT SIDEBAR) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- CENTER / MAIN: EMBEDDED DESKTOP BOOKING ENGINE -->
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-xl space-y-6">
-                <div class="text-center border-b border-zinc-900 pb-4">
-                    <h2 class="text-lg font-black uppercase text-[#f7e3af] tracking-wider">✨ RESERVE YOUR SPOT ✨</h2>
-                </div>
-
-                <form method="POST" action="{{ url_for('main.book_service') }}" class="space-y-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-[#f7e3af] mb-1">Select Stylist / Barber</label>
-                            <select name="stylist_name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-black font-bold">
-                                {% for person in staff %}
-                                <option value="{{ person.name }}">{{ person.name }} ({{ person.role }})</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-[#f7e3af] mb-1">Select Service</label>
-                            <select name="service_id" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-black font-bold">
-                                {% for s in services %}
-                                <option value="{{ s.id }}">{{ s.name }} — ${{ "%.2f"|format(s.price) }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-[#f7e3af] mb-1">Appointment Date</label>
-                            <input type="date" name="appointment_date" required class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-black font-bold">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase text-[#f7e3af] mb-1">Available Live Time Slots</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button type="button" class="py-2 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black">09:00 AM</button>
-                                <button type="button" class="py-2 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black">11:00 AM</button>
-                                <button type="button" class="py-2 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black">02:00 PM</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" name="name" required placeholder="Full Name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-black font-semibold">
-                        <input type="tel" name="phone" required placeholder="Phone Number" class="w-full bg-[#fffee0] border border-zinc-800 rounded-xl px-4 py-2.5 text-xs text-black font-semibold">
-                    </div>
-
-                    <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-xl shadow-lg hover:brightness-110 transition">
-                        CONFIRM APPOINTMENT ✂️
-                    </button>
-                </form>
-            </div>
+    <!-- SECTION 4, 5, 6: SERVICES, TIME SLOTS, PAYMENT & AUTH GATING -->
+    <section id="booking-section" class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 lg:p-8 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
+        <div class="text-center border-b border-zinc-900 pb-4">
+            <h2 class="text-base sm:text-lg font-black uppercase text-[#f7e3af] tracking-widest">
+                Reserve Appointment
+            </h2>
         </div>
 
-        <!-- RIGHT SIDEBAR: PRODUCTS CATALOG -->
-        <aside class="space-y-4">
-            <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl">
-                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-wider block border-b border-zinc-800 pb-2">📦 RETAIL PRODUCTS CATALOG</span>
-                <div class="space-y-3">
-                    {% for p in products %}
-                    <div class="bg-black border border-zinc-800 rounded-xl p-3 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-white">{{ p.name }}</p>
-                            <p class="text-[10px] text-zinc-500 font-mono">SKU: {{ p.sku }}</p>
-                        </div>
-                        <span class="text-xs font-black text-emerald-400 font-mono">${{ "%.2f"|format(p.price) }}</span>
-                    </div>
+        <form method="POST" action="{{ url_for('main.book_service') }}" class="space-y-6">
+            
+            <!-- 4. SERVICE SELECTION -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider">1. Select Service & Haircut Package</label>
+                <select name="service_id" id="service_id" onchange="updateEstimatedPrice()" class="w-full bg-[#fffee0] border border-[#e6c280]/40 rounded-2xl px-4 py-3 text-xs text-black font-bold focus:outline-none">
+                    {% for s in services %}
+                    <option value="{{ s.id }}" data-price="{{ s.price }}">
+                        {{ s.name }} — ${{ "%.2f"|format(s.price) }}
+                    </option>
                     {% else %}
-                    <p class="text-xs text-zinc-500 text-center py-4">No retail products listed.</p>
+                    <option value="1" data-price="35.00">Signature Haircut & Style — $35.00</option>
+                    <option value="2" data-price="45.00">Beard Trim & Hot Towel Treatment — $45.00</option>
+                    <option value="3" data-price="65.00">VIP Haircut & Beard Combination — $65.00</option>
                     {% endfor %}
+                </select>
+            </div>
+
+            <!-- 5. TIME SLOTS & DATE SELECTION -->
+            <div class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider mb-1">Appointment Date</label>
+                        <input type="date" name="appointment_date" id="appointment_date" required class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2.5 text-xs text-black font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider mb-1">Preferred Professional</label>
+                        <select name="stylist_name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2.5 text-xs text-black font-bold">
+                            {% for person in staff %}
+                            <option value="{{ person.name }}">{{ person.name }} ({{ person.role }})</option>
+                            {% else %}
+                            <option value="Ivonne Gonzalez">Ivonne Gonzalez (Master Stylist)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider mb-2">2. Available Live Time Slots</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">09:00 AM</button>
+                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">10:30 AM</button>
+                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">01:00 PM</button>
+                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">03:30 PM</button>
+                    </div>
                 </div>
             </div>
-        </aside>
 
-    </div>
+            <!-- 6. PAYMENT METHOD -->
+            <div class="space-y-3 pt-2">
+                <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider">3. Payment Preference (Settle at Salon)</label>
+                <div class="grid grid-cols-3 gap-3">
+                    <label class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
+                        <input type="radio" name="payment_method" value="zelle" checked class="hidden">
+                        <span class="text-xs font-black text-purple-900 tracking-wider">ZELLE</span>
+                        <span class="text-[9px] font-bold text-zinc-600 uppercase">Pay at Salon</span>
+                    </label>
+                    <label class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
+                        <input type="radio" name="payment_method" value="cashapp" class="hidden">
+                        <span class="text-xs font-black text-emerald-900 tracking-wider">CASH APP</span>
+                        <span class="text-[9px] font-bold text-zinc-600 font-mono">$Jackiecutz</span>
+                    </label>
+                    <label class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
+                        <input type="radio" name="payment_method" value="cash" class="hidden">
+                        <span class="text-xs font-black text-amber-950 tracking-wider">CASH</span>
+                        <span class="text-[9px] font-bold text-zinc-600 uppercase">In-Salon</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ESTIMATED TOTAL -->
+            <div class="bg-[#fffee0] rounded-2xl p-4 flex items-center justify-between border border-zinc-800">
+                <span class="text-xs font-black uppercase tracking-wider text-black">Estimated Total (Pay Upon Service)</span>
+                <span id="price-display" class="text-base font-black text-black font-mono">$35.00</span>
+            </div>
+
+            <!-- 7. SUBMIT BUTTON & SIGN-ON AUTH CHECK -->
+            <div class="pt-2">
+                {% if current_user.is_authenticated %}
+                    <button type="submit" class="w-full py-4 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition transform active:scale-95">
+                        Confirm Appointment
+                    </button>
+                {% else %}
+                    <a href="{{ url_for('main.login') }}" class="block text-center w-full py-4 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition transform active:scale-95">
+                        Sign In or Register to Complete Reservation
+                    </a>
+                {% endif %}
+            </div>
+
+        </form>
+    </section>
+
+    <!-- PRODUCTS CATALOG -->
+    <aside class="space-y-4">
+        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest block border-b border-zinc-800 pb-2">Available Products Catalog</span>
+            <div class="space-y-3">
+                {% for p in products %}
+                <div class="bg-black border border-zinc-800 rounded-xl p-3.5 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-white tracking-wide">{{ p.name }}</p>
+                        <p class="text-[10px] text-zinc-500 font-mono mt-0.5">SKU: {{ p.sku }}</p>
+                    </div>
+                    <span class="text-xs font-black text-emerald-400 font-mono">${{ "%.2f"|format(p.price) }}</span>
+                </div>
+                {% else %}
+                <p class="text-xs text-zinc-500 text-center py-4">No retail products currently listed.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </aside>
 
     <script>
     function toggleSideMenu() {
-        const sideMenu = document.getElementById('side-menu');
-        sideMenu.classList.toggle('-translate-x-full');
+        document.getElementById('side-menu').classList.toggle('-translate-x-full');
     }
+
+    function updateEstimatedPrice() {
+        const sel = document.getElementById('service_id');
+        const opt = sel.options[sel.selectedIndex];
+        const price = opt ? opt.getAttribute('data-price') : '35.00';
+        document.getElementById('price-display').textContent = `$${parseFloat(price).toFixed(2)}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('appointment_date');
+        if (dateInput && !dateInput.value) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    });
     </script>
 </body>
 </html>
