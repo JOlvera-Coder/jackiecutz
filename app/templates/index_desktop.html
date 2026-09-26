@@ -27,7 +27,7 @@
         </nav>
     </div>
 
-    <!-- HEADER WITH HAMBURGER & LOGO -->
+    <!-- HEADER WITH MENU CONTROL & LOGO -->
     <header class="flex items-center justify-between border-b border-zinc-900 pb-4">
         <button onclick="toggleSideMenu()" class="flex items-center space-x-2.5 px-4 py-2 bg-zinc-950 border border-[#e6c280]/40 rounded-xl text-[#f7e3af] hover:border-[#f7e3af] transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -126,9 +126,9 @@
         </div>
     </section>
 
-    <!-- SECTION 4, 5, 6: SERVICES, TIME SLOTS, PAYMENT & AUTH GATING -->
-    <section id="booking-section" class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 lg:p-8 shadow-[0_0_25px_rgba(230,194,128,0.15)] space-y-6">
-        <div class="text-center border-b border-zinc-900 pb-4">
+    <!-- BROKEN DOWN APPOINTMENT RESERVATION MODULES -->
+    <section id="booking-section" class="space-y-6">
+        <div class="text-center py-2">
             <h2 class="text-base sm:text-lg font-black uppercase text-[#f7e3af] tracking-widest">
                 Reserve Appointment
             </h2>
@@ -136,32 +136,31 @@
 
         <form method="POST" action="{{ url_for('main.book_service') }}" class="space-y-6">
             
-            <!-- 4. SERVICE SELECTION -->
-            <div class="space-y-2">
-                <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider">1. Select Service & Haircut Package</label>
-                <select name="service_id" id="service_id" onchange="updateEstimatedPrice()" class="w-full bg-[#fffee0] border border-[#e6c280]/40 rounded-2xl px-4 py-3 text-xs text-black font-bold focus:outline-none">
-                    {% for s in services %}
-                    <option value="{{ s.id }}" data-price="{{ s.price }}">
-                        {{ s.name }} — ${{ "%.2f"|format(s.price) }}
-                    </option>
-                    {% else %}
-                    <option value="1" data-price="35.00">Signature Haircut & Style — $35.00</option>
-                    <option value="2" data-price="45.00">Beard Trim & Hot Towel Treatment — $45.00</option>
-                    <option value="3" data-price="65.00">VIP Haircut & Beard Combination — $65.00</option>
-                    {% endfor %}
-                </select>
-            </div>
+            <!-- MODULE 1: SERVICE & PROFESSIONAL SELECTION -->
+            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_20px_rgba(230,194,128,0.1)] space-y-4">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest block border-b border-zinc-900 pb-2">
+                    1. Select Service & Professional
+                </span>
 
-            <!-- 5. TIME SLOTS & DATE SELECTION -->
-            <div class="space-y-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider mb-1">Appointment Date</label>
-                        <input type="date" name="appointment_date" id="appointment_date" required class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2.5 text-xs text-black font-bold">
+                        <label class="block text-[11px] font-bold uppercase text-zinc-400 tracking-wider mb-1.5">Haircut Service Package</label>
+                        <select name="service_id" id="service_id" onchange="updateEstimatedPrice()" class="w-full bg-[#fffee0] border border-[#e6c280]/40 rounded-2xl px-4 py-3 text-xs text-black font-bold focus:outline-none">
+                            {% for s in services %}
+                            <option value="{{ s.id }}" data-price="{{ s.price }}">
+                                {{ s.name }} — ${{ "%.2f"|format(s.price) }}
+                            </option>
+                            {% else %}
+                            <option value="1" data-price="35.00">Signature Haircut & Style — $35.00</option>
+                            <option value="2" data-price="45.00">Beard Trim & Hot Towel Treatment — $45.00</option>
+                            <option value="3" data-price="65.00">VIP Haircut & Beard Combination — $65.00</option>
+                            {% endfor %}
+                        </select>
                     </div>
+
                     <div>
-                        <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider mb-1">Preferred Professional</label>
-                        <select name="stylist_name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2.5 text-xs text-black font-bold">
+                        <label class="block text-[11px] font-bold uppercase text-zinc-400 tracking-wider mb-1.5">Preferred Professional</label>
+                        <select name="stylist_name" class="w-full bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-3 text-xs text-black font-bold focus:outline-none">
                             {% for person in staff %}
                             <option value="{{ person.name }}">{{ person.name }} ({{ person.role }})</option>
                             {% else %}
@@ -170,57 +169,75 @@
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <div>
-                    <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider mb-2">2. Available Live Time Slots</label>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">09:00 AM</button>
-                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">10:30 AM</button>
-                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">01:00 PM</button>
-                        <button type="button" class="py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">03:30 PM</button>
+            <!-- MODULE 2: DATE & TIME SLOT PICKER -->
+            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_20px_rgba(230,194,128,0.1)] space-y-4">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest block border-b border-zinc-900 pb-2">
+                    2. Choose Date & Available Time Slot
+                </span>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-zinc-400 tracking-wider mb-1.5">Appointment Date</label>
+                        <input type="date" name="appointment_date" id="appointment_date" required class="w-full sm:w-1/2 bg-[#fffee0] border border-zinc-800 rounded-2xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-zinc-400 tracking-wider mb-2">Live Availability Open Slots</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">09:00 AM</button>
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">10:30 AM</button>
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">01:00 PM</button>
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">03:30 PM</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 6. PAYMENT METHOD -->
-            <div class="space-y-3 pt-2">
-                <label class="block text-xs font-bold uppercase text-[#f7e3af] tracking-wider">3. Payment Preference (Settle at Salon)</label>
+            <!-- MODULE 3: PAYMENT METHOD CHOICE -->
+            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_20px_rgba(230,194,128,0.1)] space-y-4">
+                <span class="text-xs font-black uppercase text-[#f7e3af] tracking-widest block border-b border-zinc-900 pb-2">
+                    3. Payment Preference (Settle at Salon)
+                </span>
+
                 <div class="grid grid-cols-3 gap-3">
-                    <label class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
+                    <label class="bg-[#fffee0] p-3.5 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer hover:border-amber-500 transition">
                         <input type="radio" name="payment_method" value="zelle" checked class="hidden">
                         <span class="text-xs font-black text-purple-900 tracking-wider">ZELLE</span>
-                        <span class="text-[9px] font-bold text-zinc-600 uppercase">Pay at Salon</span>
+                        <span class="text-[9px] font-bold text-zinc-600 uppercase mt-0.5">Pay at Salon</span>
                     </label>
-                    <label class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
+                    <label class="bg-[#fffee0] p-3.5 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer hover:border-amber-500 transition">
                         <input type="radio" name="payment_method" value="cashapp" class="hidden">
                         <span class="text-xs font-black text-emerald-900 tracking-wider">CASH APP</span>
-                        <span class="text-[9px] font-bold text-zinc-600 font-mono">$Jackiecutz</span>
+                        <span class="text-[9px] font-bold text-zinc-600 font-mono mt-0.5">$Jackiecutz</span>
                     </label>
-                    <label class="bg-[#fffee0] p-3 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer">
+                    <label class="bg-[#fffee0] p-3.5 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center text-center cursor-pointer hover:border-amber-500 transition">
                         <input type="radio" name="payment_method" value="cash" class="hidden">
                         <span class="text-xs font-black text-amber-950 tracking-wider">CASH</span>
-                        <span class="text-[9px] font-bold text-zinc-600 uppercase">In-Salon</span>
+                        <span class="text-[9px] font-bold text-zinc-600 uppercase mt-0.5">In-Salon</span>
                     </label>
                 </div>
             </div>
 
-            <!-- ESTIMATED TOTAL -->
-            <div class="bg-[#fffee0] rounded-2xl p-4 flex items-center justify-between border border-zinc-800">
-                <span class="text-xs font-black uppercase tracking-wider text-black">Estimated Total (Pay Upon Service)</span>
-                <span id="price-display" class="text-base font-black text-black font-mono">$35.00</span>
-            </div>
+            <!-- MODULE 4: SUMMARY & FINAL GATEWAY SUBMIT -->
+            <div class="bg-black border border-[#e6c280]/40 rounded-3xl p-6 shadow-[0_0_20px_rgba(230,194,128,0.1)] space-y-4">
+                <div class="bg-[#fffee0] rounded-2xl p-4 flex items-center justify-between border border-zinc-800">
+                    <span class="text-xs font-black uppercase tracking-wider text-black">Estimated Total (Pay Upon Service)</span>
+                    <span id="price-display" class="text-base font-black text-black font-mono">$35.00</span>
+                </div>
 
-            <!-- 7. SUBMIT BUTTON & SIGN-ON AUTH CHECK -->
-            <div class="pt-2">
-                {% if current_user.is_authenticated %}
-                    <button type="submit" class="w-full py-4 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition transform active:scale-95">
-                        Confirm Appointment
-                    </button>
-                {% else %}
-                    <a href="{{ url_for('main.login') }}" class="block text-center w-full py-4 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition transform active:scale-95">
-                        Sign In or Register to Complete Reservation
-                    </a>
-                {% endif %}
+                <div>
+                    {% if current_user.is_authenticated %}
+                        <button type="submit" class="w-full py-4 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition transform active:scale-95">
+                            Confirm Appointment
+                        </button>
+                    {% else %}
+                        <a href="{{ url_for('main.login') }}" class="block text-center w-full py-4 px-4 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] hover:brightness-110 text-black font-black uppercase tracking-widest text-xs sm:text-sm rounded-2xl shadow-[0_0_20px_rgba(230,194,128,0.35)] transition transform active:scale-95">
+                            Sign In or Register to Complete Reservation
+                        </a>
+                    {% endif %}
+                </div>
             </div>
 
         </form>
