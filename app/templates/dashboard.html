@@ -137,29 +137,29 @@
                 <div class="h-64 mt-4"><canvas id="channelChart"></canvas></div>
             </div>
             <div class="dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-5">
-                <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af]">⚖️ REVENUE VS OVERHEAD</span>
+                <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af]">⚖️️ REVENUE VS OVERHEAD</span>
                 <div class="h-64 mt-4"><canvas id="revChart"></canvas></div>
             </div>
         </div>
     </div>
 
-<!-- TAB 2: INDEX MANAGER (CLEAN REORDERED LAYOUT) -->
+    <!-- TAB 2: INDEX MANAGER -->
     <div id="sec-indexmanager" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
         <div class="border-b border-zinc-800 pb-3">
             <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af] tracking-widest">PUBLIC INDEX PAGE PORTFOLIO & CAMPAIGN MANAGER</h2>
             <p class="dash-subtext text-xs text-zinc-400 mt-1">Manage marketing promotions, bulletins, and portfolio showcase uploads live on the main portal.</p>
         </div>
 
-        <!-- 1. CAMPAIGN AD & BULLETIN CONTROL PANEL (MOVED TO TOP) -->
+        <!-- CAMPAIGN AD & BULLETIN CONTROL PANEL -->
         <div class="dash-subbox bg-zinc-950 border border-amber-500/30 rounded-2xl p-6 space-y-5">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <h3 class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] tracking-wider flex items-center gap-2">
-                    CAMPAIGN AD & HOMEPAGE BULLETIN CONTROL
+                    📢 CAMPAIGN AD & HOMEPAGE BULLETIN CONTROL
                 </h3>
                 <span class="text-[10px] text-emerald-400 font-mono font-bold">🟢 Live Website Sync</span>
             </div>
 
-            <form method="POST" action="{{ url_for('main.add_service') }}" enctype="multipart/form-data" class="space-y-4">
+            <form method="POST" action="{{ url_for('main.update_campaign') }}" enctype="multipart/form-data" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Campaign Ad Title / Headline</label>
@@ -198,7 +198,7 @@
             </form>
         </div>
 
-        <!-- 2. PORTFOLIO SHOWCASE GALLERIES (WOMEN & MEN BELOW CAMPAIGNS) -->
+        <!-- PORTFOLIO SHOWCASE GALLERIES -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- WOMEN PORTFOLIO -->
             <div class="dash-subbox bg-zinc-950 border border-zinc-800 rounded-2xl p-5 space-y-4">
@@ -237,56 +237,6 @@
                     <button type="submit" class="dash-primary-btn w-full py-2 bg-[#f7e3af] hover:brightness-110 text-black font-extrabold text-xs rounded-xl uppercase transition">SAVE MEN'S PORTFOLIO</button>
                 </form>
             </div>
-        </div>
-
-    </div>
-
-        <!-- 2. CAMPAIGN AD & BULLETIN EDIT CONTROL PANEL -->
-        <div class="dash-subbox bg-zinc-950 border border-amber-500/30 rounded-2xl p-6 space-y-5">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h3 class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] flex items-center gap-2">
-                    📢 CAMPAIGN AD & HOMEPAGE BULLETIN CONTROL
-                </h3>
-                <span class="text-[10px] text-emerald-400 font-mono font-bold">🟢 Live Website Sync</span>
-            </div>
-
-            <form method="POST" action="{{ url_for('main.update_campaign') }}" enctype="multipart/form-data" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Campaign Ad Title / Headline</label>
-                        <input type="text" name="campaign_title" value="DIVINE SALON SUITE 105 EXPERIENCE" placeholder="e.g. DIVINE SALON SPECIAL" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
-                    </div>
-                    <div>
-                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Badge Tagline</label>
-                        <input type="text" name="campaign_badge" value="SPECIAL PROMOTION" placeholder="e.g. SPECIAL PROMOTION" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-amber-300 font-bold">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Campaign Description</label>
-                    <textarea name="campaign_desc" rows="2" placeholder="Master Styling & Barbering by Ivonne Gonzalez • Reserve your slot today." class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">Master Styling & Barbering by Ivonne Gonzalez • Reserve your slot today.</textarea>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Bulletin Announcement Line 1</label>
-                        <input type="text" name="bulletin_1" value="Walk-Ins Welcome: Check live floor status before visiting." class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
-                    </div>
-                    <div>
-                        <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Bulletin Announcement Line 2</label>
-                        <input type="text" name="bulletin_2" value="Address: 806-E Airtex Dr, Suite 105, Houston, TX 77073." class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="dash-label text-[10px] uppercase font-bold text-zinc-400 block mb-1">Custom Promo Banner Image (Optional Upload)</label>
-                    <input type="file" name="campaign_banner" accept="image/*" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-zinc-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#f7e3af] file:text-black">
-                </div>
-
-                <button type="submit" class="dash-primary-btn w-full py-2.5 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-extrabold text-xs rounded-xl shadow-md uppercase tracking-wider">
-                    UPDATE CAMPAIGN AD & BULLETIN ANNOUNCEMENTS 📢
-                </button>
-            </form>
         </div>
     </div>
 
@@ -401,7 +351,7 @@
             <button type="submit" class="dash-primary-btn w-full py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">REGISTER TEAM MEMBER & ENABLE STYLIST APP ACCESS ✂️</button>
         </form>
 
-        <!-- TEAM CARDS WITH EXPANDABLE NESTED WORK HISTORY SUB-TABS -->
+        <!-- TEAM CARDS -->
         <div class="space-y-4">
             {% if staff %}
                 {% for s in staff %}
@@ -433,7 +383,7 @@
                         </div>
                     </div>
 
-                    <!-- NESTED CLIENT HISTORY SUB-TAB -->
+                    <!-- NESTED CLIENT HISTORY -->
                     <div id="subtab-{{ s.id }}" class="hidden dash-subbox-inner bg-black/60 border border-zinc-800 rounded-xl p-3 text-xs space-y-2">
                         <span class="dash-gold-text text-[10px] font-black uppercase text-[#f7e3af]">📜 CLIENT SERVICE HISTORY AUDIT FOR {{ s.name }}</span>
                         <table class="w-full text-left text-zinc-300 dash-table">
@@ -480,7 +430,7 @@
             </div>
         </div>
 
-        <!-- NEW: TARGETED DEMOGRAPHIC EMAIL BLAST ENGINE -->
+        <!-- TARGETED DEMOGRAPHIC EMAIL BLAST ENGINE -->
         <div class="dash-subbox bg-zinc-950 border border-amber-500/30 rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <h3 class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] flex items-center gap-2">
@@ -620,7 +570,7 @@
         </div>
     </div>
 
-    <!-- TAB 5: CATALOG -->
+    <!-- TAB 5: CATALOG (CLEAN GRID, DURATION Menu & ANCHOR INTEGRATED) -->
     <div id="sec-menu" class="tab-content hidden space-y-6 dash-card bg-black border border-[#e6c280]/40 rounded-3xl p-6">
         <div class="flex items-center justify-between border-b border-zinc-800 pb-4 dash-border">
             <h2 class="dash-gold-text text-sm font-black uppercase text-[#f7e3af]">📜 SALON ENTERPRISE CATALOGS</h2>
@@ -637,17 +587,55 @@
 
         <!-- SUB-TAB 1: SERVICE CATALOG -->
         <div id="subcat-services" class="space-y-5">
-            <form method="POST" action="{{ url_for('main.add_service') }}" class="dash-subbox bg-zinc-950 p-4 rounded-2xl border border-zinc-800 grid grid-cols-1 sm:grid-cols-5 gap-3">
-                <input type="text" name="category" required placeholder="Category (e.g. Men's)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="text" name="name" required placeholder="Service Name" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="number" step="0.01" name="price_min" required placeholder="Min Price ($)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <input type="number" step="0.01" name="price_max" placeholder="Max Price (Optional)" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                <select name="required_role" class="dash-input bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-xs text-white">
-                    <option value="Barber">Barber</option>
-                    <option value="Stylist">Stylist</option>
-                    <option value="Master">Master</option>
-                </select>
-                <button type="submit" class="dash-primary-btn sm:col-span-5 py-2 bg-[#f7e3af] text-black font-extrabold text-xs rounded-xl">ADD SERVICE TO CATALOG ✂️</button>
+            <form method="POST" action="{{ url_for('main.add_service') }}" class="dash-subbox bg-zinc-950 p-5 rounded-2xl border border-zinc-800 space-y-4">
+                <span class="dash-gold-text text-xs font-black uppercase text-[#f7e3af] block border-b border-zinc-800 pb-2">Add New Service to Catalog</span>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold block mb-1">Category</label>
+                        <input type="text" name="category" required placeholder="e.g. Haircuts" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                    </div>
+
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold block mb-1">Service Name</label>
+                        <input type="text" name="name" required placeholder="Service Title" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                    </div>
+
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold block mb-1">Min Price ($)</label>
+                        <input type="number" step="0.01" name="price_min" required placeholder="35.00" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                    </div>
+
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold block mb-1">Max Price ($)</label>
+                        <input type="number" step="0.01" name="price_max" placeholder="Optional" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                    </div>
+
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold block mb-1">Duration (Mins)</label>
+                        <select name="duration" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-amber-300 font-bold">
+                            <option value="15">15 Min</option>
+                            <option value="30" selected>30 Min</option>
+                            <option value="45">45 Min</option>
+                            <option value="60">60 Min (1 Hr)</option>
+                            <option value="90">90 Min (1.5 Hr)</option>
+                            <option value="120">120 Min (2 Hr)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="dash-label text-[10px] uppercase font-bold block mb-1">Required Role</label>
+                        <select name="required_role" class="dash-input w-full bg-zinc-900 border border-zinc-700 rounded-xl p-2.5 text-xs text-white">
+                            <option value="Master Stylist">Master Stylist</option>
+                            <option value="Stylist">Stylist</option>
+                            <option value="Barber">Barber</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="dash-primary-btn w-full py-2.5 bg-gradient-to-r from-[#e6c280] via-[#f7e3af] to-[#caa055] text-black font-extrabold text-xs rounded-xl shadow-md uppercase tracking-wider">
+                    ADD SERVICE TO CATALOG ✂️
+                </button>
             </form>
 
             <div class="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950 dash-subbox">
@@ -658,6 +646,7 @@
                             <th class="p-3.5">Service Name</th>
                             <th class="p-3.5">Min Price ($)</th>
                             <th class="p-3.5">Max Price ($)</th>
+                            <th class="p-3.5">Duration</th>
                             <th class="p-3.5">Required Role</th>
                             <th class="p-3.5 text-center">Action Controls</th>
                         </tr>
@@ -678,10 +667,13 @@
                                 <input type="number" step="0.01" id="svc-pmax-{{ svc.id }}" form="edit-svc-{{ svc.id }}" name="price_max" value="{{ '%.2f'|format(svc.price_max) if svc.price_max else '' }}" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs font-mono text-emerald-400 font-bold w-24 transition">
                             </td>
                             <td class="p-3.5">
+                                <span class="font-mono text-amber-300 font-bold">{{ svc.duration or 30 }} min</span>
+                            </td>
+                            <td class="p-3.5">
                                 <select id="svc-role-{{ svc.id }}" form="edit-svc-{{ svc.id }}" name="required_role" disabled class="dash-input-row bg-zinc-900/40 disabled:bg-transparent border border-zinc-700/60 disabled:border-transparent rounded-lg px-2.5 py-1 text-xs text-zinc-300 transition">
                                     <option value="Barber" {% if svc.required_role == 'Barber' %}selected{% endif %}>Barber</option>
                                     <option value="Stylist" {% if svc.required_role == 'Stylist' %}selected{% endif %}>Stylist</option>
-                                    <option value="Master" {% if svc.required_role == 'Master' %}selected{% endif %}>Master</option>
+                                    <option value="Master Stylist" {% if svc.required_role == 'Master Stylist' or svc.required_role == 'Master' %}selected{% endif %}>Master Stylist</option>
                                 </select>
                             </td>
                             <td class="p-3.5">
@@ -697,6 +689,8 @@
                                 </div>
                             </td>
                         </tr>
+                        {% else %}
+                        <tr><td colspan="7" class="p-4 text-center text-zinc-500 dash-subtext">No services listed in catalog. Use form above to add entries.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -954,6 +948,12 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // AUTOMATICALLY SWITCH TO CATALOG TAB IF #menu ANCHOR IS IN URL
+        if (window.location.hash) {
+            const hashTab = window.location.hash.replace('#', '');
+            switchDashboardTab(hashTab);
+        }
+
         if (localStorage.getItem('dashboard_theme') === 'light') {
             document.documentElement.classList.add('light-theme');
         }

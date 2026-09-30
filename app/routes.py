@@ -464,6 +464,10 @@ def delete_client(client_id):
     return redirect(url_for('main.stylist_dashboard'))
 
 
+# ==========================================
+# SAFE SERVICE CATALOG ROUTES (PRESERVE TAB & EXISTING DATA)
+# ==========================================
+
 @main_bp.route('/add_service', methods=['POST'])
 def add_service():
     name = request.form.get('name', '').strip()
@@ -501,19 +505,91 @@ def add_service():
         print(f"Error adding service: {err}")
         flash('Failed to add service. Please verify form values.', 'danger')
 
-    return redirect(url_for('main.stylist_dashboard'))
+    # Redirect directly back to the Catalog tab anchor (#menu)
+    return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
 
 
 @main_bp.route('/edit_service', methods=['POST'])
 def edit_service():
-    flash('Service catalog updated.', 'success')
-    return redirect(url_for('main.stylist_dashboard'))
+    service_id = request.form.get('service_id')
+    try:
+        from app.models import Service
+        svc = Service.query.get(service_id)
+        if svc:
+            if request.form.get('name'): svc.name = request.form.get('name').strip()
+            if request.form.get('category'): svc.category = request.form.get('category').strip()
+            if request.form.get('price_min'): svc.price_min = float(request.form.get('price_min'))
+            if request.form.get('price_max'): 
+                pmax = request.form.get('price_max').strip()
+                svc.price_max = float(pmax) if pmax else None
+            if request.form.get('duration'): svc.duration = int(request.form.get('duration'))
+            if request.form.get('required_role'): svc.required_role = request.form.get('required_role')
+            
+            db.session.commit()
+            flash('Service catalog updated successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating service: {e}")
+        flash('Failed to update service.', 'danger')
+
+    return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
 
 
 @main_bp.route('/delete_service/<int:service_id>', methods=['POST'])
 def delete_service(service_id):
-    flash('Service removed from catalog.', 'info')
-    return redirect(url_for('main.stylist_dashboard'))
+    try:
+        from app.models import Service
+        svc = Service.query.get(service_id)
+        if svc:
+            db.session.delete(svc)
+            db.session.commit()
+            flash('Service removed from catalog.', 'info')
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting service: {e}")
+
+    return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
+
+
+@main_bp.route('/seed_services')
+def seed_services():
+    try:
+        from app.models import Service
+        
+        ivonne_menu = [
+            {"name": "Signature Haircut & Style", "category": "Haircuts", "price_min": 35.00, "duration": 45, "required_role": "Master Stylist"},
+            {"name": "Beard Trim & Hot Towel Treatment", "category": "Barbering", "price_min": 25.00, "duration": 30, "required_role": "Barber"},
+            {"name": "VIP Haircut & Beard Combination", "category": "Combos", "price_min": 55.00, "duration": 60, "required_role": "Master Stylist"},
+            {"name": "Women's Trim & Blowout", "category": "Styling", "price_min": 45.00, "duration": 45, "required_role": "Master Stylist"},
+            {"name": "Full Color & Highlights", "category": "Color", "price_min": 85.00, "duration": 120, "required_role": "Master Stylist"},
+            {"name": "Kids Cut (12 & Under)", "category": "Haircuts", "price_min": 25.00, "duration": 30, "required_role": "Stylist"}
+        ]
+        
+        added_count = 0
+        for item in ivonne_menu:
+            # Check if service already exists so we NEVER delete existing items
+            existing = Service.query.filter_by(name=item["name"]).first()
+            if not existing:
+                new_svc = Service(
+                    name=item["name"],
+                    category=item["category"],
+                    price_min=item["price_min"],
+                    duration=item["duration"],
+                    required_role=item["required_role"]
+                )
+                db.session.add(new_svc)
+                added_count += 1
+
+        db.session.commit()
+        if added_count > 0:
+            flash(f"Added {added_count} new service(s) to Ivonne's catalog!", "success")
+        else:
+            flash("All catalog services are already up to date.", "info")
+
+        return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
+    except Exception as e:
+        db.session.rollback()
+        return f"Database Seed Error: {e}"
 
 # ==========================================
 # 6. PRODUCTS, EXPENSES & REPORTS
