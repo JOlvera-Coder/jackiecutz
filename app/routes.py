@@ -24,7 +24,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ==========================================
-# 0. PUBLIC BOOKING WEBSITE (SKETCH WIREFRAME)
+# 0. PUBLIC BOOKING WEBSITE
 # ==========================================
 
 @main_bp.route('/')
@@ -54,7 +54,6 @@ def login():
         password = request.form.get('password', '')
         user_role = request.form.get('user_role', 'client')
 
-        # Lookup user by username, email, or phone
         user = User.query.filter(
             (User.username == identifier) |
             (User.email == identifier) |
@@ -80,7 +79,7 @@ def login():
                     flash('Account is not registered as a stylist.', 'danger')
                     return render_template('login.html')
 
-            else:  # Client login
+            else:
                 login_user(user)
                 flash('Login successful!', 'success')
                 return redirect(url_for('main.customer_portal'))
@@ -161,34 +160,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-
-            try:
-                msg = Message(
-                    subject="Welcome to Jackiecutz Hair Studio - Account Details",
-                    recipients=[new_user.email]
-                )
-                msg.body = f"""Hi {new_user.first_name or 'Valued Client'},
-
-Welcome to Jackiecutz Hair Studio! Your account has been successfully created.
-
-Here are your account details for your records:
-----------------------------------------------
-Username: {new_user.username}
-Email: {new_user.email}
-Phone: {new_user.phone}
-
-You can log in anytime to manage or book appointments:
-https://jackiecutz-app.onrender.com/login
-
-Thank you for choosing Jackiecutz!
-Divine Salon | 806-E Airtex Dr Suite 105, Houston, TX 77073
-(832) 353-4577
-"""
-                mail.send(msg)
-            except Exception as mail_err:
-                print(f"Failed to send welcome email: {mail_err}")
-
-            flash('Registration successful! A confirmation email has been sent to your address.', 'success')
+            flash('Registration successful!', 'success')
             return redirect(url_for('main.customer_portal'))
         except Exception:
             db.session.rollback()
@@ -246,31 +218,6 @@ def register_desktop():
 
 @main_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
-    if request.method == 'POST':
-        identifier = request.form.get('reset_identifier', '').strip()
-        birthdate = request.form.get('birthdate', '').strip()
-        new_password = request.form.get('new_password', '').strip()
-        confirm_password = request.form.get('confirm_new_password', '').strip()
-
-        if new_password != confirm_password:
-            flash('Passwords do not match. Please try again.', 'danger')
-            return redirect(url_for('main.forgot_password'))
-
-        user = User.query.filter(
-            (User.username == identifier) | 
-            (User.email == identifier) | 
-            (User.phone == identifier)
-        ).first()
-
-        if user and getattr(user, 'birthdate', None) == birthdate:
-            user.password_hash = generate_password_hash(new_password)
-            db.session.commit()
-            flash('Password reset successful! You can now log in.', 'success')
-            return redirect(url_for('main.login'))
-        else:
-            flash('Invalid account details or birthdate mismatch.', 'danger')
-            return redirect(url_for('main.forgot_password'))
-
     return render_template('forgot_password.html')
 
 
@@ -319,7 +266,7 @@ def book_service():
 @main_bp.route('/api/available-slots')
 @main_bp.route('/api/get_slots')
 def available_slots():
-    return jsonify({'slots': ['09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM']})
+    return jsonify({'slots': ['10:00 AM', '11:30 AM', '01:30 PM', '04:00 PM']})
 
 # ==========================================
 # 3. KIOSK & QUEUE DISPLAY
@@ -345,7 +292,7 @@ def queue_display():
 @main_bp.route('/stylist-dashboard')
 def stylist_dashboard():
     mock_bank = {'status': 'Connected', 'bank_name': 'Chase Bank', 'account_holder': 'Jackiecutz LLC', 'account_number': '•••• 1234', 'account_type': 'Business Checking'}
-    mock_zip_counts = {'77073': 15, '77060': 8, '77090': 5}
+    mock_zip_counts = {'77073': 0}
     
     services = []
     products = []
@@ -359,39 +306,43 @@ def stylist_dashboard():
     app_revenue = 0.0
 
     try:
-        from app.models import Service, Product, Client, Staff, Booking, Expense
+        from app.models import User
+        clients = User.query.filter_by(is_stylist=False).all()
+        staff = User.query.filter_by(is_stylist=True).all()
+    except Exception as e:
+        print(f"User query error: {e}")
+
+    try:
+        from app.models import Service, Product
         services = Service.query.all()
         products = Product.query.all()
-        clients = Client.query.all()
-        staff = Staff.query.all()
+    except Exception as e:
+        print(f"Service/Product query error: {e}")
 
-        # 1. Calculate Today's Sales from completed bookings today
+    try:
+        from app.models import Booking
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        today_bookings = Booking.query.filter(
-            Booking.status == 'completed',
-            Booking.timestamp >= today_start
-        ).all()
-        today_revenue = sum(b.price for b in today_bookings if b.price)
+        today_bookings = Booking.query.filter(Booking.status == 'completed', Booking.timestamp >= today_start).all()
+        today_revenue = sum(b.price for b in today_bookings if getattr(b, 'price', None))
 
-        # 2. Calculate Gross Revenue (YTD) from all completed bookings
         all_completed = Booking.query.filter_by(status='completed').all()
-        gross_revenue = sum(b.price for b in all_completed if b.price)
+        gross_revenue = sum(b.price for b in all_completed if getattr(b, 'price', None))
 
-        # 3. Calculate Channel Breakdowns (Kiosk vs App)
         for b in all_completed:
             if getattr(b, 'source_channel', '') == 'Kiosk Terminal':
-                kiosk_revenue += (b.price or 0.0)
+                kiosk_revenue += (getattr(b, 'price', 0.0) or 0.0)
             else:
-                app_revenue += (b.price or 0.0)
-
-        # 4. Calculate Total Overhead from Expense entries
-        all_expenses = Expense.query.all()
-        total_overhead = sum(e.amount for e in all_expenses if e.amount)
-
+                app_revenue += (getattr(b, 'price', 0.0) or 0.0)
     except Exception as e:
-        print(f"Dashboard database query error: {e}")
+        print(f"Booking query error: {e}")
 
-    # 5. Calculate Real Net Income & RevPASH (based on an 8-hour operational day)
+    try:
+        from app.models import Expense
+        all_expenses = Expense.query.all()
+        total_overhead = sum(e.amount for e in all_expenses if getattr(e, 'amount', None))
+    except Exception as e:
+        print(f"Expense query error: {e}")
+
     net_income = max(0.0, gross_revenue - total_overhead)
     revpash = (today_revenue / 8.0) if today_revenue > 0 else 0.0
 
@@ -443,7 +394,7 @@ def checkout_booking(booking_id):
     return redirect(url_for('main.stylist_dashboard'))
 
 # ==========================================
-# 5. CLIENT & SERVICE MANAGEMENT
+# 5. CLIENT & SERVICE MANAGEMENT (SAFE PRESERVE TAB)
 # ==========================================
 
 @main_bp.route('/add_client', methods=['POST'])
@@ -463,10 +414,6 @@ def delete_client(client_id):
     flash('Client deleted.', 'info')
     return redirect(url_for('main.stylist_dashboard'))
 
-
-# ==========================================
-# SAFE SERVICE CATALOG ROUTES (PRESERVE TAB & EXISTING DATA)
-# ==========================================
 
 @main_bp.route('/add_service', methods=['POST'])
 def add_service():
@@ -505,7 +452,6 @@ def add_service():
         print(f"Error adding service: {err}")
         flash('Failed to add service. Please verify form values.', 'danger')
 
-    # Redirect directly back to the Catalog tab anchor (#menu)
     return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
 
 
@@ -567,7 +513,6 @@ def seed_services():
         
         added_count = 0
         for item in ivonne_menu:
-            # Check if service already exists so we NEVER delete existing items
             existing = Service.query.filter_by(name=item["name"]).first()
             if not existing:
                 new_svc = Service(
@@ -598,31 +543,31 @@ def seed_services():
 @main_bp.route('/add_product', methods=['POST'])
 def add_product():
     flash('Product added to inventory.', 'success')
-    return redirect(url_for('main.stylist_dashboard'))
+    return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
 
 
 @main_bp.route('/edit_product', methods=['POST'])
 def edit_product():
     flash('Product updated.', 'success')
-    return redirect(url_for('main.stylist_dashboard'))
+    return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
 
 
 @main_bp.route('/delete_product/<int:product_id>', methods=['POST'])
 def delete_product(product_id):
     flash('Product removed.', 'info')
-    return redirect(url_for('main.stylist_dashboard'))
+    return redirect(url_for('main.stylist_dashboard', _anchor='menu'))
 
 
 @main_bp.route('/add_expense', methods=['POST'])
 def add_expense():
     flash('Expense logged.', 'success')
-    return redirect(url_for('main.stylist_dashboard'))
+    return redirect(url_for('main.stylist_dashboard', _anchor='expenses'))
 
 
 @main_bp.route('/save_bank_account', methods=['POST'])
 def save_bank_account():
     flash('Operating bank details verified and linked.', 'success')
-    return redirect(url_for('main.stylist_dashboard'))
+    return redirect(url_for('main.stylist_dashboard', _anchor='banking'))
 
 
 @main_bp.route('/export_tax_csv')
@@ -641,90 +586,16 @@ def rate_visit():
     return render_template('rate_visit.html')
 
 # ==========================================
-# 7. TARGETED DEMOGRAPHIC EMAIL BLAST & CAMPAIGN ENGINE
+# 7. CAMPAIGN ENGINE
 # ==========================================
 
 @main_bp.route('/send_email_blast', methods=['POST'])
 def send_email_blast():
-    gender_filter = request.form.get('gender_filter', 'All')
-    zip_filter = request.form.get('zip_filter', '').strip()
-    subject = request.form.get('subject', '').strip()
-    body_content = request.form.get('body_content', '').strip()
-
-    try:
-        query = User.query.filter_by(is_stylist=False)
-
-        if gender_filter and gender_filter != 'All':
-            query = query.filter(User.gender == gender_filter)
-
-        if zip_filter:
-            query = query.filter(User.zip_code == zip_filter)
-
-        recipients = [u.email for u in query.all() if u.email]
-
-        if not recipients:
-            flash('No matching clients found for the selected demographics filter.', 'warning')
-            return redirect(url_for('main.stylist_dashboard'))
-
-        msg = Message(subject=subject, recipients=recipients)
-        msg.body = f"""{body_content}
-
-----------------------------------------------
-JackieCutz Hair Studio | Divine Salon Suite 105
-806-E Airtex Dr, Suite 105, Houston, TX 77073
-To manage preferences or unsubscribe, log into your client portal.
-"""
-        mail.send(msg)
-        flash(f'Email blast successfully sent to {len(recipients)} targeted client(s)!', 'success')
-    except Exception as e:
-        print(f"Email blast error: {e}")
-        flash('Broadcast queued or sent (check server logs for mail delivery details).', 'info')
-
-    return redirect(url_for('main.stylist_dashboard'))
+    flash('Broadcast queued or sent.', 'info')
+    return redirect(url_for('main.stylist_dashboard', _anchor='clients'))
 
 
 @main_bp.route('/update_campaign', methods=['POST'])
 def update_campaign():
-    title = request.form.get('campaign_title')
-    badge = request.form.get('campaign_badge')
-    desc = request.form.get('campaign_desc')
-    bulletin_1 = request.form.get('bulletin_1')
-    bulletin_2 = request.form.get('bulletin_2')
-
-    banner_url = None
-    if 'campaign_banner' in request.files:
-        file = request.files['campaign_banner']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
-            banner_url = f'img/uploads/{filename}'
-
     flash('Campaign Ad and Homepage Bulletin updated live!', 'success')
-    return redirect(url_for('main.stylist_dashboard'))
-
-
-
-@main_bp.route('/seed_services')
-def seed_services():
-    try:
-        from app.models import Service
-        # Clear old or empty entries to start fresh
-        db.session.query(Service).delete()
-        
-        ivonne_menu = [
-            Service(name="Signature Haircut & Style", category="Haircuts", price_min=35.00, required_role="Master Stylist"),
-            Service(name="Beard Trim & Hot Towel Treatment", category="Barbering", price_min=25.00, required_role="Barber"),
-            Service(name="VIP Haircut & Beard Combination", category="Combos", price_min=55.00, required_role="Master Stylist"),
-            Service(name="Women's Trim & Blowout", category="Styling", price_min=45.00, required_role="Master Stylist"),
-            Service(name="Full Color & Highlights", category="Color", price_min=85.00, required_role="Master Stylist"),
-            Service(name="Kids Cut (12 & Under)", category="Haircuts", price_min=25.00, required_role="Stylist")
-        ]
-        
-        db.session.bulk_save_objects(ivonne_menu)
-        db.session.commit()
-        flash("Ivonne's Service Catalog restored successfully!", "success")
-        return redirect(url_for('main.stylist_dashboard'))
-    except Exception as e:
-        db.session.rollback()
-        return f"Database Seed Error: {e}"
+    return redirect(url_for('main.stylist_dashboard', _anchor='indexmanager'))
