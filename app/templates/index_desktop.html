@@ -147,13 +147,11 @@
                         <label class="block text-[11px] font-bold uppercase text-zinc-400 tracking-wider mb-1.5">Haircut Service Package</label>
                         <select name="service_id" id="service_id" onchange="updateEstimatedPrice()" class="w-full bg-[#fffee0] border border-[#e6c280]/40 rounded-2xl px-4 py-3 text-xs text-black font-bold focus:outline-none">
                             {% for s in services %}
-                            <option value="{{ s.id }}" data-price="{{ s.price }}">
-                                {{ s.name }} — ${{ "%.2f"|format(s.price) }}
+                            <option value="{{ s.id }}" data-price="{{ s.price_min or s.price or 35.00 }}">
+                                {{ s.name }} — ${{ "%.2f"|format(s.price_min or s.price or 0.0) }}
                             </option>
                             {% else %}
-                            <option value="1" data-price="35.00">Signature Haircut & Style — $35.00</option>
-                            <option value="2" data-price="45.00">Beard Trim & Hot Towel Treatment — $45.00</option>
-                            <option value="3" data-price="65.00">VIP Haircut & Beard Combination — $65.00</option>
+                            <option value="">No services available (Add from Dashboard)</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -186,10 +184,10 @@
                     <div>
                         <label class="block text-[11px] font-bold uppercase text-zinc-400 tracking-wider mb-2">Live Availability Open Slots</label>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">09:00 AM</button>
-                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">10:30 AM</button>
-                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">01:00 PM</button>
-                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">03:30 PM</button>
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">10:00 AM</button>
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">11:30 AM</button>
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">01:30 PM</button>
+                            <button type="button" class="py-2.5 bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-300 rounded-xl hover:bg-[#f7e3af] hover:text-black transition">04:00 PM</button>
                         </div>
                     </div>
                 </div>

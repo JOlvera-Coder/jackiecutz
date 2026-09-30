@@ -585,3 +585,29 @@ def update_campaign():
 
     flash('Campaign Ad and Homepage Bulletin updated live!', 'success')
     return redirect(url_for('main.stylist_dashboard'))
+
+
+
+@main_bp.route('/seed_services')
+def seed_services():
+    try:
+        from app.models import Service
+        # Clear old or empty entries to start fresh
+        db.session.query(Service).delete()
+        
+        ivonne_menu = [
+            Service(name="Signature Haircut & Style", category="Haircuts", price_min=35.00, required_role="Master Stylist"),
+            Service(name="Beard Trim & Hot Towel Treatment", category="Barbering", price_min=25.00, required_role="Barber"),
+            Service(name="VIP Haircut & Beard Combination", category="Combos", price_min=55.00, required_role="Master Stylist"),
+            Service(name="Women's Trim & Blowout", category="Styling", price_min=45.00, required_role="Master Stylist"),
+            Service(name="Full Color & Highlights", category="Color", price_min=85.00, required_role="Master Stylist"),
+            Service(name="Kids Cut (12 & Under)", category="Haircuts", price_min=25.00, required_role="Stylist")
+        ]
+        
+        db.session.bulk_save_objects(ivonne_menu)
+        db.session.commit()
+        flash("Ivonne's Service Catalog restored successfully!", "success")
+        return redirect(url_for('main.stylist_dashboard'))
+    except Exception as e:
+        db.session.rollback()
+        return f"Database Seed Error: {e}"
