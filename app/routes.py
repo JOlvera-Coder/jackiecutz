@@ -90,6 +90,28 @@ def login():
     return render_template('login.html')
 
 
+@main_bp.route('/login_desktop', methods=['GET', 'POST'])
+def login_desktop():
+    if request.method == 'POST':
+        identifier = request.form.get('login_identifier', '').strip()
+        password = request.form.get('password', '')
+
+        user = User.query.filter(
+            (User.username == identifier) |
+            (User.email == identifier) |
+            (User.phone == identifier)
+        ).first()
+
+        if user and user.password_hash and check_password_hash(user.password_hash, password):
+            login_user(user)
+            flash('Login successful! Welcome back.', 'success')
+            return redirect(url_for('main.index', _anchor='booking-section'))
+        else:
+            flash('Invalid credentials. Please try again.', 'danger')
+
+    return render_template('login_desktop.html')
+
+
 @main_bp.route('/logout')
 def logout():
     logout_user()
@@ -174,6 +196,52 @@ Divine Salon | 806-E Airtex Dr Suite 105, Houston, TX 77073
             return render_template('register.html')
 
     return render_template('register.html')
+
+
+@main_bp.route('/register_desktop', methods=['GET', 'POST'])
+def register_desktop():
+    if request.method == 'POST':
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        username = request.form.get('username', '').strip()
+        phone = request.form.get('phone', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password')
+        zip_code = request.form.get('zip_code', '').strip()
+
+        existing_user = User.query.filter(
+            (User.email == email) | 
+            (User.phone == phone) | 
+            (User.username == username)
+        ).first()
+
+        if existing_user:
+            flash('An account with this email, phone, or username already exists.', 'warning')
+            return redirect(url_for('main.login_desktop'))
+
+        new_user = User(
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+            name=f"{first_name} {last_name}".strip(),
+            phone=phone,
+            email=email,
+            zip_code=zip_code,
+            password_hash=generate_password_hash(password),
+            is_stylist=False
+        )
+
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            flash('Registration successful! Returning to your booking.', 'success')
+            return redirect(url_for('main.index', _anchor='booking-section'))
+        except Exception:
+            db.session.rollback()
+            flash('Registration error occurred. Please try again.', 'danger')
+
+    return render_template('register_desktop.html')
 
 
 @main_bp.route('/forgot_password', methods=['GET', 'POST'])
