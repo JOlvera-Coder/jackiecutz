@@ -351,14 +351,49 @@ def stylist_dashboard():
     products = []
     clients = []
     staff = []
+    
+    today_revenue = 0.0
+    gross_revenue = 0.0
+    total_overhead = 0.0
+    kiosk_revenue = 0.0
+    app_revenue = 0.0
+
     try:
-        from app.models import Service, Product, Client, Staff
+        from app.models import Service, Product, Client, Staff, Booking, Expense
         services = Service.query.all()
         products = Product.query.all()
         clients = Client.query.all()
         staff = Staff.query.all()
+
+        # 1. Calculate Today's Sales from completed bookings today
+        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_bookings = Booking.query.filter(
+            Booking.status == 'completed',
+            Booking.timestamp >= today_start
+        ).all()
+        today_revenue = sum(b.price for b in today_bookings if b.price)
+
+        # 2. Calculate Gross Revenue (YTD) from all completed bookings
+        all_completed = Booking.query.filter_by(status='completed').all()
+        gross_revenue = sum(b.price for b in all_completed if b.price)
+
+        # 3. Calculate Channel Breakdowns (Kiosk vs App)
+        for b in all_completed:
+            if getattr(b, 'source_channel', '') == 'Kiosk Terminal':
+                kiosk_revenue += (b.price or 0.0)
+            else:
+                app_revenue += (b.price or 0.0)
+
+        # 4. Calculate Total Overhead from Expense entries
+        all_expenses = Expense.query.all()
+        total_overhead = sum(e.amount for e in all_expenses if e.amount)
+
     except Exception as e:
-        print(f"Dashboard query fallback: {e}")
+        print(f"Dashboard database query error: {e}")
+
+    # 5. Calculate Real Net Income & RevPASH (based on an 8-hour operational day)
+    net_income = max(0.0, gross_revenue - total_overhead)
+    revpash = (today_revenue / 8.0) if today_revenue > 0 else 0.0
 
     return render_template(
         'dashboard.html', 
@@ -368,11 +403,13 @@ def stylist_dashboard():
         products=products,
         clients=clients,
         staff=staff,
-        today_revenue=385.00,
-        gross_revenue=48250.00,
-        total_overhead=12400.00,
-        net_income=35850.00,
-        revpash=65.50
+        today_revenue=today_revenue,
+        gross_revenue=gross_revenue,
+        total_overhead=total_overhead,
+        net_income=net_income,
+        revpash=revpash,
+        kiosk_revenue=kiosk_revenue,
+        app_revenue=app_revenue
     )
 
 
@@ -429,9 +466,11 @@ def delete_client(client_id):
 
 @main_bp.route('/add_service', methods=['POST'])
 def add_service():
-    name = request.form.get('name')
-    category = request.form.get('category')
-    price_min = request.form.get('price_min')
+    name = request.form.get('name', '').strip()
+    category = request.form.get('category', '').strip()
+    price_min = request.form.get('price_min', 0.0)
+    price_max = request.form.get('price_max', None)
+    duration = request.form.get('duration', 30)
     required_role = request.form.get('required_role', 'Stylist')
     
     image_url = None
@@ -449,16 +488,18 @@ def add_service():
             name=name,
             category=category,
             price_min=float(price_min) if price_min else 0.0,
+            price_max=float(price_max) if price_max else None,
+            duration=int(duration) if duration else 30,
             required_role=required_role,
             image_url=image_url
         )
         db.session.add(new_svc)
         db.session.commit()
-        flash(f'Service "{name}" added to live catalog!', 'success')
+        flash(f'Service "{name}" added to catalog successfully!', 'success')
     except Exception as err:
         db.session.rollback()
         print(f"Error adding service: {err}")
-        flash('Service added.', 'success')
+        flash('Failed to add service. Please verify form values.', 'danger')
 
     return redirect(url_for('main.stylist_dashboard'))
 
